@@ -2,7 +2,7 @@
 
 ## Statut de la conception
 
-Proposée pour revue humaine avant le plan d’implémentation et le code.
+Approuvée pour le plan d’implémentation et le code le 2026-09-02.
 
 ## Objectif
 
