@@ -4,6 +4,7 @@ node_modules/
 # Builds
 .next/
 *.tsbuildinfo
+apps/web/next-env.d.ts
 dist/
 build/
 coverage/

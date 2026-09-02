@@ -190,7 +190,8 @@ Ajouter la connectivité de test minimale sans introduire prématurément le mod
 
 ### Restants
 
-- Aucun écran fonctionnel ; le shell technique et les états de base restent à créer.
+- Les écrans fonctionnels et les états de base restent à créer ; le shell
+  technique est en place.
 
 ## Tests
 
@@ -213,6 +214,7 @@ Ajouter la connectivité de test minimale sans introduire prématurément le mod
 | `CI=true pnpm --filter @jdr-hub/web test` | Réussi : 1 test dans 1 fichier | 2026-09-02 |
 | `CI=true pnpm --filter @jdr-hub/web typecheck` | Réussi | 2026-09-02 |
 | `CI=true pnpm --filter @jdr-hub/web build` | Réussi ; route statique `/` générée | 2026-09-02 |
+| `CI=true pnpm build` | Réussi ; builds API et web exécutés via les workspaces | 2026-09-02 |
 | `CI=true pnpm exec vitest run tests/architecture/workspace.test.ts tests/architecture/database-boundary.test.ts --exclude '.superpowers/**'` | Réussi : 5 tests dans 2 fichiers | 2026-09-02 |
 | `CI=true pnpm typecheck` | Réussi | 2026-09-02 |
 | `git diff --check` | Réussi | 2026-09-02 |

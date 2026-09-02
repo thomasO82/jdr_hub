@@ -8,7 +8,13 @@ const web = resolve(dirname(fileURLToPath(import.meta.url)), '../../apps/web')
 describe('web shell', () => {
   it('has a server page and the official logo asset', () => {
     const page = readFileSync(resolve(web, 'app/page.tsx'), 'utf8')
-    expect(existsSync(resolve(web, 'public/branding/logo.svg'))).toBe(true)
+    const logo = resolve(web, 'public/branding/logo.svg')
+
+    expect(existsSync(logo)).toBe(true)
+    expect(page).toContain('/branding/logo.svg')
+    expect(readFileSync(logo)).toEqual(
+      readFileSync(resolve(web, '../../docs/branding/logo.svg')),
+    )
     expect(page).toContain('<main')
     expect(page).not.toContain('dangerouslySetInnerHTML')
   })
