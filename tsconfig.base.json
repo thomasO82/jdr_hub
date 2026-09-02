@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@jdr-hub/shared": ["packages/shared/src/index.ts"],
+      "@jdr-hub/database": ["packages/database/src/index.ts"]
+    }
+  },
+  "include": ["tests/**/*.ts"]
+}

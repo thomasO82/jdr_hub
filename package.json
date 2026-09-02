@@ -1,0 +1,18 @@
+{
+  "name": "jdr-hub",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.25.0",
+  "scripts": {
+    "lint": "tsc -p tsconfig.base.json",
+    "typecheck": "tsc -p tsconfig.base.json",
+    "test": "vitest run",
+    "build": "tsc -p tsconfig.base.json",
+    "audit": "pnpm audit"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^3.0.0"
+  }
+}
