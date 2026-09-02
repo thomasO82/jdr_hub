@@ -1,9 +1,27 @@
-import { existsSync, readFileSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../..')
+
+const dependencySections = [
+  'dependencies',
+  'devDependencies',
+  'optionalDependencies',
+  'peerDependencies',
+] as const
+
+function workspacePackageManifests(): string[] {
+  return [
+    resolve(root, 'package.json'),
+    ...['apps', 'packages'].flatMap((workspace) =>
+      readdirSync(resolve(root, workspace), { withFileTypes: true })
+        .filter((entry) => entry.isDirectory())
+        .map((entry) => resolve(root, workspace, entry.name, 'package.json')),
+    ),
+  ].filter((manifest) => existsSync(manifest))
+}
 
 describe('workspace boundaries', () => {
   it('declares the application and package workspaces', () => {
@@ -14,5 +32,23 @@ describe('workspace boundaries', () => {
     expect(existsSync(resolve(root, 'apps/api'))).toBe(true)
     expect(existsSync(resolve(root, 'packages/shared'))).toBe(true)
     expect(existsSync(resolve(root, 'packages/database'))).toBe(true)
+  })
+
+  it('does not declare dependencies through local path specifiers', () => {
+    for (const manifest of workspacePackageManifests()) {
+      const packageJson = JSON.parse(readFileSync(manifest, 'utf8')) as Record<
+        string,
+        unknown
+      >
+
+      for (const section of dependencySections) {
+        const dependencies = packageJson[section]
+        if (!dependencies || typeof dependencies !== 'object') continue
+
+        for (const version of Object.values(dependencies)) {
+          expect(version).not.toMatch(/^(file|link|workspace):/)
+        }
+      }
+    }
   })
 })
