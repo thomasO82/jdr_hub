@@ -51,7 +51,7 @@ la séparation du code navigateur et du code de base de données.
 
 ### Restant à faire
 
-Créer les applications, les conteneurs, le routage local et la CI.
+Créer les conteneurs, le routage local et la CI.
 
 ## Besoin utilisateur
 
@@ -61,12 +61,12 @@ Fournir une base technique installable, testable et reproductible pour développ
 
 ### Réalisé
 
-Le socle de packages et les contrôles de frontières sont disponibles pour les
-développements suivants ; aucun comportement utilisateur n’est encore exposé.
+Le socle de packages, l’API technique et le shell web sont disponibles pour
+les développements suivants ; aucun comportement métier n’est encore exposé.
 
 ### Restant à faire
 
-Rendre le socle exécutable localement et vérifiable par CI.
+Rendre le socle complet exécutable localement et vérifiable par CI.
 
 ## Périmètre prévu
 
@@ -103,8 +103,8 @@ Un développeur clone le dépôt, fournit uniquement des valeurs factices ou des
 ### Réalisé
 
 Le parcours développeur est partiellement disponible : installation pnpm,
-tests d’architecture et vérification TypeScript sont reproductibles. Le
-parcours HTTP et Docker reste à implémenter.
+tests d’architecture, API `/health`, shell web et vérifications TypeScript/
+Next.js sont reproductibles. Docker et le routage public restent à implémenter.
 
 ### Restant à faire
 
@@ -137,11 +137,11 @@ Monorepo pnpm avec Next.js App Router, Hono REST, packages TypeScript partagés,
 Le workspace pnpm, les options TypeScript strictes et les frontières
 `@jdr-hub/shared`/`@jdr-hub/database` sont implémentés. Le package database
 reste vide de modèle métier, l’API Hono possède son endpoint de santé et le
-frontend ne possède encore aucun code applicatif.
+shell Next.js rend la page technique avec le logo officiel.
 
 ### Restant à faire
 
-Implémenter les services, le shell web, les vérifications Compose et la CI.
+Implémenter les services, les vérifications Compose, le reverse proxy et la CI.
 
 ## Modèle de données et migrations
 
@@ -185,7 +185,8 @@ Ajouter la connectivité de test minimale sans introduire prématurément le mod
 
 ### Réalisés
 
-- Aucun composant applicatif ; cette absence est volontaire à cette étape.
+- Le shell technique Next.js rend une page Server Component avec un landmark
+  `main`, un message de démarrage en français et le logo officiel.
 
 ### Restants
 
@@ -209,6 +210,9 @@ Ajouter la connectivité de test minimale sans introduire prématurément le mod
 | `CI=true pnpm --filter @jdr-hub/api test` | Réussi : 7 tests dans 2 fichiers | 2026-09-02 |
 | `CI=true pnpm --filter @jdr-hub/api typecheck` | Réussi | 2026-09-02 |
 | `CI=true pnpm --filter @jdr-hub/api build` | Réussi | 2026-09-02 |
+| `CI=true pnpm --filter @jdr-hub/web test` | Réussi : 1 test dans 1 fichier | 2026-09-02 |
+| `CI=true pnpm --filter @jdr-hub/web typecheck` | Réussi | 2026-09-02 |
+| `CI=true pnpm --filter @jdr-hub/web build` | Réussi ; route statique `/` générée | 2026-09-02 |
 | `CI=true pnpm exec vitest run tests/architecture/workspace.test.ts tests/architecture/database-boundary.test.ts --exclude '.superpowers/**'` | Réussi : 5 tests dans 2 fichiers | 2026-09-02 |
 | `CI=true pnpm typecheck` | Réussi | 2026-09-02 |
 | `git diff --check` | Réussi | 2026-09-02 |
@@ -238,6 +242,14 @@ Ajouter la connectivité de test minimale sans introduire prématurément le mod
 - Le détecteur d’imports serveur est centralisé dans
   `tests/architecture/helpers/database-boundary.ts` pour éviter la duplication.
 - Résultat final : tests ciblés, typecheck et contrôle du diff réussis.
+
+### Évolution datée — Shell Next.js, 2026-09-02
+
+- Red : `tests/smoke/web-shell.test.ts` échouait avec `ENOENT` avant la
+  création de `apps/web/app/page.tsx`.
+- Green : le smoke test passe ; typecheck et build Next.js passent.
+- Refactor : le shell reste un Server Component minimal, sans logique métier,
+  sans import database et sans HTML injecté.
 
 ### Évolution datée — API Hono, 2026-09-02
 
@@ -280,14 +292,16 @@ Ajouter la connectivité de test minimale sans introduire prématurément le mod
 
 - `package.json`, `pnpm-workspace.yaml`, `pnpm-lock.yaml` et `tsconfig.base.json`.
 - `apps/api/package.json`, `apps/api/tsconfig.json` et `apps/api/src/`.
+- `apps/web/package.json`, `apps/web/tsconfig.json`, `apps/web/next.config.ts`,
+  `apps/web/app/` et `apps/web/public/branding/logo.svg`.
 - `packages/shared/` et `packages/database/`.
 - `tests/architecture/workspace.test.ts`.
 - `tests/architecture/database-boundary.test.ts` et son helper.
 
 ## Limites connues
 
-- Le shell web, le reverse proxy, Docker et la CI restent à implémenter ;
-  l’API technique initiale est en place.
+- Le reverse proxy, Docker et la CI restent à implémenter ; l’API technique
+  et le shell web initiaux sont en place.
 - L’API actuelle se limite à la santé technique ; aucune route métier n’est
   incluse.
 - La protection de la frontière database est un garde-fou d’architecture par
@@ -321,6 +335,7 @@ Après implémentation : installer avec pnpm, démarrer Compose, vérifier les h
 - `b6007c3 chore: define shared package boundaries`.
 - `62a1edc feat: add Hono health endpoint`.
 - `e503d58 fix: harden Hono API bootstrap`.
+- `02e5d2d feat: add Next.js web shell`.
 
 ## Décisions associées
 
