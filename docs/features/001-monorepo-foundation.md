@@ -89,6 +89,8 @@ Rendre le socle exécutable localement et vérifiable par CI.
 - Le workspace pnpm et sa configuration TypeScript stricte sont implémentés.
 - `packages/shared` et `packages/database` disposent de manifests, tsconfigs
   et points d’entrée stables.
+- `apps/api` expose `GET /health` avec une enveloppe stable, un identifiant de
+  requête et un bootstrap Node validant `PORT`.
 - Les tests d’architecture vérifient les workspaces, les dépendances locales
   interdites et l’absence d’import serveur depuis les sources navigateur.
 
@@ -134,8 +136,8 @@ Monorepo pnpm avec Next.js App Router, Hono REST, packages TypeScript partagés,
 
 Le workspace pnpm, les options TypeScript strictes et les frontières
 `@jdr-hub/shared`/`@jdr-hub/database` sont implémentés. Le package database
-reste vide de modèle métier et le frontend ne possède encore aucun code
-applicatif.
+reste vide de modèle métier, l’API Hono possède son endpoint de santé et le
+frontend ne possède encore aucun code applicatif.
 
 ### Restant à faire
 
@@ -165,7 +167,8 @@ Ajouter la connectivité de test minimale sans introduire prématurément le mod
 
 ### Implémentées
 
-- Aucune route implémentée.
+- `GET /health` — enveloppe `{ data, error, meta }` et `requestId` par requête.
+- Les réponses 404 et 500 utilisent également un `requestId`.
 
 ### Restantes
 
@@ -201,7 +204,10 @@ Ajouter la connectivité de test minimale sans introduire prématurément le mod
 | Commande | Résultat | Date |
 | --- | --- | --- |
 | `CI=true pnpm install --frozen-lockfile` | Réussi avec pnpm 11.25.0 | 2026-09-02 |
-| `CI=true pnpm exec vitest run tests/architecture/workspace.test.ts tests/architecture/database-boundary.test.ts` | Réussi : 5 tests dans 2 fichiers | 2026-09-02 |
+| `CI=true pnpm --filter @jdr-hub/api test` | Réussi : 6 tests dans 2 fichiers | 2026-09-02 |
+| `CI=true pnpm --filter @jdr-hub/api typecheck` | Réussi | 2026-09-02 |
+| `CI=true pnpm --filter @jdr-hub/api build` | Réussi | 2026-09-02 |
+| `CI=true pnpm exec vitest run tests/architecture/workspace.test.ts tests/architecture/database-boundary.test.ts --exclude '.superpowers/**'` | Réussi : 5 tests dans 2 fichiers | 2026-09-02 |
 | `CI=true pnpm typecheck` | Réussi | 2026-09-02 |
 | `git diff --check` | Réussi | 2026-09-02 |
 
@@ -230,6 +236,15 @@ Ajouter la connectivité de test minimale sans introduire prématurément le mod
 - Le détecteur d’imports serveur est centralisé dans
   `tests/architecture/helpers/database-boundary.ts` pour éviter la duplication.
 - Résultat final : tests ciblés, typecheck et contrôle du diff réussis.
+
+### Évolution datée — API Hono, 2026-09-02
+
+- Red : le test `apps/api/src/app.test.ts` échouait avant `createApiApp` avec
+  le module introuvable ; la configuration de port a ensuite reçu ses cas
+  invalides.
+- Green : `@jdr-hub/api test` passe avec 6 tests ; typecheck et build passent.
+- Refactor : le `requestId` est produit par middleware, le bootstrap est
+  séparé de l’export package, et `PORT` est validé dans un module dédié.
 
 ## Contrôles de sécurité
 
@@ -262,6 +277,7 @@ Ajouter la connectivité de test minimale sans introduire prématurément le mod
 ## Fichiers principaux
 
 - `package.json`, `pnpm-workspace.yaml`, `pnpm-lock.yaml` et `tsconfig.base.json`.
+- `apps/api/package.json`, `apps/api/tsconfig.json` et `apps/api/src/`.
 - `packages/shared/` et `packages/database/`.
 - `tests/architecture/workspace.test.ts`.
 - `tests/architecture/database-boundary.test.ts` et son helper.
@@ -269,6 +285,8 @@ Ajouter la connectivité de test minimale sans introduire prématurément le mod
 ## Limites connues
 
 - Les applications web/API, Docker, reverse proxy et CI restent à implémenter.
+- L’API actuelle se limite à la santé technique ; aucune route métier n’est
+  incluse.
 - La protection de la frontière database est un garde-fou d’architecture par
   test ; elle devra être complétée par les configurations de build des apps.
 
@@ -298,6 +316,8 @@ Après implémentation : installer avec pnpm, démarrer Compose, vérifier les h
 - `bc49b0f chore: scaffold pnpm workspace`.
 - `f99f100 test: enforce workspace dependency boundaries`.
 - `b6007c3 chore: define shared package boundaries`.
+- `62a1edc feat: add Hono health endpoint`.
+- `e503d58 fix: harden Hono API bootstrap`.
 
 ## Décisions associées
 
