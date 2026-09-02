@@ -1,4 +1,4 @@
-import { existsSync, readdirSync, readFileSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
@@ -21,6 +21,17 @@ function workspacePackageManifests(): string[] {
         .map((entry) => resolve(root, workspace, entry.name, 'package.json')),
     ),
   ].filter((manifest) => existsSync(manifest))
+}
+
+function frontendSourceFiles(directory: string): string[] {
+  if (!existsSync(directory)) return []
+
+  return readdirSync(directory, { withFileTypes: true }).flatMap((entry) => {
+    const path = resolve(directory, entry.name)
+    if (entry.isDirectory()) return frontendSourceFiles(path)
+    if (!statSync(path).isFile() || !/\.(tsx?|jsx?)$/.test(entry.name)) return []
+    return [path]
+  })
 }
 
 describe('workspace boundaries', () => {
@@ -50,5 +61,14 @@ describe('workspace boundaries', () => {
         }
       }
     }
+  })
+
+  it('keeps server database code out of browser source directories', () => {
+    const imports = ['apps/web/app', 'apps/web/components', 'apps/web/features']
+      .flatMap((directory) => frontendSourceFiles(resolve(root, directory)))
+      .map((file) => readFileSync(file, 'utf8'))
+      .join('\n')
+
+    expect(imports).not.toMatch(/@jdr-hub\/database|packages\/database|drizzle-orm/)
   })
 })
