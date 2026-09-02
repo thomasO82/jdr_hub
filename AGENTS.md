@@ -168,7 +168,7 @@ Ne pas mettre les règles métier dans React, exposer Drizzle au navigateur, dup
 
 ## 11. Workflow Git obligatoire
 
-Chaque fonctionnalité utilise une branche dédiée créée depuis un `main` propre et à jour. Il est interdit de développer directement sur `main`.
+Chaque fonctionnalité utilise une branche dédiée créée depuis un `develop` propre et à jour. Les Pull Requests de fonctionnalité ciblent `develop`, puis une promotion séparée et validée peut rejoindre `main`. Il est interdit de développer directement sur `main`.
 
 Convention : `feat/`, `fix/`, `refactor/`, `docs/`, `test/` ou `chore/` suivi d'une description courte, par exemple `feat/discord-auth` ou `feat/games-and-tags`.
 
@@ -184,7 +184,7 @@ refactor: simplify game creation service
 
 Ne pas committer `.env`, secrets, `node_modules`, builds, fichiers temporaires ou `Zone.Identifier`.
 
-Avant une Pull Request : lint, TypeScript, tests, build, examen du diff, contrôle des secrets, documentation, commits, push de la branche, puis PR vers `main`.
+Avant une Pull Request : lint, TypeScript, tests, build, examen du diff, contrôle des secrets, documentation, commits, push de la branche, puis PR vers `develop`. La promotion vers `main` suit un contrôle séparé et une validation humaine.
 
 Chaque PR décrit : résumé, fichiers/modules, règles métier, décisions, tests, preuve TDD, sécurité, commandes, résultats, limites, vérification manuelle et captures pour les changements visuels.
 
