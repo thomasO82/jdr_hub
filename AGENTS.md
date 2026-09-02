@@ -320,4 +320,205 @@ Pour une décision mineure et réversible, choisir rationnellement, documenter e
 
 Une fonctionnalité est terminée uniquement si : critères satisfaits, tests écrits avant l'implémentation, échec initial vérifié, nouveaux et anciens tests verts, aucun test fusionné modifié sans autorisation, TypeScript/lint/build verts, sécurité vérifiée, documentation et commentaires à jour, responsive et accessibilité contrôlés, diff propre, aucun secret, branche poussée, PR créée et instructions de vérification fournies.
 
+La fonctionnalité n'est terminée que si sa fiche dans `docs/features/` et `docs/project-status.md` ont été mis à jour.
+
 La fonctionnalité est fusionnée uniquement par le propriétaire du projet.
+
+## 26. Plugins, skills et outils obligatoires
+
+Les plugins et skills complètent les règles du projet sans jamais les remplacer. L'ordre de priorité reste : demande explicite du propriétaire, `AGENTS.md`, cahier des charges, décisions validées, exigences de sécurité, puis recommandations des plugins.
+
+Avant d'invoquer un plugin ou une skill, vérifier qu'il est disponible dans la session active. Annoncer brièvement son utilisation et sa finalité. Ne jamais prétendre avoir utilisé un outil qui n'a pas réellement été invoqué. Si un outil obligatoire est indisponible, s'arrêter avant l'action concernée, expliquer le blocage et demander une décision au propriétaire.
+
+Utiliser les outils selon le contexte suivant :
+
+- nouvelle fonctionnalité, modification de comportement ou décision de conception : `superpowers:brainstorming` avant toute implémentation ;
+- plan d'implémentation multi-étapes : `superpowers:writing-plans` après validation de la conception ;
+- fonctionnalité ou correction : `superpowers:test-driven-development` avant le code de production ;
+- bug, test en échec ou comportement inattendu : `superpowers:systematic-debugging` avant de proposer une correction ;
+- utilisation d'une API Next.js, Hono, Drizzle, Zod, Vitest, Playwright, Tailwind CSS, shadcn/ui ou Discord : Context7 pour consulter la documentation actuelle ;
+- développement ou modification significative de l'interface web : `build-web-apps`, en respectant les maquettes et le design system du projet ;
+- authentification, autorisation, session, donnée sensible, endpoint exposé ou changement de sécurité : Codex Security ;
+- avant d'affirmer qu'une tâche est terminée ou réussie : `superpowers:verification-before-completion` avec preuves fraîches ;
+- création, consultation ou mise à jour d'une Pull Request : plugin GitHub, sans jamais fusionner la PR ;
+- avant une Pull Request contenant du code : Codex Security et, s'il est disponible, `differential-review` ;
+- ajout ou mise à jour de dépendances : `supply-chain-risk-auditor` s'il est disponible ;
+- vérification de conformité entre code et spécifications : `spec-to-code-compliance` s'il est disponible.
+
+Context7 doit vérifier la documentation correspondant aux versions réellement installées dans le dépôt. S'il ne couvre pas correctement une bibliothèque, consulter sa documentation officielle. Context7 ne constitue jamais une source de vérité pour les règles métier de JDR Hub.
+
+Ne pas lancer tous les plugins pour chaque tâche. Utiliser uniquement ceux qui sont pertinents afin de limiter le bruit, les permissions, le temps d'exécution et les contradictions.
+
+Un plugin, une skill, un serveur MCP, un hook, un sous-agent ou un script hérite de toutes les restrictions de ce fichier et de `docs/security/ai-access-policy.md`. Aucun outil ne donne l'autorisation de lire un secret, modifier une référence protégée, modifier un test fusionné, pousser sur `main` ou fusionner une Pull Request.
+
+## 27. Politique d'accès de l'IA aux fichiers
+
+Avant toute exploration du dépôt, lire `docs/security/ai-access-policy.md` sans tenter d'ouvrir au préalable un fichier potentiellement secret. Cette politique distingue :
+
+- les fichiers dont la lecture et la modification sont interdites ;
+- les références lisibles mais non modifiables sans autorisation ;
+- les tests et migrations protégés ;
+- les fichiers de travail ordinaires.
+
+Cette politique s'applique aux commandes shell, recherches récursives, plugins, skills, serveurs MCP, hooks, sous-agents, scripts et outils externes. Lors d'un inventaire ou d'une recherche, exclure explicitement les chemins interdits. Ne jamais afficher, résumer, copier, indexer, transmettre ou journaliser leur contenu.
+
+Si un fichier interdit est rencontré, ne signaler que son chemin et la raison du blocage. Demander au propriétaire une valeur factice ou une information non sensible. Une autorisation d'exception doit être explicite, limitée à un fichier et à une opération, et ne vaut pas autorisation générale.
+
+`.gitignore` limite le versionnement, mais ne constitue pas un contrôle d'accès. Les secrets réels doivent rester hors du dépôt et être fournis par un gestionnaire de secrets, GitHub Secrets, l'environnement de déploiement ou une autre solution prévue à cet effet.
+
+## 28. Suivi et traçabilité des fonctionnalités
+
+- Toute fonctionnalité possède une fiche dans `docs/features/`.
+- `docs/project-status.md` donne l'état global du projet.
+- La fiche doit être créée ou mise à jour avant la Pull Request.
+- Une fonctionnalité ne peut pas être déclarée terminée sans cette fiche.
+- La fiche décrit uniquement ce qui a réellement été implémenté.
+- Les limites, erreurs restantes et travaux reportés doivent être indiqués.
+- Les commandes et résultats des tests doivent être consignés.
+- La preuve du cycle TDD Red, Green, Refactor doit être renseignée.
+- Les contrôles de sécurité doivent être renseignés.
+- Le statut doit être `IN_REVIEW` au moment de l'ouverture de la Pull Request.
+- Codex ne doit jamais indiquer `MERGED` avant confirmation du propriétaire.
+- Une fiche fusionnée ne doit pas être réécrite silencieusement.
+- Une évolution importante doit créer une nouvelle fiche ou une section datée.
+- Les décisions architecturales restent enregistrées dans `docs/decisions/`.
+- Les secrets, données personnelles et valeurs sensibles ne doivent jamais apparaître dans ces documents.
+- `docs/security/ai-access-policy.md` s'applique à tous ces fichiers.
+
+## 28. Suivi et traçabilité des fonctionnalités
+
+Chaque fonctionnalité doit être documentée afin de conserver une trace précise
+de l’état du projet, du contexte initial, du travail réalisé et des éléments
+restants.
+
+Les documents de suivi sont :
+
+- `docs/project-status.md` pour la vision globale du projet ;
+- `docs/features/` pour les fiches détaillées des fonctionnalités ;
+- `docs/decisions/` pour les décisions métier et architecturales importantes.
+
+### Tableau de suivi global
+
+Avant de commencer une fonctionnalité, mettre à jour
+`docs/project-status.md` avec :
+
+- l’identifiant de la fonctionnalité ;
+- son nom ;
+- son statut ;
+- le nom de sa branche ;
+- sa fiche détaillée ;
+- ses dépendances éventuelles.
+
+Les seuls statuts autorisés sont :
+
+- `PLANNED` : fonctionnalité prévue mais non commencée ;
+- `IN_PROGRESS` : développement en cours ;
+- `BLOCKED` : développement bloqué ;
+- `IN_REVIEW` : implémentation terminée et Pull Request en attente ;
+- `MERGED` : Pull Request fusionnée par le propriétaire.
+
+Codex ne doit jamais indiquer `MERGED` avant confirmation explicite du
+propriétaire ou vérification de l’état réel de la Pull Request sur GitHub.
+
+GitHub reste la source de vérité pour l’état réel des Pull Requests.
+
+### Fiche de fonctionnalité
+
+Chaque fonctionnalité possède une fiche :
+
+`docs/features/NNN-nom-de-la-fonctionnalite.md`
+
+Exemples :
+
+- `docs/features/001-project-foundation.md`
+- `docs/features/002-discord-authentication.md`
+- `docs/features/003-game-creation.md`
+- `docs/features/004-game-tags.md`
+
+La numérotation est croissante et ne doit pas être réutilisée.
+
+La fiche doit être créée au début de la fonctionnalité avec le statut
+`IN_PROGRESS`, puis complétée pendant le développement.
+
+Elle doit contenir :
+
+- identifiant et nom ;
+- statut ;
+- branche ;
+- Pull Request ;
+- dates ;
+- dépendances ;
+- contexte ;
+- besoin utilisateur ;
+- périmètre prévu ;
+- fonctionnalités réellement réalisées ;
+- parcours utilisateur ;
+- règles métier implémentées ;
+- architecture et choix techniques ;
+- modèle de données et migrations ;
+- routes API ;
+- pages et composants ;
+- tests ajoutés ;
+- preuve du cycle TDD Red, Green, Refactor ;
+- contrôles de sécurité ;
+- documentation technique consultée ;
+- fichiers principaux ;
+- limites connues ;
+- travaux reportés ;
+- procédure de vérification manuelle ;
+- commits importants ;
+- décisions associées.
+
+La fiche doit clairement distinguer :
+
+- ce qui était prévu ;
+- ce qui a réellement été réalisé ;
+- ce qui reste à faire.
+
+Ne jamais présenter comme réalisée une fonctionnalité absente, incomplète,
+désactivée ou non vérifiée.
+
+### Mise à jour avant Pull Request
+
+Avant la création de chaque Pull Request :
+
+1. compléter la fiche de fonctionnalité ;
+2. consigner les commandes de vérification réellement exécutées ;
+3. indiquer les résultats des tests ;
+4. consigner la preuve TDD ;
+5. consigner les contrôles de sécurité ;
+6. documenter les limites et travaux reportés ;
+7. passer le statut à `IN_REVIEW` ;
+8. mettre à jour `docs/project-status.md` ;
+9. inclure la fiche dans la Pull Request.
+
+Une fonctionnalité n’est pas terminée tant que sa fiche et le tableau global
+ne sont pas à jour.
+
+### Après fusion
+
+Codex ne fusionne jamais la Pull Request.
+
+Après confirmation de la fusion par le propriétaire, passer le statut de la
+fonctionnalité à `MERGED` au début de la prochaine branche documentaire ou
+fonctionnelle.
+
+Si aucune nouvelle fonctionnalité n’est prévue, effectuer cette synchronisation
+dans une Pull Request documentaire dédiée.
+
+### Protection de l’historique
+
+Une fiche correspondant à une fonctionnalité fusionnée constitue un historique
+du projet. Elle ne doit pas être supprimée, réécrite ou corrigée silencieusement.
+
+Une évolution importante doit :
+
+- créer une nouvelle fiche ; ou
+- ajouter une section datée explicitement reliée à une nouvelle Pull Request.
+
+Une erreur documentaire peut être corrigée avec une justification claire dans
+le diff et la Pull Request.
+
+Les fiches ne doivent jamais contenir de secret, jeton, mot de passe, donnée
+personnelle réelle ou contenu interdit par
+`docs/security/ai-access-policy.md`.
