@@ -32,4 +32,20 @@ describe('GET /health', () => {
       meta: { requestId: expect.any(String) },
     })
   })
+
+  it('returns a sanitized internal-error envelope with a request id', async () => {
+    const app = createApiApp()
+    app.get('/test-error', () => {
+      throw new Error('test-only failure')
+    })
+
+    const response = await app.request('/test-error')
+
+    expect(response.status).toBe(500)
+    expect(await response.json()).toEqual({
+      data: null,
+      error: { code: 'INTERNAL_ERROR', message: 'Internal server error' },
+      meta: { requestId: expect.any(String) },
+    })
+  })
 })

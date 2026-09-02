@@ -167,12 +167,14 @@ Ajouter la connectivité de test minimale sans introduire prématurément le mod
 
 ### Implémentées
 
-- `GET /health` — enveloppe `{ data, error, meta }` et `requestId` par requête.
+- `GET /health` — route interne Hono avec enveloppe `{ data, error, meta }`
+  et `requestId` par requête.
 - Les réponses 404 et 500 utilisent également un `requestId`.
 
 ### Restantes
 
-- Endpoint de santé, validation de taille de corps et format d’erreur avec `requestId`.
+- Publication de l’endpoint interne sous `/api/health` via le reverse proxy,
+  validation de taille de corps et intégration complète du format d’erreur.
 
 ## Interface et composants
 
@@ -204,7 +206,7 @@ Ajouter la connectivité de test minimale sans introduire prématurément le mod
 | Commande | Résultat | Date |
 | --- | --- | --- |
 | `CI=true pnpm install --frozen-lockfile` | Réussi avec pnpm 11.25.0 | 2026-09-02 |
-| `CI=true pnpm --filter @jdr-hub/api test` | Réussi : 6 tests dans 2 fichiers | 2026-09-02 |
+| `CI=true pnpm --filter @jdr-hub/api test` | Réussi : 7 tests dans 2 fichiers | 2026-09-02 |
 | `CI=true pnpm --filter @jdr-hub/api typecheck` | Réussi | 2026-09-02 |
 | `CI=true pnpm --filter @jdr-hub/api build` | Réussi | 2026-09-02 |
 | `CI=true pnpm exec vitest run tests/architecture/workspace.test.ts tests/architecture/database-boundary.test.ts --exclude '.superpowers/**'` | Réussi : 5 tests dans 2 fichiers | 2026-09-02 |
@@ -242,7 +244,7 @@ Ajouter la connectivité de test minimale sans introduire prématurément le mod
 - Red : le test `apps/api/src/app.test.ts` échouait avant `createApiApp` avec
   le module introuvable ; la configuration de port a ensuite reçu ses cas
   invalides.
-- Green : `@jdr-hub/api test` passe avec 6 tests ; typecheck et build passent.
+- Green : `@jdr-hub/api test` passe avec 7 tests ; typecheck et build passent.
 - Refactor : le `requestId` est produit par middleware, le bootstrap est
   séparé de l’export package, et `PORT` est validé dans un module dédié.
 
@@ -284,7 +286,8 @@ Ajouter la connectivité de test minimale sans introduire prématurément le mod
 
 ## Limites connues
 
-- Les applications web/API, Docker, reverse proxy et CI restent à implémenter.
+- Le shell web, le reverse proxy, Docker et la CI restent à implémenter ;
+  l’API technique initiale est en place.
 - L’API actuelle se limite à la santé technique ; aucune route métier n’est
   incluse.
 - La protection de la frontière database est un garde-fou d’architecture par
