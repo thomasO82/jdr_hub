@@ -44,11 +44,14 @@ Non créée — la Pull Request ciblera `develop`.
 
 ### Réalisé
 
-La conception F00 est validée comme prochaine étape documentaire. L’implémentation technique n’a pas commencé.
+La conception F00 est validée. Le workspace pnpm strict, les scripts racine,
+les quatre frontières de répertoires et les packages `@jdr-hub/shared` et
+`@jdr-hub/database` sont en place. Les tests d’architecture protègent aussi
+la séparation du code navigateur et du code de base de données.
 
 ### Restant à faire
 
-Créer le workspace, les applications, les packages, les conteneurs, le routage local et la CI.
+Créer les applications, les conteneurs, le routage local et la CI.
 
 ## Besoin utilisateur
 
@@ -58,7 +61,8 @@ Fournir une base technique installable, testable et reproductible pour développ
 
 ### Réalisé
 
-Non applicable à ce stade : aucun comportement applicatif n’est encore disponible.
+Le socle de packages et les contrôles de frontières sont disponibles pour les
+développements suivants ; aucun comportement utilisateur n’est encore exposé.
 
 ### Restant à faire
 
@@ -82,6 +86,11 @@ Rendre le socle exécutable localement et vérifiable par CI.
 
 - La branche `chore/monorepo-foundation` a été créée depuis `develop`.
 - La conception et les critères de F00 sont documentés.
+- Le workspace pnpm et sa configuration TypeScript stricte sont implémentés.
+- `packages/shared` et `packages/database` disposent de manifests, tsconfigs
+  et points d’entrée stables.
+- Les tests d’architecture vérifient les workspaces, les dépendances locales
+  interdites et l’absence d’import serveur depuis les sources navigateur.
 
 ## Parcours utilisateur
 
@@ -91,7 +100,9 @@ Un développeur clone le dépôt, fournit uniquement des valeurs factices ou des
 
 ### Réalisé
 
-Non disponible : le socle n’est pas encore implémenté.
+Le parcours développeur est partiellement disponible : installation pnpm,
+tests d’architecture et vérification TypeScript sont reproductibles. Le
+parcours HTTP et Docker reste à implémenter.
 
 ### Restant à faire
 
@@ -121,11 +132,14 @@ Monorepo pnpm avec Next.js App Router, Hono REST, packages TypeScript partagés,
 
 ### Réalisé
 
-La stack et les frontières sont documentées dans le cahier des charges et la conception F00 ; aucun fichier applicatif n’a encore été créé.
+Le workspace pnpm, les options TypeScript strictes et les frontières
+`@jdr-hub/shared`/`@jdr-hub/database` sont implémentés. Le package database
+reste vide de modèle métier et le frontend ne possède encore aucun code
+applicatif.
 
 ### Restant à faire
 
-Implémenter les frontières workspace, les scripts, les services et les vérifications reproductibles.
+Implémenter les services, le shell web, les vérifications Compose et la CI.
 
 ## Modèle de données et migrations
 
@@ -135,7 +149,8 @@ Préparer l’accès Drizzle et PostgreSQL sans créer de migration métier. Les
 
 ### Réalisé
 
-Aucun schéma ni migration créé.
+Aucun schéma ni migration créé ; la frontière package est préparée sans
+introduire de modèle métier.
 
 ### Restant à faire
 
@@ -165,7 +180,7 @@ Ajouter la connectivité de test minimale sans introduire prématurément le mod
 
 ### Réalisés
 
-- Aucun composant applicatif.
+- Aucun composant applicatif ; cette absence est volontaire à cette étape.
 
 ### Restants
 
@@ -185,7 +200,10 @@ Ajouter la connectivité de test minimale sans introduire prématurément le mod
 
 | Commande | Résultat | Date |
 | --- | --- | --- |
-| `rg`, contrôles Markdown et vérifications Git documentaires | Réussis pour la phase de conception ; aucun test applicatif n’existe encore | 2026-09-02 |
+| `CI=true pnpm install --frozen-lockfile` | Réussi avec pnpm 11.25.0 | 2026-09-02 |
+| `CI=true pnpm exec vitest run tests/architecture/workspace.test.ts tests/architecture/database-boundary.test.ts` | Réussi : 7 tests dans 3 fichiers | 2026-09-02 |
+| `CI=true pnpm typecheck` | Réussi | 2026-09-02 |
+| `git diff --check` | Réussi | 2026-09-02 |
 
 ### Restants
 
@@ -195,21 +213,23 @@ Ajouter la connectivité de test minimale sans introduire prématurément le mod
 
 ### Red
 
-- Tests écrits avant l’implémentation : À faire avant le code F00.
-- Commande exécutée : Non applicable avant la création des tests.
-- Échec initial et raison attendue : À consigner lorsque les tests rouges seront exécutés.
+- Test écrit avant l’implémentation : test d’architecture des packages et de
+  leurs points d’entrée.
+- Commande exécutée sur le snapshot propre `f99f100` :
+  `CI=true pnpm exec vitest run .superpowers/sdd/2026-09-02-monorepo-foundation/task-2-red-baseline.test.ts`.
+- Échec initial : `packages/shared/package.json` absent, comme attendu.
 
 ### Green
 
-- Implémentation minimale ajoutée : Aucune.
-- Commande exécutée : Non applicable.
-- Résultat : À consigner après l’implémentation minimale.
+- Implémentation minimale : manifests, tsconfigs et points d’entrée vides des
+  deux packages, plus les tests de frontière.
+- Résultat : 7 tests passants et `pnpm typecheck` réussi.
 
 ### Refactor
 
-- Refactorisations effectuées sans changement de comportement : Aucune.
-- Commande exécutée : Non applicable.
-- Résultat final : À consigner après la phase Green et la refactorisation.
+- Le détecteur d’imports serveur est centralisé dans
+  `tests/architecture/helpers/database-boundary.ts` pour éviter la duplication.
+- Résultat final : tests ciblés, typecheck et contrôle du diff réussis.
 
 ## Contrôles de sécurité
 
@@ -241,12 +261,16 @@ Ajouter la connectivité de test minimale sans introduire prématurément le mod
 
 ## Fichiers principaux
 
-- À créer dans F00 : workspace pnpm, `apps/web`, `apps/api`, packages, Docker Compose, workflows CI et documentation de démarrage.
+- `package.json`, `pnpm-workspace.yaml`, `pnpm-lock.yaml` et `tsconfig.base.json`.
+- `packages/shared/` et `packages/database/`.
+- `tests/architecture/workspace.test.ts`.
+- `tests/architecture/database-boundary.test.ts` et son helper.
 
 ## Limites connues
 
-- Le code applicatif et les configurations F00 ne sont pas encore implémentés.
-- Aucun test automatisé de projet n’est encore disponible dans le dépôt.
+- Les applications web/API, Docker, reverse proxy et CI restent à implémenter.
+- La protection de la frontière database est un garde-fou d’architecture par
+  test ; elle devra être complétée par les configurations de build des apps.
 
 ## Travaux reportés
 
@@ -271,7 +295,9 @@ Après implémentation : installer avec pnpm, démarrer Compose, vérifier les h
 
 ## Commits importants
 
-- À venir : commits TDD Red, Green et Refactor de F00.
+- `bc49b0f chore: scaffold pnpm workspace`.
+- `f99f100 test: enforce workspace dependency boundaries`.
+- `b6007c3 chore: define shared package boundaries`.
 
 ## Décisions associées
 
