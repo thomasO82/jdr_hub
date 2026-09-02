@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+
+<html class="light" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>JDR Hub - Gestion de Partie</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&amp;family=Hanken+Grotesk:wght@600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-container": "#836100",
+                    "on-secondary-fixed-variant": "#3a485b",
+                    "secondary-fixed": "#d5e3fc",
+                    "surface-container-low": "#f2f4f6",
+                    "tertiary": "#654a00",
+                    "on-primary-fixed-variant": "#5a00c6",
+                    "error-container": "#ffdad6",
+                    "inverse-on-surface": "#eff1f3",
+                    "primary-fixed": "#eaddff",
+                    "secondary-fixed-dim": "#b9c7df",
+                    "inverse-surface": "#2d3133",
+                    "on-primary-fixed": "#25005a",
+                    "background": "#f7f9fb",
+                    "surface-dim": "#d8dadc",
+                    "error": "#ba1a1a",
+                    "surface-bright": "#f7f9fb",
+                    "on-tertiary": "#ffffff",
+                    "surface": "#f7f9fb",
+                    "surface-tint": "#732ee4",
+                    "surface-container-high": "#e6e8ea",
+                    "on-surface-variant": "#4a4455",
+                    "primary": "#630ed4",
+                    "primary-container": "#7c3aed",
+                    "secondary": "#515f74",
+                    "surface-variant": "#e0e3e5",
+                    "tertiary-fixed": "#ffdf9f",
+                    "secondary-container": "#d5e3fc",
+                    "on-tertiary-fixed": "#261a00",
+                    "outline-variant": "#ccc3d8",
+                    "on-secondary-fixed": "#0d1c2e",
+                    "tertiary-fixed-dim": "#f9bd22",
+                    "surface-container-lowest": "#ffffff",
+                    "on-primary": "#ffffff",
+                    "on-primary-container": "#ede0ff",
+                    "surface-container": "#eceef0",
+                    "on-background": "#191c1e",
+                    "on-error": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "surface-container-highest": "#e0e3e5",
+                    "inverse-primary": "#d2bbff",
+                    "on-surface": "#191c1e",
+                    "on-tertiary-container": "#ffe2ab",
+                    "on-secondary": "#ffffff",
+                    "primary-fixed-dim": "#d2bbff",
+                    "on-tertiary-fixed-variant": "#5c4300",
+                    "outline": "#7b7487",
+                    "on-secondary-container": "#57657a"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "container-padding": "24px",
+                    "xl": "40px",
+                    "md": "16px",
+                    "base": "4px",
+                    "xs": "4px",
+                    "lg": "24px",
+                    "sm": "8px",
+                    "gutter": "16px"
+            },
+            "fontFamily": {
+                    "headline-sm": ["Hanken Grotesk"],
+                    "label-md": ["Geist"],
+                    "headline-md": ["Hanken Grotesk"],
+                    "body-lg": ["Inter"],
+                    "headline-lg-mobile": ["Hanken Grotesk"],
+                    "body-md": ["Inter"],
+                    "display-lg": ["Hanken Grotesk"],
+                    "headline-lg": ["Hanken Grotesk"],
+                    "body-sm": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-sm": ["20px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                    "label-md": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                    "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                    "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .stat-block {
+            background-color: #f1f5f9;
+        }
+        .shadow-level-1 {
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+        }
+        .shadow-level-2 {
+            box-shadow: 0 10px 15px -3px rgba(124, 58, 237, 0.1), 0 4px 6px -4px rgba(124, 58, 237, 0.1);
+        }
+        
+        /* Custom scrollbar for a cleaner look */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface min-h-screen flex font-body-md overflow-hidden">
+<!-- SideNavBar (Shared Component) -->
+<nav class="bg-surface border-r border-outline-variant shadow-sm hidden md:flex flex-col h-full py-lg px-md docked h-screen w-64 left-0 top-0 z-50 shrink-0">
+<!-- Brand Header -->
+<div class="flex items-center gap-sm mb-xl px-sm">
+<div class="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center text-on-primary-container shadow-level-1">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary">JDR Hub</h1>
+<p class="font-label-md text-label-md text-on-surface-variant">Digital Dungeon Master</p>
+</div>
+</div>
+<!-- Navigation Links -->
+<ul class="flex flex-col gap-sm flex-grow">
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-body-md">Dashboard</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-primary font-bold border-r-4 border-primary bg-primary-container/10 active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">casino</span>
+<span class="font-body-md">Games</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="font-body-md">Players</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+<span class="font-body-md">Schedule</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined">account_circle</span>
+<span class="font-body-md">Profile</span>
+</a>
+</li>
+</ul>
+<!-- Bottom Actions -->
+<div class="mt-auto pt-lg border-t border-outline-variant/50">
+<button class="w-full bg-primary text-on-primary font-label-md text-label-md py-sm px-md rounded-lg shadow-level-1 hover:shadow-level-2 transition-all active:scale-95 flex items-center justify-center gap-sm">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                New Game
+            </button>
+<!-- User Mini Profile -->
+<div class="mt-lg flex items-center gap-sm px-sm cursor-pointer hover:bg-surface-container-low p-sm rounded-lg transition-colors">
+<img alt="User Profile Avatar" class="w-8 h-8 rounded-full object-cover" data-alt="A modern, high-quality profile avatar of a confident digital dungeon master in a brightly lit studio setting. The image should feature a clean, professional aesthetic with subtle magical or fantasy violet lighting accents in the background, matching a sleek web application interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBteXHObPcMN_D4uDw9NjVin_9lxLdy5ac_y9NlX2wtQ4AsD2ChbxkJ4tSPjSi4Al0lirr7Meorw3FrFi9dMD_RRlcPEE29DVubkI02tU3hM1SSe7MZc_R0bmKxR_ADbx9ypHjcykkMAEdFQqHLIVv9IVY7bzP_48McnmHxt2RT-ygh0BwUv1D9IsiACxTMLwios1zoBwHRlreEtJTbUjo2HHcPx3KEaOhdfSY8ea_ld4xU3-QXEdHB"/>
+<div class="flex-1 min-w-0">
+<p class="font-body-sm text-body-sm font-medium text-on-surface truncate">Alex GM</p>
+<p class="font-label-md text-label-md text-on-surface-variant truncate">Maître de Jeu</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant text-[16px]">more_vert</span>
+</div>
+</div>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col h-screen overflow-hidden bg-background relative">
+<!-- TopAppBar (Mobile Only - Replaces SideNav) -->
+<header class="md:hidden sticky top-0 z-40 flex justify-between items-center w-full px-lg py-md mb-lg backdrop-blur-md bg-surface/80 border-b border-outline-variant/30 shadow-sm">
+<div class="flex items-center gap-sm">
+<div class="w-8 h-8 rounded-lg bg-primary-container flex items-center justify-center text-on-primary-container">
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+</div>
+<h1 class="font-headline-sm text-headline-sm font-bold text-primary">JDR Hub</h1>
+</div>
+<div class="flex gap-sm">
+<button class="text-on-surface-variant hover:text-primary transition-all p-xs rounded-full hover:bg-surface-container">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<img alt="User Avatar" class="w-8 h-8 rounded-full object-cover cursor-pointer" data-alt="A modern, high-quality profile avatar of a confident digital dungeon master in a brightly lit studio setting. The image should feature a clean, professional aesthetic with subtle magical or fantasy violet lighting accents in the background, matching a sleek web application interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC4X58EhK9xqil7-CgvYFFBW6rNGkE6aSgF2pta9cDZBbuovdaDMDwgac1Yj6t6kTZ3Od4tN0aKPAIo4HpePqZTI16ADF3_SfEE-bHSYnFSw8nsI8wCs36OOqNvGSnAC2xEbN0XLb5dpqpn5wzRjlHSaOQSK5L43BBT4juoOjIyeDRRAiRFaHKBDPIkVE_TCS2GMcU3UUkvEck2b9aWWZyQIQa44MQLD_z0JNjowgqezYX26_yxGcW6"/>
+</div>
+</header>
+<!-- Canvas / Content Scrollable Area -->
+<div class="flex-1 overflow-y-auto p-md md:p-container-padding relative z-10 w-full max-w-[1200px] mx-auto">
+<!-- Game Context Header -->
+<div class="mb-lg">
+<div class="flex items-center gap-2 mb-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]">arrow_back</span>
+<a class="font-label-md text-label-md hover:text-primary transition-colors uppercase tracking-wider" href="#">Toutes les parties</a>
+</div>
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-md mb-md">
+<div>
+<div class="flex items-center gap-sm mb-xs">
+<span class="bg-tertiary-container/20 text-tertiary px-2 py-1 rounded-full font-label-md text-label-md uppercase">Campagne Active</span>
+<span class="flex items-center gap-xs text-on-surface-variant font-label-md text-label-md">
+<span class="material-symbols-outlined text-[14px]">public</span> D&amp;D 5E
+                            </span>
+</div>
+<h2 class="font-display-lg text-headline-lg-mobile md:text-display-lg text-on-surface mb-xs">La Malédiction de Strahd</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-2xl">Gestion de la campagne, des joueurs et des candidatures en cours.</p>
+</div>
+<div class="flex gap-sm">
+<button class="flex items-center gap-xs px-md py-sm rounded-lg border border-outline-variant text-secondary font-body-sm hover:bg-surface-container-low transition-colors shadow-sm bg-surface">
+<span class="material-symbols-outlined text-[18px]">share</span> Partager
+                        </button>
+<button class="flex items-center gap-xs px-md py-sm rounded-lg bg-primary text-on-primary font-body-sm shadow-level-1 hover:shadow-level-2 transition-all">
+<span class="material-symbols-outlined text-[18px]">play_arrow</span> Lancer la session
+                        </button>
+</div>
+</div>
+</div>
+<!-- In-Page Navigation Tabs -->
+<div class="border-b border-outline-variant mb-lg overflow-x-auto no-scrollbar">
+<ul class="flex gap-lg min-w-max px-sm">
+<li>
+<a class="block pb-sm font-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Vue d'ensemble</a>
+</li>
+<li>
+<a class="block pb-sm font-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Joueurs <span class="ml-xs bg-surface-container-high text-on-surface px-2 py-0.5 rounded-full text-xs">4</span></a>
+</li>
+<li>
+<!-- ACTIVE TAB -->
+<a class="block pb-sm font-body-md text-primary font-medium border-b-2 border-primary relative" href="#">
+                            Candidatures
+                            <span class="absolute -top-1 -right-4 flex h-3 w-3">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-error opacity-75"></span>
+<span class="relative inline-flex rounded-full h-3 w-3 bg-error border-2 border-surface"></span>
+</span>
+</a>
+</li>
+<li>
+<a class="block pb-sm font-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Séances</a>
+</li>
+<li>
+<a class="block pb-sm font-body-md text-on-surface-variant hover:text-primary transition-colors" href="#">Paramètres</a>
+</li>
+</ul>
+</div>
+<!-- Tab Content: Candidatures -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-lg">
+<!-- Left Column: Applications List (Bento-style Cards) -->
+<div class="lg:col-span-8 flex flex-col gap-md">
+<div class="flex items-center justify-between mb-sm">
+<h3 class="font-headline-md text-headline-md text-on-surface">Nouvelles Requêtes <span class="text-on-surface-variant font-normal text-[16px]">(2)</span></h3>
+<button class="text-primary font-label-md text-label-md hover:underline uppercase tracking-wider">Trier par date</button>
+</div>
+<!-- Application Card 1 -->
+<div class="bg-surface rounded-xl p-md shadow-level-1 border border-outline-variant/30 hover:shadow-level-2 transition-shadow group relative overflow-hidden">
+<!-- Decorative glow -->
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-2xl -mr-16 -mt-16 pointer-events-none"></div>
+<div class="flex flex-col sm:flex-row gap-md relative z-10">
+<!-- Applicant Info -->
+<div class="flex gap-md flex-1">
+<div class="relative shrink-0">
+<img alt="Mélina Character Avatar" class="w-16 h-16 rounded-full object-cover ring-2 ring-surface-container" data-alt="A portrait of a fantasy roleplaying character, a young female elf rogue, drawn in a modern digital illustration style with clean lines and subtle lighting, presented as a circular avatar image against a neutral studio background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBprJDf4rFPANUBEpdxYTWXfi8trXQ-ZCwnXQWfSeV7tTXojSwZsBUBThEve5365xAJCzQgvDqae62cnG_lLiEPQLDXREl32LyCTC0EOUGTcmJTow0IUM8EO7ll0MF4gfrHE3G7YT8YNlXvxm2J0le3aGD_6XdynmPZrW1JZ86rhB5DNDHq5gD8pOCPm2ode0pII2SolAkhNmrAADxmAs9Zy-3dcaO9OEE1mf7rK7w6VbEZaRZOHPSv"/>
+<div class="absolute -bottom-1 -right-1 bg-surface rounded-full p-0.5">
+<span class="bg-tertiary-container/30 text-tertiary text-[10px] font-bold px-1.5 py-0.5 rounded-sm uppercase">Débutant</span>
+</div>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<div>
+<h4 class="font-headline-sm text-headline-sm text-on-surface m-0 leading-tight">Mélina</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-xs">Joue: <strong>Voleur Elfe</strong> (Niv. 1)</p>
+</div>
+<span class="font-label-md text-label-md text-on-surface-variant flex items-center gap-xs"><span class="material-symbols-outlined text-[14px]">schedule</span> Il y a 2h</span>
+</div>
+<div class="mt-sm bg-surface-container-low rounded-lg p-sm stat-block border border-outline-variant/20">
+<p class="font-body-sm text-body-sm text-on-surface italic line-clamp-2">"Bonjour ! Je suis passionnée par l'univers de Ravenloft. Je n'ai jamais joué à la 5E mais je connais bien les règles de base. Je suis dispo les jeudis soirs."</p>
+</div>
+</div>
+</div>
+<!-- Actions -->
+<div class="flex sm:flex-col justify-end gap-sm shrink-0 border-t sm:border-t-0 sm:border-l border-outline-variant/30 pt-sm sm:pt-0 sm:pl-md mt-sm sm:mt-0">
+<button class="flex-1 sm:flex-none flex justify-center items-center gap-xs bg-primary text-on-primary font-body-sm py-2 px-4 rounded-lg shadow-sm hover:bg-primary-container transition-colors">
+<span class="material-symbols-outlined text-[18px]">check</span> Accepter
+                                </button>
+<button class="flex-1 sm:flex-none flex justify-center items-center gap-xs bg-surface border border-outline-variant text-error font-body-sm py-2 px-4 rounded-lg shadow-sm hover:bg-error-container/20 transition-colors">
+<span class="material-symbols-outlined text-[18px]">close</span> Refuser
+                                </button>
+</div>
+</div>
+</div>
+<!-- Application Card 2 -->
+<div class="bg-surface rounded-xl p-md shadow-level-1 border border-outline-variant/30 hover:shadow-level-2 transition-shadow group relative overflow-hidden">
+<div class="flex flex-col sm:flex-row gap-md relative z-10">
+<!-- Applicant Info -->
+<div class="flex gap-md flex-1">
+<div class="relative shrink-0">
+<div class="w-16 h-16 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-headline-md ring-2 ring-surface-container">
+                                        T
+                                    </div>
+<div class="absolute -bottom-1 -right-1 bg-surface rounded-full p-0.5">
+<span class="bg-primary/20 text-primary text-[10px] font-bold px-1.5 py-0.5 rounded-sm uppercase">Vétéran</span>
+</div>
+</div>
+<div class="flex-1">
+<div class="flex justify-between items-start">
+<div>
+<h4 class="font-headline-sm text-headline-sm text-on-surface m-0 leading-tight">Thomas (Thormar)</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-xs">Joue: <strong>Paladin Humain</strong> (Niv. 3)</p>
+</div>
+<span class="font-label-md text-label-md text-on-surface-variant flex items-center gap-xs"><span class="material-symbols-outlined text-[14px]">schedule</span> Hier</span>
+</div>
+<div class="mt-sm bg-surface-container-low rounded-lg p-sm stat-block border border-outline-variant/20">
+<p class="font-body-sm text-body-sm text-on-surface italic line-clamp-2">"Salut, mj expérimenté ici cherchant à être joueur pour une fois. Mon paladin de l'Aube Lathanderite s'intègrerait parfaitement dans le groupe actuel."</p>
+</div>
+<div class="mt-xs flex gap-xs">
+<span class="font-label-md text-[10px] bg-surface-variant text-on-surface-variant px-2 py-0.5 rounded-full flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">verified</span> Profil Vérifié</span>
+<span class="font-label-md text-[10px] bg-surface-variant text-on-surface-variant px-2 py-0.5 rounded-full flex items-center gap-1"><span class="material-symbols-outlined text-[12px]">mic</span> Micro OK</span>
+</div>
+</div>
+</div>
+<!-- Actions -->
+<div class="flex sm:flex-col justify-end gap-sm shrink-0 border-t sm:border-t-0 sm:border-l border-outline-variant/30 pt-sm sm:pt-0 sm:pl-md mt-sm sm:mt-0">
+<button class="flex-1 sm:flex-none flex justify-center items-center gap-xs bg-primary text-on-primary font-body-sm py-2 px-4 rounded-lg shadow-sm hover:bg-primary-container transition-colors">
+<span class="material-symbols-outlined text-[18px]">check</span> Accepter
+                                </button>
+<button class="flex-1 sm:flex-none flex justify-center items-center gap-xs bg-surface border border-outline-variant text-error font-body-sm py-2 px-4 rounded-lg shadow-sm hover:bg-error-container/20 transition-colors">
+<span class="material-symbols-outlined text-[18px]">close</span> Refuser
+                                </button>
+<button class="flex-1 sm:flex-none flex justify-center items-center gap-xs bg-transparent text-secondary font-body-sm py-1 px-4 rounded-lg hover:bg-surface-container-low transition-colors mt-auto">
+<span class="material-symbols-outlined text-[18px]">chat</span> Message
+                                </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Context/Sidebar -->
+<div class="lg:col-span-4 flex flex-col gap-md">
+<!-- Party Status Bento Box -->
+<div class="bg-surface rounded-xl p-md shadow-level-1 border border-outline-variant/30 glass-panel">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-sm flex items-center gap-xs">
+<span class="material-symbols-outlined text-primary">group</span> État du Groupe
+                        </h3>
+<div class="flex justify-between items-end mb-sm">
+<div class="flex flex-col">
+<span class="font-display-lg text-display-lg text-on-surface leading-none">4<span class="text-on-surface-variant text-headline-sm">/6</span></span>
+<span class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider mt-1">Places occupées</span>
+</div>
+<div class="w-16 h-16 rounded-full border-4 border-surface-container-high border-t-primary flex items-center justify-center transform -rotate-45">
+<span class="transform rotate-45 font-headline-sm text-primary">66%</span>
+</div>
+</div>
+<div class="bg-surface-container-low rounded-lg p-sm border border-outline-variant/20">
+<h4 class="font-label-md text-label-md text-on-surface-variant mb-xs uppercase">Besoins du groupe</h4>
+<div class="flex flex-wrap gap-sm">
+<span class="bg-error-container/30 text-error-container-on font-label-md text-[11px] px-2 py-1 rounded-sm border border-error/20 flex items-center gap-1">Soigneur Requis <span class="material-symbols-outlined text-[12px]">healing</span></span>
+<span class="bg-surface-variant text-on-surface-variant font-label-md text-[11px] px-2 py-1 rounded-sm border border-outline-variant/50">Lanceur de Sorts</span>
+</div>
+</div>
+</div>
+<!-- Upcoming Session Mini-Widget -->
+<div class="bg-surface rounded-xl overflow-hidden shadow-level-1 border border-outline-variant/30">
+<div class="bg-primary-container/10 p-md border-b border-outline-variant/20 relative">
+<!-- WebGL Shader background for magical feel in header -->
+<div class="absolute inset-0 opacity-30 pointer-events-none mix-blend-overlay" style="background-image: radial-gradient(circle at 80% 20%, rgba(124, 58, 237, 0.4) 0%, transparent 50%);"></div>
+<h3 class="font-headline-sm text-headline-sm text-primary flex items-center gap-xs relative z-10">
+<span class="material-symbols-outlined">event</span> Prochaine Séance
+                            </h3>
+</div>
+<div class="p-md">
+<div class="flex items-start gap-md mb-md">
+<div class="bg-surface-container text-center rounded-lg overflow-hidden shrink-0 shadow-sm border border-outline-variant/20">
+<div class="bg-secondary text-on-secondary font-label-md text-[10px] py-1 px-3 uppercase tracking-wider">Jeu</div>
+<div class="font-headline-md text-on-surface py-1 px-3 bg-surface">24</div>
+</div>
+<div>
+<h4 class="font-headline-sm text-body-md font-semibold text-on-surface leading-tight">Session 4 : Le Moulin à Os</h4>
+<p class="font-body-sm text-on-surface-variant mt-xs flex items-center gap-xs"><span class="material-symbols-outlined text-[14px]">schedule</span> 20:30 - 23:30 CET</p>
+</div>
+</div>
+<button class="w-full py-2 bg-surface-container-low hover:bg-surface-container border border-outline-variant rounded-lg font-body-sm text-on-surface transition-colors flex justify-center items-center gap-sm">
+<span class="material-symbols-outlined text-[18px]">edit_calendar</span> Gérer le calendrier
+                            </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom spacing for mobile nav -->
+<div class="h-24 md:h-8 w-full"></div>
+</div>
+</main>
+<!-- BottomNavBar (Shared Component - Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-4 pt-2 bg-surface/90 backdrop-blur-lg border-t border-outline-variant/20 shadow-lg rounded-t-xl">
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container/50 rounded-full px-4 py-1 transition-transform active:scale-90" href="#">
+<span class="material-symbols-outlined text-[24px]">home</span>
+<span class="font-label-md text-[10px] mt-1">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 transition-transform active:scale-90" href="#">
+<span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">casino</span>
+<span class="font-label-md text-[10px] mt-1">Games</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container/50 rounded-full px-4 py-1 transition-transform active:scale-90" href="#">
+<span class="material-symbols-outlined text-[24px]">group</span>
+<span class="font-label-md text-[10px] mt-1">Players</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container/50 rounded-full px-4 py-1 transition-transform active:scale-90" href="#">
+<span class="material-symbols-outlined text-[24px]">event</span>
+<span class="font-label-md text-[10px] mt-1">Calendar</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container/50 rounded-full px-4 py-1 transition-transform active:scale-90" href="#">
+<span class="material-symbols-outlined text-[24px]">person</span>
+<span class="font-label-md text-[10px] mt-1">Profile</span>
+</a>
+</nav>
+</body></html>

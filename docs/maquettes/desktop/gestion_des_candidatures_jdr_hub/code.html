@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+
+<html class="light" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>JDR Hub - Gestion des Candidatures</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;family=Hanken+Grotesk:ital,wght@0,100..900;1,100..900&amp;family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-background": "#191c1e",
+                      "surface-container": "#eceef0",
+                      "on-secondary-container": "#57657a",
+                      "on-tertiary-fixed": "#261a00",
+                      "background": "#f7f9fb",
+                      "surface": "#f7f9fb",
+                      "primary-container": "#7c3aed",
+                      "error": "#ba1a1a",
+                      "surface-variant": "#e0e3e5",
+                      "tertiary-fixed-dim": "#f9bd22",
+                      "inverse-primary": "#d2bbff",
+                      "tertiary-fixed": "#ffdf9f",
+                      "secondary": "#515f74",
+                      "on-primary-fixed-variant": "#5a00c6",
+                      "secondary-fixed-dim": "#b9c7df",
+                      "on-tertiary": "#ffffff",
+                      "surface-dim": "#d8dadc",
+                      "surface-container-high": "#e6e8ea",
+                      "primary-fixed-dim": "#d2bbff",
+                      "on-primary": "#ffffff",
+                      "surface-container-low": "#f2f4f6",
+                      "on-secondary-fixed-variant": "#3a485b",
+                      "outline-variant": "#ccc3d8",
+                      "on-error-container": "#93000a",
+                      "surface-tint": "#732ee4",
+                      "on-tertiary-container": "#ffe2ab",
+                      "error-container": "#ffdad6",
+                      "on-surface": "#191c1e",
+                      "surface-container-lowest": "#ffffff",
+                      "tertiary-container": "#836100",
+                      "primary-fixed": "#eaddff",
+                      "on-secondary": "#ffffff",
+                      "secondary-fixed": "#d5e3fc",
+                      "tertiary": "#654a00",
+                      "on-surface-variant": "#4a4455",
+                      "secondary-container": "#d5e3fc",
+                      "on-tertiary-fixed-variant": "#5c4300",
+                      "inverse-surface": "#2d3133",
+                      "outline": "#7b7487",
+                      "surface-container-highest": "#e0e3e5",
+                      "on-primary-container": "#ede0ff",
+                      "primary": "#630ed4",
+                      "on-primary-fixed": "#25005a",
+                      "on-secondary-fixed": "#0d1c2e",
+                      "surface-bright": "#f7f9fb",
+                      "on-error": "#ffffff",
+                      "inverse-on-surface": "#eff1f3"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "base": "4px",
+                      "xl": "40px",
+                      "sm": "8px",
+                      "xs": "4px",
+                      "gutter": "16px",
+                      "container-padding": "24px",
+                      "lg": "24px",
+                      "md": "16px"
+              },
+              "fontFamily": {
+                      "body-sm": [
+                              "Inter"
+                      ],
+                      "label-md": [
+                              "Geist"
+                      ],
+                      "headline-lg-mobile": [
+                              "Hanken Grotesk"
+                      ],
+                      "headline-lg": [
+                              "Hanken Grotesk"
+                      ],
+                      "display-lg": [
+                              "Hanken Grotesk"
+                      ],
+                      "headline-sm": [
+                              "Hanken Grotesk"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "headline-md": [
+                              "Hanken Grotesk"
+                      ]
+              },
+              "fontSize": {
+                      "body-sm": [
+                              "14px",
+                              {
+                                      "lineHeight": "1.5",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-md": [
+                              "12px",
+                              {
+                                      "lineHeight": "1",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-lg-mobile": [
+                              "28px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "headline-sm": [
+                              "20px",
+                              {
+                                      "lineHeight": "1.4",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "1.3",
+                                      "fontWeight": "600"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        
+        .card-shadow {
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-hover-shadow:hover {
+            box-shadow: 0 10px 15px -3px rgba(124, 58, 237, 0.1), 0 4px 6px -4px rgba(124, 58, 237, 0.1);
+            transform: translateY(-2px);
+            transition: all 0.2s ease-in-out;
+        }
+
+        .stat-block {
+            background-color: #f1f5f9;
+        }
+      </style>
+</head>
+<body class="bg-background text-on-background antialiased min-h-screen flex font-body-md text-body-md overflow-hidden">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full w-64 flex flex-col p-md z-40 bg-surface dark:bg-surface-container-low border-r border-outline-variant dark:border-outline shadow-sm dark:shadow-none hidden md:flex">
+<div class="flex items-center gap-sm mb-xl px-sm">
+<div class="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center text-on-primary-container shadow-sm">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">swords</span>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed">JDR Hub</h1>
+<p class="font-label-md text-label-md text-on-surface-variant">Dungeon Master</p>
+</div>
+</div>
+<nav class="flex-1 flex flex-col gap-xs">
+<a class="flex items-center gap-md text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container-highest rounded-xl px-md py-sm transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-body-md text-body-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-md bg-secondary-container dark:bg-primary-container text-on-secondary-container dark:text-on-primary-container rounded-xl px-md py-sm active:scale-[0.98] transition-transform duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="casino">casino</span>
+<span class="font-body-md text-body-md font-medium">Games</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container-highest rounded-xl px-md py-sm transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-body-md text-body-md">Players</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container-highest rounded-xl px-md py-sm transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span>
+<span class="font-body-md text-body-md">Schedule</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container-highest rounded-xl px-md py-sm transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-body-md text-body-md">Profile</span>
+</a>
+</nav>
+<div class="mt-auto flex flex-col gap-md pt-md border-t border-outline-variant/30">
+<button class="w-full bg-primary-container text-on-primary-container hover:bg-surface-tint hover:text-on-primary rounded-xl py-sm px-md flex items-center justify-center gap-sm font-label-md text-label-md transition-colors card-shadow active:scale-[0.98]">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                New Campaign
+            </button>
+<a class="flex items-center gap-md text-on-surface-variant dark:text-on-surface-variant hover:bg-surface-container-high dark:hover:bg-surface-container-highest rounded-xl px-md py-sm transition-colors duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-body-md text-body-md">Settings</span>
+</a>
+<div class="flex items-center gap-md px-md py-sm mt-sm">
+<img alt="User avatar" class="w-8 h-8 rounded-full object-cover shadow-sm border border-outline-variant" data-alt="A modern, high-quality digital portrait of a Dungeon Master avatar. Subtle ethereal lighting with violet tones, clean corporate SaaS style mixed with subtle fantasy elements. Professional, confident expression." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCxqoU6aKZuevftOo7xoetba9kL41VAssPcHW3QSNO-Kx9fdsWqmFDpR7u4f1gqys1enGh3Nbx5Hc6iX8v8LVBUmAdc9tJY82WRUtFORqFWVkXX6jilBMrJNRZal0OKycYpAyw46WvpQMuhBd0N-PwjFDXI4UlRXqdB9_qZaJuJ7sjJBzenresBw8t8fpXlA3keC6WMFwiUqkDH1ujIqRG3g_lFbCoO6pAwqIqvjHWSnp68FdkADof9"/>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface">Alex DM</span>
+<span class="font-label-md text-label-md text-on-surface-variant text-[10px]">Pro Tier</span>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col ml-0 md:ml-64 relative h-screen overflow-hidden bg-surface-bright">
+<!-- TopNavBar -->
+<header class="fixed top-0 right-0 left-0 md:left-64 flex justify-between items-center px-lg h-16 z-30 bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-md border-b border-outline-variant dark:border-outline shadow-sm dark:shadow-none transition-all">
+<!-- Mobile Menu Toggle (visible only on small screens) -->
+<button class="md:hidden text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<!-- Search -->
+<div class="hidden sm:flex items-center relative w-64">
+<span class="material-symbols-outlined absolute left-3 text-on-surface-variant text-[20px]">search</span>
+<input class="w-full bg-surface-container-low border border-outline-variant rounded-full py-1.5 pl-10 pr-4 font-body-sm text-body-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all" placeholder="Rechercher..." type="text"/>
+</div>
+<!-- Actions -->
+<div class="flex items-center gap-md ml-auto">
+<button class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary transition-all p-2 rounded-full hover:bg-surface-container-low active:scale-95">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="text-on-surface-variant dark:text-on-surface-variant hover:text-primary transition-all p-2 rounded-full hover:bg-surface-container-low active:scale-95">
+<span class="material-symbols-outlined" data-icon="history_edu">history_edu</span>
+</button>
+<button class="hidden md:flex items-center gap-xs bg-primary text-on-primary px-4 py-1.5 rounded-full font-label-md text-label-md hover:bg-surface-tint shadow-sm transition-colors active:scale-95">
+                    Create Post
+                </button>
+<img alt="User profile" class="w-8 h-8 rounded-full ml-sm border border-outline-variant md:hidden cursor-pointer" data-alt="A small circular avatar image showing a stylized modern wizard or game master profile picture, minimalist flat vector style with subtle violet accents." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBC5gBFnLEADiqtg0VoZevrRwnpQWZ_OccAyH74qbbjIepGvDyff-a2SJFVfvxR9Y_FUNIYJWsg5CCdRp2NKrRjErao8OJCL3QfJ6MQ2dqmYdoS0nrrylS6SsKXEGmC9ZWtJ4avvbpi8N9ysWZHc7U4xbVUd_qenfIBeZZS6RmqlsdTirOnlbKyQpAyyQUUI5_QYwLF0ZUBsS_OZ-HC-5yimbZWfXi4H8oB683n0OiRIzwhvdHfCCB0"/>
+</div>
+</header>
+<!-- Page Content Scrollable Area -->
+<div class="flex-1 overflow-y-auto mt-16 p-lg pb-xl">
+<div class="max-w-[1200px] mx-auto">
+<!-- Page Header -->
+<div class="mb-lg flex flex-col md:flex-row md:items-end justify-between gap-md">
+<div>
+<div class="flex items-center gap-sm mb-1 text-primary">
+<span class="material-symbols-outlined text-[18px]">auto_stories</span>
+<span class="font-label-md text-label-md uppercase tracking-wider">Campagne Actuelle</span>
+</div>
+<h2 class="font-display-lg text-display-lg text-on-background mb-xs">Gestion des Candidatures</h2>
+<p class="font-body-lg text-body-lg text-on-surface-variant flex items-center gap-2">
+                            La Malédiction de Strahd 
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-label-md bg-surface-container border border-outline-variant text-on-surface-variant">D&amp;D 5E</span>
+</p>
+</div>
+<div class="flex gap-sm">
+<button class="px-4 py-2 bg-surface text-on-surface border border-outline-variant rounded-lg font-label-md text-label-md hover:bg-surface-container-low transition-colors shadow-sm flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">filter_list</span>
+                            Filtrer
+                        </button>
+</div>
+</div>
+<!-- Main Layout Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-lg">
+<!-- Left Column: Candidates List (8 cols) -->
+<div class="lg:col-span-8 flex flex-col gap-md">
+<!-- Tabs -->
+<div class="flex gap-md border-b border-outline-variant/50 pb-sm mb-sm overflow-x-auto hide-scrollbar">
+<button class="text-primary font-label-md text-label-md font-bold border-b-2 border-primary pb-2 px-1 whitespace-nowrap">
+                                En attente (3)
+                            </button>
+<button class="text-on-surface-variant hover:text-primary font-label-md text-label-md pb-2 px-1 transition-colors whitespace-nowrap">
+                                Acceptées (8)
+                            </button>
+<button class="text-on-surface-variant hover:text-primary font-label-md text-label-md pb-2 px-1 transition-colors whitespace-nowrap">
+                                Refusées (2)
+                            </button>
+</div>
+<!-- Candidate Card 1 -->
+<div class="bg-surface rounded-xl p-md card-shadow card-hover-shadow border border-outline-variant/30 flex flex-col sm:flex-row gap-md relative overflow-hidden group">
+<!-- Decorative accent line -->
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-tertiary-fixed-dim"></div>
+<div class="flex-shrink-0 flex flex-col items-center gap-sm">
+<img alt="Mélina" class="w-16 h-16 rounded-full object-cover border-2 border-surface shadow-sm" data-alt="A modern, clean avatar portrait of a female TTRPG player named Mélina. Minimalist illustration style, slate blue background, subtle lighting, professional gamer aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCJWYpZWXmIsycmVDNO6EKPdJK5_bMVAkaFrj9cJw3lTbO7ZD6d7QsOUZPjEYOyjypHiTWOF1UAA6SDoddQ7C1QV8DkmLQRVNDrgtSM6UmS7LXGC0ftBDH3ootM8C2bDUxyTDQCvhaeW2yyndlA8oYuePe3CJ06EO0vSSHJgL2irHAeVLX1WdaWtnEca8frzNqFIBw_Obh7B7h44K7S0JkEl7CCINQE9rkfh2KcgSRSKNRg_5XFm1YC"/>
+<span class="bg-surface-container px-2 py-0.5 rounded font-label-md text-[10px] text-on-surface-variant">Vétéran</span>
+</div>
+<div class="flex-1 flex flex-col min-w-0">
+<div class="flex justify-between items-start mb-1">
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-background truncate">Mélina</h3>
+<p class="font-body-sm text-body-sm text-secondary truncate flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">swords</span>
+                                            Voleur Elfe (Niv 1)
+                                        </p>
+</div>
+<span class="text-on-surface-variant text-[12px] font-label-md">il y a 2h</span>
+</div>
+<div class="bg-surface-container-low p-sm rounded-lg mt-2 mb-3 border border-outline-variant/20">
+<p class="font-body-sm text-body-sm text-on-surface line-clamp-2 italic">
+                                        "J'adore l'ambiance horreur gothique. Je joue depuis 5 ans et j'aime particulièrement le roleplay d'investigation. Mon personnage est un ancien détective privé..."
+                                    </p>
+</div>
+<div class="flex flex-wrap gap-xs mb-md">
+<span class="inline-flex items-center gap-1 bg-secondary-fixed text-on-secondary-fixed px-2 py-1 rounded-md font-label-md text-[10px]">
+<span class="material-symbols-outlined text-[12px]">verified</span>
+                                        Profil vérifié
+                                    </span>
+<span class="inline-flex items-center gap-1 bg-surface-container-high text-on-surface px-2 py-1 rounded-md font-label-md text-[10px]">
+<span class="material-symbols-outlined text-[12px]">mic</span>
+                                        Micro OK
+                                    </span>
+<span class="inline-flex items-center gap-1 bg-surface-container-high text-on-surface px-2 py-1 rounded-md font-label-md text-[10px]">
+<span class="material-symbols-outlined text-[12px]">schedule</span>
+                                        Dispo Ven/Sam
+                                    </span>
+</div>
+<div class="flex items-center gap-sm mt-auto justify-end sm:justify-start">
+<button class="bg-primary text-on-primary px-4 py-2 rounded-lg font-label-md text-label-md hover:bg-surface-tint shadow-sm transition-colors flex items-center gap-1 active:scale-95">
+<span class="material-symbols-outlined text-[16px]">check</span> Accepter
+                                    </button>
+<button class="border border-outline-variant text-on-surface hover:bg-error-container hover:text-on-error-container hover:border-error-container px-4 py-2 rounded-lg font-label-md text-label-md transition-colors flex items-center gap-1 active:scale-95">
+<span class="material-symbols-outlined text-[16px]">close</span> Refuser
+                                    </button>
+<button class="ml-auto sm:ml-0 text-on-surface-variant hover:text-primary hover:bg-surface-container p-2 rounded-lg transition-colors" title="Envoyer un message">
+<span class="material-symbols-outlined">chat</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Candidate Card 2 -->
+<div class="bg-surface rounded-xl p-md card-shadow card-hover-shadow border border-outline-variant/30 flex flex-col sm:flex-row gap-md relative overflow-hidden group">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-tertiary-fixed-dim"></div>
+<div class="flex-shrink-0 flex flex-col items-center gap-sm">
+<img alt="Dorian" class="w-16 h-16 rounded-full object-cover border-2 border-surface shadow-sm" data-alt="A clean, modern avatar portrait of a male TTRPG player named Dorian. Minimalist illustration style, subtle lighting, slate blue background, wearing a casual modern outfit." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDip3lhnTz9Dp3B_0sDpWaSzjvGF2i6fmB5-lYKFMVoxhTaLaiV1hTY7G74P6CTX0Ere-Sot4A0S-HW23K2uMotTsn80Vj00fpUAIMuKGdAVhF6BAxKrEg4OD7hJfIsu_O_fU16YX5eq3EzLl6UrDgQ0E2iElebix6cGHlx7lis1zZAXap1D1Jx4qckubAuzJZFfBEl2KGKnG1KTNdGCiQ14VPAjZZErARwWzhAmMrFOAAqCvZsZU5S"/>
+<span class="bg-surface-container px-2 py-0.5 rounded font-label-md text-[10px] text-on-surface-variant">Débutant</span>
+</div>
+<div class="flex-1 flex flex-col min-w-0">
+<div class="flex justify-between items-start mb-1">
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-background truncate">Dorian</h3>
+<p class="font-body-sm text-body-sm text-secondary truncate flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">auto_fix_high</span>
+                                            Mage de Guerre (Niv 1)
+                                        </p>
+</div>
+<span class="text-on-surface-variant text-[12px] font-label-md">hier</span>
+</div>
+<div class="bg-surface-container-low p-sm rounded-lg mt-2 mb-3 border border-outline-variant/20">
+<p class="font-body-sm text-body-sm text-on-surface line-clamp-2 italic">
+                                        "Je débute sur D&amp;D 5e mais j'ai lu les règles. Je cherche un groupe patient. Mon mage utilise la magie pour palier à sa cécité partielle."
+                                    </p>
+</div>
+<div class="flex flex-wrap gap-xs mb-md">
+<span class="inline-flex items-center gap-1 bg-surface-container-high text-on-surface px-2 py-1 rounded-md font-label-md text-[10px]">
+<span class="material-symbols-outlined text-[12px]">mic</span>
+                                        Micro OK
+                                    </span>
+</div>
+<div class="flex items-center gap-sm mt-auto justify-end sm:justify-start">
+<button class="bg-primary text-on-primary px-4 py-2 rounded-lg font-label-md text-label-md hover:bg-surface-tint shadow-sm transition-colors flex items-center gap-1 active:scale-95">
+<span class="material-symbols-outlined text-[16px]">check</span> Accepter
+                                    </button>
+<button class="border border-outline-variant text-on-surface hover:bg-error-container hover:text-on-error-container hover:border-error-container px-4 py-2 rounded-lg font-label-md text-label-md transition-colors flex items-center gap-1 active:scale-95">
+<span class="material-symbols-outlined text-[16px]">close</span> Refuser
+                                    </button>
+<button class="ml-auto sm:ml-0 text-on-surface-variant hover:text-primary hover:bg-surface-container p-2 rounded-lg transition-colors" title="Envoyer un message">
+<span class="material-symbols-outlined">chat</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Candidate Card 3 (Minimalist variant) -->
+<div class="bg-surface rounded-xl p-md card-shadow card-hover-shadow border border-outline-variant/30 flex flex-col sm:flex-row gap-md relative overflow-hidden group opacity-80 hover:opacity-100 transition-opacity">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-surface-variant"></div>
+<div class="flex-shrink-0 flex flex-col items-center gap-sm">
+<div class="w-16 h-16 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant text-headline-sm font-bold border-2 border-surface shadow-sm">
+                                    L
+                                </div>
+<span class="bg-surface-container px-2 py-0.5 rounded font-label-md text-[10px] text-on-surface-variant">Intermédiaire</span>
+</div>
+<div class="flex-1 flex flex-col min-w-0">
+<div class="flex justify-between items-start mb-1">
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-background truncate">Lukas_RPG</h3>
+<p class="font-body-sm text-body-sm text-secondary truncate flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">shield</span>
+                                            Paladin (Niv 1)
+                                        </p>
+</div>
+<span class="text-on-surface-variant text-[12px] font-label-md">il y a 2 jours</span>
+</div>
+<div class="bg-surface-container-low p-sm rounded-lg mt-2 mb-3 border border-outline-variant/20">
+<p class="font-body-sm text-body-sm text-on-surface line-clamp-1 italic text-on-surface-variant">
+                                        "Prêt à purger le mal de Barovie."
+                                    </p>
+</div>
+<div class="flex items-center gap-sm mt-auto justify-end sm:justify-start">
+<button class="bg-primary text-on-primary px-4 py-2 rounded-lg font-label-md text-label-md hover:bg-surface-tint shadow-sm transition-colors flex items-center gap-1 active:scale-95">
+<span class="material-symbols-outlined text-[16px]">check</span>
+</button>
+<button class="border border-outline-variant text-on-surface hover:bg-error-container hover:text-on-error-container hover:border-error-container px-4 py-2 rounded-lg font-label-md text-label-md transition-colors flex items-center gap-1 active:scale-95">
+<span class="material-symbols-outlined text-[16px]">close</span>
+</button>
+<button class="ml-auto sm:ml-0 text-on-surface-variant hover:text-primary hover:bg-surface-container p-2 rounded-lg transition-colors" title="Envoyer un message">
+<span class="material-symbols-outlined">chat</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Campaign Stats (4 cols) -->
+<div class="lg:col-span-4 flex flex-col gap-md">
+<!-- Main Stats Card (Glassmorphism hint) -->
+<div class="bg-surface rounded-xl p-md card-shadow border border-outline-variant/30 relative overflow-hidden">
+<!-- Subtle abstract bg element -->
+<div class="absolute -right-10 -top-10 w-32 h-32 bg-primary-container/10 rounded-full blur-2xl"></div>
+<h3 class="font-headline-sm text-headline-sm text-on-background mb-sm relative z-10">Statut de la Campagne</h3>
+<div class="space-y-4 relative z-10">
+<!-- Capacity -->
+<div class="bg-surface-container-low rounded-lg p-sm border border-outline-variant/20 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">groups</span>
+<span class="font-body-sm text-body-sm text-on-surface">Places restantes</span>
+</div>
+<div class="flex items-baseline gap-1">
+<span class="font-headline-md text-headline-md text-on-background font-bold">2</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">/ 6</span>
+</div>
+</div>
+<!-- Progress bar for capacity -->
+<div class="w-full bg-surface-variant rounded-full h-2 mb-2 overflow-hidden">
+<div class="bg-gradient-to-r from-primary to-surface-tint h-2 rounded-full" style="width: 66%"></div>
+</div>
+<!-- Quick Stats List -->
+<div class="grid grid-cols-2 gap-sm mt-4">
+<div class="stat-block rounded-lg p-sm border border-outline-variant/20 flex flex-col">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase mb-1">Candidatures</span>
+<span class="font-headline-sm text-headline-sm text-on-background">13</span>
+</div>
+<div class="stat-block rounded-lg p-sm border border-outline-variant/20 flex flex-col">
+<span class="font-label-md text-label-md text-on-surface-variant uppercase mb-1">Session 0</span>
+<span class="font-headline-sm text-headline-sm text-on-background text-[14px]">Prévue le 12/10</span>
+</div>
+</div>
+<!-- Action -->
+<button class="w-full mt-2 bg-surface text-primary border border-primary/30 rounded-lg py-2 font-label-md text-label-md hover:bg-primary-container/10 transition-colors flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-[18px]">settings</span>
+                                    Paramètres de la campagne
+                                </button>
+</div>
+</div>
+<!-- Next Session Widget -->
+<div class="bg-surface rounded-xl p-md card-shadow border border-outline-variant/30 flex items-start gap-md">
+<div class="w-12 h-12 rounded-lg bg-secondary-container flex flex-col items-center justify-center text-on-secondary-container flex-shrink-0">
+<span class="font-label-md text-[10px] uppercase">Oct</span>
+<span class="font-headline-sm font-bold leading-none">12</span>
+</div>
+<div>
+<h4 class="font-label-md text-label-md text-on-surface mb-1">Prochaine étape</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Sélection finale des joueurs et préparation de la Session 0.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+
+<html lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>La Crypte Maudite - JDR Hub</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@500&amp;family=Hanken+Grotesk:wght@600;700&amp;family=Inter:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "tertiary-container": "#836100",
+                      "on-secondary-fixed-variant": "#3a485b",
+                      "secondary-fixed": "#d5e3fc",
+                      "surface-container-low": "#f2f4f6",
+                      "tertiary": "#654a00",
+                      "on-primary-fixed-variant": "#5a00c6",
+                      "error-container": "#ffdad6",
+                      "inverse-on-surface": "#eff1f3",
+                      "primary-fixed": "#eaddff",
+                      "secondary-fixed-dim": "#b9c7df",
+                      "inverse-surface": "#2d3133",
+                      "on-primary-fixed": "#25005a",
+                      "background": "#f7f9fb",
+                      "surface-dim": "#d8dadc",
+                      "error": "#ba1a1a",
+                      "surface-bright": "#f7f9fb",
+                      "on-tertiary": "#ffffff",
+                      "surface": "#f7f9fb",
+                      "surface-tint": "#732ee4",
+                      "surface-container-high": "#e6e8ea",
+                      "on-surface-variant": "#4a4455",
+                      "primary": "#630ed4",
+                      "primary-container": "#7c3aed",
+                      "secondary": "#515f74",
+                      "surface-variant": "#e0e3e5",
+                      "tertiary-fixed": "#ffdf9f",
+                      "secondary-container": "#d5e3fc",
+                      "on-tertiary-fixed": "#261a00",
+                      "outline-variant": "#ccc3d8",
+                      "on-secondary-fixed": "#0d1c2e",
+                      "tertiary-fixed-dim": "#f9bd22",
+                      "surface-container-lowest": "#ffffff",
+                      "on-primary": "#ffffff",
+                      "on-primary-container": "#ede0ff",
+                      "surface-container": "#eceef0",
+                      "on-background": "#191c1e",
+                      "on-error": "#ffffff",
+                      "on-error-container": "#93000a",
+                      "surface-container-highest": "#e0e3e5",
+                      "inverse-primary": "#d2bbff",
+                      "on-surface": "#191c1e",
+                      "on-tertiary-container": "#ffe2ab",
+                      "on-secondary": "#ffffff",
+                      "primary-fixed-dim": "#d2bbff",
+                      "on-tertiary-fixed-variant": "#5c4300",
+                      "outline": "#7b7487",
+                      "on-secondary-container": "#57657a"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "container-padding": "24px",
+                      "xl": "40px",
+                      "md": "16px",
+                      "base": "4px",
+                      "xs": "4px",
+                      "lg": "24px",
+                      "sm": "8px",
+                      "gutter": "16px"
+              },
+              "fontFamily": {
+                      "headline-sm": ["Hanken Grotesk"],
+                      "label-md": ["Geist"],
+                      "headline-md": ["Hanken Grotesk"],
+                      "body-lg": ["Inter"],
+                      "headline-lg-mobile": ["Hanken Grotesk"],
+                      "body-md": ["Inter"],
+                      "display-lg": ["Hanken Grotesk"],
+                      "headline-lg": ["Hanken Grotesk"],
+                      "body-sm": ["Inter"]
+              },
+              "fontSize": {
+                      "headline-sm": ["20px", { "lineHeight": "1.4", "fontWeight": "600" }],
+                      "label-md": ["12px", { "lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                      "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                      "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                      "headline-lg-mobile": ["28px", { "lineHeight": "1.2", "fontWeight": "600" }],
+                      "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                      "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                      "headline-lg": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                      "body-sm": ["14px", { "lineHeight": "1.5", "fontWeight": "400" }]
+              },
+              "boxShadow": {
+                  'level-1': '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1)',
+                  'level-2': '0 10px 15px -3px rgba(124, 58, 237, 0.1), 0 4px 6px -4px rgba(124, 58, 237, 0.1)',
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        body { background-color: theme('colors.background'); color: theme('colors.on-background'); }
+        .ambient-shadow { box-shadow: 0 10px 40px -10px rgba(99, 14, 212, 0.08); }
+        .glass-panel { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.3); }
+        .stat-block { background-color: theme('colors.surface-container-low'); border: 1px solid theme('colors.outline-variant'); border-radius: theme('borderRadius.lg'); padding: theme('spacing.md'); }
+        .stat-label { font-family: theme('fontFamily.label-md'); font-size: theme('fontSize.label-md')[0]; font-weight: 600; color: theme('colors.secondary'); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: theme('spacing.base'); }
+        .stat-value { font-family: theme('fontFamily.body-md'); font-size: theme('fontSize.body-md')[0]; color: theme('colors.on-surface'); font-weight: 500; }
+        
+        /* Gradient text for titles */
+        .text-gradient { background: linear-gradient(135deg, theme('colors.primary') 0%, theme('colors.on-primary-fixed-variant') 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    </style>
+</head>
+<body class="flex h-screen w-full overflow-hidden antialiased">
+<!-- JSON Component: SideNavBar -->
+<nav class="hidden md:flex flex-col h-full py-lg px-md bg-surface border-r border-outline-variant shadow-sm docked w-64 left-0 top-0 z-50">
+<div class="flex items-center gap-sm mb-xl px-sm">
+<span class="material-symbols-outlined text-primary text-3xl" data-weight="fill" style="font-variation-settings: 'FILL' 1;">hexagon</span>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary tracking-tight">JDR Hub</h1>
+<p class="font-label-md text-label-md text-secondary">Digital Dungeon Master</p>
+</div>
+</div>
+<div class="flex-1 space-y-sm">
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors active:scale-95 duration-150 font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+                Dashboard
+            </a>
+<!-- Active Tab: Games -->
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-primary font-bold border-r-4 border-primary bg-primary-container/10 active:scale-95 duration-150 font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined" data-weight="fill" style="font-variation-settings: 'FILL' 1;">casino</span>
+                Games
+            </a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors active:scale-95 duration-150 font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">group</span>
+                Players
+            </a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors active:scale-95 duration-150 font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">calendar_today</span>
+                Schedule
+            </a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant hover:text-primary hover:bg-surface-container-high transition-colors active:scale-95 duration-150 font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined">account_circle</span>
+                Profile
+            </a>
+</div>
+<button class="mt-auto flex items-center justify-center gap-sm w-full py-md bg-primary text-on-primary rounded-lg font-headline-sm text-headline-sm hover:bg-on-primary-fixed-variant transition-colors shadow-level-2 active:scale-95 duration-150">
+<span class="material-symbols-outlined" data-weight="fill" style="font-variation-settings: 'FILL' 1;">add</span>
+            New Game
+        </button>
+</nav>
+<!-- Main Content Wrapper -->
+<div class="flex-1 flex flex-col h-full overflow-hidden relative">
+<!-- JSON Component: TopAppBar -->
+<header class="sticky top-0 z-40 flex justify-between items-center w-full px-lg py-md mb-lg backdrop-blur-md bg-surface/80 border-b border-outline-variant/30 shadow-sm docked full-width focus-within:ring-2 focus-within:ring-primary">
+<!-- Breadcrumb (Contextual addition for detail page, replacing search for this specific view to focus on navigation back) -->
+<div class="flex items-center gap-sm text-on-surface-variant font-body-md text-body-md">
+<a class="hover:text-primary transition-colors flex items-center gap-xs" href="#">
+<span class="material-symbols-outlined text-sm">arrow_back</span>
+                    Jeux
+                </a>
+<span class="text-outline">/</span>
+<span class="font-bold text-on-surface">La Crypte Maudite</span>
+</div>
+<div class="flex items-center gap-md">
+<button class="p-sm rounded-full text-on-surface-variant hover:text-primary hover:bg-surface-container transition-all">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-sm rounded-full text-on-surface-variant hover:text-primary hover:bg-surface-container transition-all">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<img alt="User Avatar" class="w-10 h-10 rounded-full border-2 border-surface object-cover shadow-sm cursor-pointer" data-alt="A minimalist digital portrait of a sophisticated user avatar, framed from the shoulders up. They are wearing sleek, dark slate robes with subtle violet geometric patterns. The lighting is soft and modern, highlighting a calm, organized demeanor. The background is a clean, neutral gradient to maintain a professional, high-end aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAPQ56qwqdUGIxNQ570DYJJaAhMRu_2Nf90LWALM0N8pxI2zRzA7lVrnzeGVAlg0WGzE4XD3Ytc1APU9j7EDavSQRD22tIy1_FSFSciohg9F6F67SsrshWSIS45QrpwK9pOIa7zA1gOmEIc5tOm74RevvxBEkF5RVdXvlCmiRrOc2BINKRehiaX4uj1Q4vP0hZ1R8TLecVgwmsFCG-cNnNXGm39ruFdrsh7AU6BWnDWWd6FAkfzVTJf"/>
+</div>
+</header>
+<!-- Scrollable Content Canvas -->
+<main class="flex-1 overflow-y-auto px-md md:px-xl pb-32 md:pb-xl">
+<div class="max-w-[1200px] mx-auto w-full">
+<!-- Hero Section -->
+<div class="relative w-full h-[300px] md:h-[400px] rounded-[24px] overflow-hidden mb-lg shadow-level-1 ambient-shadow group" data-alt="A wide cinematic shot of a dark, ancient stone crypt entrance bathed in eerie, ethereal violet light. The aesthetic is modern-professional fantasy, focusing on mood and atmospheric depth rather than clutter. Mist rolls across the cracked floor tiles. High-key contrast with deep slate shadows and vibrant magical accents. Rendered in a sleek, high-fidelity digital art style." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuA-tXKJLYU_mdsUs5F8vNyOpt_jUrEAKRPjErJK_wxDTv7o9dFLo3OKqRHFqCHoBU7xzxVSKHp2jBCIBF6T-Og3NmNy8Ig5S-QhfOG6BJsGDwJBfcZHHyJW8enUfYVO3Rc9a_hLTiVYBN19RvAx97VKO3yDWM_mQrYkx69rUrz5-_FLXYQr9q3VNKIQNPK7L-BFB_CNZlwTsryqEZIbsUFaL0ifAjCr2K9nHvCP_KWcIdN6reVoS_ZB')">
+<!-- Gradient Overlay -->
+<div class="absolute inset-0 bg-gradient-to-t from-inverse-surface/90 via-inverse-surface/40 to-transparent"></div>
+<!-- Content inside Hero -->
+<div class="absolute bottom-0 left-0 w-full p-lg md:p-xl flex flex-col md:flex-row md:items-end justify-between gap-md">
+<div>
+<div class="flex gap-sm mb-sm">
+<span class="bg-primary-container/20 text-inverse-primary backdrop-blur-md px-sm py-xs rounded font-label-md text-label-md border border-primary/30">Campagne</span>
+<span class="bg-surface/10 text-on-tertiary backdrop-blur-md px-sm py-xs rounded font-label-md text-label-md border border-white/20">D&amp;D 5E</span>
+</div>
+<h1 class="font-headline-lg-mobile md:font-display-lg text-headline-lg-mobile md:text-display-lg text-on-tertiary tracking-tight drop-shadow-md">La Crypte Maudite</h1>
+</div>
+<!-- GM Info Pill -->
+<div class="flex items-center gap-sm bg-surface/10 backdrop-blur-md border border-white/20 rounded-full p-xs pr-md w-max">
+<img alt="Arkanis Avatar" class="w-8 h-8 rounded-full object-cover" data-alt="A minimalist digital portrait of a sophisticated dungeon master character, framed from the shoulders up. They are wearing sleek, dark slate robes with subtle violet geometric patterns. The lighting is soft and modern, highlighting a calm, organized demeanor. The background is a clean, neutral gradient to maintain a professional, high-end aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBj0cYqOF2uamTwqzTKLFFS4FEqOg93mJDWOSwUjSx-pg8svw8NHI5YY9b1oQsgyZ8ls-RCKf1_TQ3mUtDskW_LZFVMxMIRy6klsj9aEATfQU__nc9QVG0MozCx1RyTnCADz2GYHH1Er19NlFdBU3gdBzb4D160RXE5TIh3LuYUTUhgFtNjWcZByuSpKy8P7Y6GYdRgztVhEmTD4g1DLjyps751sJBpl1QHFdG8qliB-e0dGRX-Q7Rr"/>
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-secondary-fixed-dim uppercase tracking-wider text-[10px]">Maître du Jeu</span>
+<span class="font-body-sm text-body-sm text-on-tertiary font-bold leading-none">Arkanis</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Bento Grid Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-lg">
+<!-- Left Column: Main Content -->
+<div class="lg:col-span-8 flex flex-col gap-lg">
+<!-- Description Card -->
+<div class="bg-surface rounded-xl shadow-level-1 border border-outline-variant/30 p-lg relative overflow-hidden">
+<!-- Subtle decorative element -->
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary-container/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none"></div>
+<h2 class="font-headline-md text-headline-md text-on-surface mb-md flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">menu_book</span>
+                                Synopsis
+                            </h2>
+<div class="font-body-md text-body-md text-on-surface-variant space-y-md leading-relaxed">
+<p>
+                                    Depuis des siècles, la Crypte d'Oakhaven repose en silence sous les collines d'émeraude, scellée par une magie dont on a oublié le nom. Mais récemment, le sceau a commencé à se fissurer. Des murmures s'échappent des pierres, et la terre alentour se flétrit.
+                                </p>
+<p>
+                                    Vous êtes un groupe d'aventuriers hétéroclites, engagés par le bourgmestre désespéré pour enquêter sur ces phénomènes avant que la corruption n'atteigne le village. Ce qui devait être une simple mission d'exploration se transformera vite en une lutte pour la survie contre des forces anciennes et affamées.
+                                </p>
+<p>
+                                    Préparez-vous à affronter des énigmes mortelles, des créatures nées de l'ombre, et peut-être, vos propres peurs enfouies. La Crypte ne rend jamais ce qu'elle prend.
+                                </p>
+</div>
+<div class="mt-lg pt-md border-t border-outline-variant/20 flex flex-wrap gap-sm">
+<span class="px-md py-sm bg-surface-container text-on-surface font-label-md text-label-md rounded-full">#DarkFantasy</span>
+<span class="px-md py-sm bg-surface-container text-on-surface font-label-md text-label-md rounded-full">#Exploration</span>
+<span class="px-md py-sm bg-surface-container text-on-surface font-label-md text-label-md rounded-full">#HorreurPsychologique</span>
+<span class="px-md py-sm bg-primary-container/10 text-primary font-label-md text-label-md rounded-full border border-primary/20">Débutants Acceptés</span>
+</div>
+</div>
+<!-- Upcoming Sessions -->
+<div class="bg-surface rounded-xl shadow-level-1 border border-outline-variant/30 p-lg">
+<h2 class="font-headline-md text-headline-md text-on-surface mb-md flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">event</span>
+                                Prochaines Sessions
+                            </h2>
+<div class="space-y-sm">
+<!-- Session Item -->
+<div class="flex items-center justify-between p-md rounded-lg hover:bg-surface-container-low transition-colors border border-transparent hover:border-outline-variant/30 group cursor-pointer">
+<div class="flex items-center gap-md">
+<div class="flex flex-col items-center justify-center bg-primary-container/10 text-primary w-12 h-12 rounded-lg border border-primary/20 group-hover:bg-primary group-hover:text-on-primary transition-colors">
+<span class="font-label-md text-label-md uppercase text-[10px]">Oct</span>
+<span class="font-headline-sm text-headline-sm font-bold leading-none">12</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Session 0: Création &amp; Prologue</h3>
+<p class="font-body-sm text-body-sm text-secondary flex items-center gap-xs mt-1">
+<span class="material-symbols-outlined text-[14px]">schedule</span> 20:30 - 23:30 (CET)
+                                            </p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+<!-- Session Item -->
+<div class="flex items-center justify-between p-md rounded-lg hover:bg-surface-container-low transition-colors border border-transparent hover:border-outline-variant/30 group cursor-pointer">
+<div class="flex items-center gap-md">
+<div class="flex flex-col items-center justify-center bg-surface-container text-on-surface-variant w-12 h-12 rounded-lg border border-outline-variant/30 group-hover:bg-primary group-hover:text-on-primary transition-colors">
+<span class="font-label-md text-label-md uppercase text-[10px]">Oct</span>
+<span class="font-headline-sm text-headline-sm font-bold leading-none">19</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Session 1: La Descente</h3>
+<p class="font-body-sm text-body-sm text-secondary flex items-center gap-xs mt-1">
+<span class="material-symbols-outlined text-[14px]">schedule</span> 20:30 - 23:30 (CET)
+                                            </p>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Sidebar Stats & Actions -->
+<div class="lg:col-span-4 flex flex-col gap-lg">
+<!-- CTA Card (Sticky visually) -->
+<div class="bg-surface rounded-xl shadow-level-2 border border-primary/20 p-md relative overflow-hidden flex flex-col items-center text-center">
+<div class="absolute inset-0 bg-gradient-to-br from-primary-container/10 to-transparent pointer-events-none"></div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-xs relative z-10">Rejoindre l'Aventure</h3>
+<p class="font-body-sm text-body-sm text-secondary mb-md relative z-10">3 places restantes. Candidatures ouvertes jusqu'au 10 Octobre.</p>
+<button class="w-full py-md px-lg bg-primary text-on-primary rounded-lg font-headline-sm text-headline-sm hover:bg-primary-container hover:text-on-primary-container transition-all shadow-md active:scale-95 duration-150 relative z-10 flex items-center justify-center gap-sm">
+<span class="material-symbols-outlined">edit_document</span>
+                                Postuler pour rejoindre
+                            </button>
+</div>
+<!-- Quick Stats (Stat Block Style) -->
+<div class="bg-surface rounded-xl shadow-level-1 border border-outline-variant/30 p-lg">
+<h2 class="font-headline-sm text-headline-sm text-on-surface mb-md border-b border-outline-variant/30 pb-sm">Détails de la Partie</h2>
+<div class="grid grid-cols-2 gap-sm">
+<div class="stat-block col-span-2">
+<div class="stat-label flex items-center gap-xs"><span class="material-symbols-outlined text-[16px]">menu_book</span> Système</div>
+<div class="stat-value">Dungeons &amp; Dragons 5E</div>
+</div>
+<div class="stat-block">
+<div class="stat-label flex items-center gap-xs"><span class="material-symbols-outlined text-[16px]">group</span> Joueurs</div>
+<div class="stat-value">2 / 5 <span class="text-primary text-sm">(3 requis)</span></div>
+</div>
+<div class="stat-block">
+<div class="stat-label flex items-center gap-xs"><span class="material-symbols-outlined text-[16px]">language</span> Mode</div>
+<div class="stat-value">En ligne (VTT)</div>
+</div>
+<div class="stat-block col-span-2">
+<div class="stat-label flex items-center gap-xs"><span class="material-symbols-outlined text-[16px]">headset_mic</span> Outils</div>
+<div class="stat-value flex gap-sm mt-1">
+<span class="bg-surface-container-high px-sm py-xs rounded text-sm text-on-surface-variant flex items-center gap-xs"><span class="material-symbols-outlined text-[14px]">forum</span> Discord</span>
+<span class="bg-surface-container-high px-sm py-xs rounded text-sm text-on-surface-variant flex items-center gap-xs"><span class="material-symbols-outlined text-[14px]">grid_on</span> Roll20</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Current Players List -->
+<div class="bg-surface rounded-xl shadow-level-1 border border-outline-variant/30 p-lg">
+<h2 class="font-headline-sm text-headline-sm text-on-surface mb-md border-b border-outline-variant/30 pb-sm flex justify-between items-center">
+                                Groupe Actuel
+                                <span class="bg-surface-container-high text-secondary font-label-md text-label-md px-2 py-1 rounded-full">2/5</span>
+</h2>
+<div class="flex flex-col gap-md">
+<!-- Player 1 -->
+<div class="flex items-center gap-md">
+<img alt="Character Avatar 1" class="w-12 h-12 rounded-full object-cover border border-outline-variant/50 shadow-sm" data-alt="A clean, modern digital portrait of an elven rogue character, focused on the face. Sharp features, wearing stylized leather armor in cool slate blues. Subtle glowing violet eyes indicating magical affinity. Professional lighting, uncluttered background, fitting a premium digital tabletop platform." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDsOz-89USDsVpLBcni1_KEaNzfzOJ2F_4hNXGgSf4YHrngXlqQAYOMMwk_Ae3Ia9OP1djDV3Xsc4wq9P7hzTLkPHmEr3cQOh0leDNleNzRT6eUCyvW8FyczN9cjv68W9ZNFLgo44HhEs2Fv5wxYA507nh7SXOiHh-cuFn5vupEyFSnm_PpWVkn3WcaFMsuzUVnCTJJFLpIOPIisctE0TgsIehLV1YY_LYaUQ6Gx-POAlBnv868zRD2"/>
+<div>
+<h4 class="font-body-md text-body-md font-bold text-on-surface leading-tight">Elara Moonwhisper</h4>
+<p class="font-body-sm text-body-sm text-secondary">Voleuse (Niv. 3)</p>
+</div>
+</div>
+<!-- Player 2 -->
+<div class="flex items-center gap-md">
+<img alt="Character Avatar 2" class="w-12 h-12 rounded-full object-cover border border-outline-variant/50 shadow-sm" data-alt="A high-quality digital portrait of a dwarven cleric, minimalist style. Clean lines, wearing refined, unweathered plate armor with subtle ethereal accents. The mood is resolute and organized. Soft studio lighting against a light grey background to ensure UI cleanliness." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCFUlYQG6LvemaXol4vTgGizACvp4opvKik0mwnl7WJdKvwTFRnqj8YjYnN-LLI6hAMeY1TJ3e0v8Bkd60tP87FAE_1g_Mfe6vGvObUABXhf31pC-23lhh37ic6lCFa_fminMAKpvbCl1E6Hti4pElozh7nY8IOghn7gWZqjZgHL6COLLv2agoIC77mW1Qi-WyaJ31FU1eg0L-ggXFk82ZVGaMZp97AbI7JdJFRxbiVxVpWtEVF0AAJ"/>
+<div>
+<h4 class="font-body-md text-body-md font-bold text-on-surface leading-tight">Thorin Ironfoot</h4>
+<p class="font-body-sm text-body-sm text-secondary">Clerc (Niv. 3)</p>
+</div>
+</div>
+<!-- Empty Slots -->
+<div class="flex items-center gap-md opacity-50 border border-dashed border-outline-variant rounded-lg p-sm mt-sm">
+<div class="w-10 h-10 rounded-full border-2 border-dashed border-outline-variant flex items-center justify-center bg-surface-container-low text-secondary">
+<span class="material-symbols-outlined">person_add</span>
+</div>
+<div class="font-body-sm text-body-sm text-secondary italic">Place disponible</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+<!-- JSON Component: BottomNavBar -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-4 pt-2 bg-surface/90 backdrop-blur-lg border-t border-outline-variant/20 shadow-lg docked full-width rounded-t-xl">
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container/50 active:scale-90 transition-transform font-label-md text-label-md px-4 py-1 rounded-full" href="#">
+<span class="material-symbols-outlined">home</span>
+<span>Home</span>
+</a>
+<!-- Active Tab: Games -->
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 hover:bg-secondary-container/50 active:scale-90 transition-transform font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-weight="fill" style="font-variation-settings: 'FILL' 1;">casino</span>
+<span>Games</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container/50 active:scale-90 transition-transform font-label-md text-label-md px-4 py-1 rounded-full" href="#">
+<span class="material-symbols-outlined">group</span>
+<span>Players</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container/50 active:scale-90 transition-transform font-label-md text-label-md px-4 py-1 rounded-full" href="#">
+<span class="material-symbols-outlined">event</span>
+<span>Calendar</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container/50 active:scale-90 transition-transform font-label-md text-label-md px-4 py-1 rounded-full" href="#">
+<span class="material-symbols-outlined">person</span>
+<span>Profile</span>
+</a>
+</nav>
+</body></html>

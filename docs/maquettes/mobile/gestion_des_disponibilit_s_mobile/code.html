@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+
+<html class="light" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>JDR Hub - Mes Disponibilités</title>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@500&amp;family=Hanken+Grotesk:wght@600;700&amp;family=Inter:wght@400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary": "#515f74",
+                        "inverse-surface": "#2d3133",
+                        "tertiary-fixed-dim": "#f9bd22",
+                        "inverse-primary": "#d2bbff",
+                        "surface-container": "#eceef0",
+                        "on-primary": "#ffffff",
+                        "on-secondary": "#ffffff",
+                        "surface-container-high": "#e6e8ea",
+                        "surface-tint": "#732ee4",
+                        "surface-variant": "#e0e3e5",
+                        "on-error-container": "#93000a",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-container": "#836100",
+                        "on-surface": "#191c1e",
+                        "secondary-fixed": "#d5e3fc",
+                        "secondary-fixed-dim": "#b9c7df",
+                        "surface": "#f7f9fb",
+                        "primary-fixed": "#eaddff",
+                        "on-tertiary-fixed-variant": "#5c4300",
+                        "on-surface-variant": "#4a4455",
+                        "surface-dim": "#d8dadc",
+                        "on-tertiary-container": "#ffe2ab",
+                        "error-container": "#ffdad6",
+                        "tertiary-fixed": "#ffdf9f",
+                        "on-background": "#191c1e",
+                        "error": "#ba1a1a",
+                        "outline": "#7b7487",
+                        "on-secondary-container": "#57657a",
+                        "primary": "#630ed4",
+                        "surface-container-highest": "#e0e3e5",
+                        "on-error": "#ffffff",
+                        "on-primary-fixed-variant": "#5a00c6",
+                        "background": "#f7f9fb",
+                        "outline-variant": "#ccc3d8",
+                        "inverse-on-surface": "#eff1f3",
+                        "surface-container-low": "#f2f4f6",
+                        "on-secondary-fixed-variant": "#3a485b",
+                        "on-secondary-fixed": "#0d1c2e",
+                        "primary-container": "#7c3aed",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-fixed": "#261a00",
+                        "secondary-container": "#d5e3fc",
+                        "on-primary-fixed": "#25005a",
+                        "surface-bright": "#f7f9fb",
+                        "primary-fixed-dim": "#d2bbff",
+                        "on-primary-container": "#ede0ff",
+                        "tertiary": "#654a00"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "lg": "24px",
+                        "base": "4px",
+                        "xl": "40px",
+                        "gutter": "16px",
+                        "md": "16px",
+                        "xs": "4px",
+                        "sm": "8px",
+                        "container-padding": "24px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "label-md": ["Geist"],
+                        "headline-sm": ["Hanken Grotesk"],
+                        "headline-lg-mobile": ["Hanken Grotesk"],
+                        "display-lg": ["Hanken Grotesk"],
+                        "body-sm": ["Inter"],
+                        "headline-md": ["Hanken Grotesk"],
+                        "headline-lg": ["Hanken Grotesk"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "label-md": ["12px", { "lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "headline-sm": ["20px", { "lineHeight": "1.4", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "1.2", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-sm": ["14px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-header {
+            background-color: rgba(247, 249, 251, 0.85);
+            backdrop-filter: blur(12px);
+        }
+        
+        .slot-btn {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        /* Available State */
+        .slot-available {
+            background-color: theme('colors.primary');
+            color: theme('colors.on-primary');
+            border: 1px solid theme('colors.primary');
+            box-shadow: 0 4px 6px -4px rgba(99, 14, 212, 0.2), 0 10px 15px -3px rgba(99, 14, 212, 0.1);
+        }
+        
+        /* Flexible State */
+        .slot-flexible {
+            background-color: theme('colors.surface');
+            color: theme('colors.on-surface');
+            border: 2px solid theme('colors.tertiary-fixed-dim');
+        }
+        
+        /* Unavailable State */
+        .slot-unavailable {
+            background-color: theme('colors.surface-container-high');
+            color: theme('colors.on-surface-variant');
+            border: 1px solid theme('colors.outline-variant');
+        }
+        
+        /* Subtle Violet Shadow for floating actions */
+        .shadow-magical {
+            box-shadow: 0 10px 15px -3px rgba(124, 58, 237, 0.15), 0 4px 6px -4px rgba(124, 58, 237, 0.1);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col pt-16 pb-24 selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full bg-surface/80 dark:bg-on-surface/80 backdrop-blur-md shadow-sm dark:shadow-none border-b border-outline-variant/30 dark:border-outline/20 z-50 h-16 flex items-center justify-between px-md">
+<div class="flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim" style="font-variation-settings: 'FILL' 0;">auto_fix_high</span>
+<span class="font-headline-md text-headline-md text-primary dark:text-primary-fixed-dim tracking-tight">JDR Hub</span>
+</div>
+<button class="hover:bg-primary/5 dark:hover:bg-primary-fixed-dim/10 transition-colors rounded-full p-2 active:scale-95 duration-150 text-on-surface-variant dark:text-surface-variant">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">notifications</span>
+</button>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 px-md py-lg flex flex-col gap-lg max-w-[800px] mx-auto w-full">
+<!-- Header -->
+<div class="flex flex-col gap-xs">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Mes Disponibilités Habituelles</h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Définissez vos créneaux préférés pour faciliter la planification des parties.</p>
+</div>
+<!-- Weekly Grid Mobile (Tabbed/Horizontal Selector) -->
+<section class="flex flex-col gap-md">
+<!-- Day Selector -->
+<div class="flex gap-sm overflow-x-auto pb-sm no-scrollbar scroll-smooth snap-x">
+<button class="snap-start flex flex-col items-center justify-center min-w-[60px] h-[72px] rounded-xl bg-primary text-on-primary shadow-magical shrink-0">
+<span class="font-label-md text-label-md uppercase">Lun</span>
+<span class="font-headline-sm text-headline-sm">12</span>
+</button>
+<button class="snap-start flex flex-col items-center justify-center min-w-[60px] h-[72px] rounded-xl bg-surface-container text-on-surface-variant border border-outline-variant/50 shrink-0">
+<span class="font-label-md text-label-md uppercase">Mar</span>
+<span class="font-headline-sm text-headline-sm">13</span>
+</button>
+<button class="snap-start flex flex-col items-center justify-center min-w-[60px] h-[72px] rounded-xl bg-surface-container text-on-surface-variant border border-outline-variant/50 shrink-0">
+<span class="font-label-md text-label-md uppercase">Mer</span>
+<span class="font-headline-sm text-headline-sm">14</span>
+</button>
+<button class="snap-start flex flex-col items-center justify-center min-w-[60px] h-[72px] rounded-xl bg-surface-container text-on-surface-variant border border-outline-variant/50 shrink-0">
+<span class="font-label-md text-label-md uppercase">Jeu</span>
+<span class="font-headline-sm text-headline-sm">15</span>
+</button>
+<button class="snap-start flex flex-col items-center justify-center min-w-[60px] h-[72px] rounded-xl bg-surface-container text-on-surface-variant border border-outline-variant/50 shrink-0">
+<span class="font-label-md text-label-md uppercase">Ven</span>
+<span class="font-headline-sm text-headline-sm">16</span>
+</button>
+<button class="snap-start flex flex-col items-center justify-center min-w-[60px] h-[72px] rounded-xl bg-surface-container text-on-surface-variant border border-outline-variant/50 shrink-0">
+<span class="font-label-md text-label-md uppercase">Sam</span>
+<span class="font-headline-sm text-headline-sm">17</span>
+</button>
+<button class="snap-start flex flex-col items-center justify-center min-w-[60px] h-[72px] rounded-xl bg-surface-container text-on-surface-variant border border-outline-variant/50 shrink-0">
+<span class="font-label-md text-label-md uppercase">Dim</span>
+<span class="font-headline-sm text-headline-sm">18</span>
+</button>
+</div>
+<!-- Time Slots for Selected Day (Monday) -->
+<div class="flex flex-col gap-sm bg-surface p-md rounded-xl shadow-[0_1px_3px_0_rgba(0,0,0,0.1),0_1px_2px_-1px_rgba(0,0,0,0.1)] border border-surface-container">
+<h2 class="font-headline-sm text-headline-sm text-on-surface mb-xs border-b border-surface-container-high pb-xs">Lundi</h2>
+<!-- Matin -->
+<button class="slot-btn slot-unavailable w-full flex items-center justify-between p-md rounded-lg text-left group active:scale-[0.98]">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-outline">wb_twilight</span>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface">Matin</span>
+<span class="font-label-md text-label-md text-on-surface-variant">08:00 - 12:00</span>
+</div>
+</div>
+<span class="material-symbols-outlined">close</span>
+</button>
+<!-- Après-midi -->
+<button class="slot-btn slot-flexible w-full flex items-center justify-between p-md rounded-lg text-left group active:scale-[0.98]">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-tertiary-fixed-dim">qr_code_2</span>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-surface">Après-midi</span>
+<span class="font-label-md text-label-md text-on-surface-variant">13:00 - 18:00</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-tertiary-fixed-dim">question_mark</span>
+</button>
+<!-- Soir -->
+<button class="slot-btn slot-available w-full flex items-center justify-between p-md rounded-lg text-left group active:scale-[0.98]">
+<div class="flex items-center gap-md">
+<span class="material-symbols-outlined text-on-primary">dark_mode</span>
+<div class="flex flex-col">
+<span class="font-headline-sm text-headline-sm text-on-primary">Soir</span>
+<span class="font-label-md text-label-md text-on-primary/80">19:00 - 23:00</span>
+</div>
+</div>
+<span class="material-symbols-outlined">check</span>
+</button>
+</div>
+</section>
+<!-- Exceptions & Congés -->
+<section class="flex flex-col gap-sm">
+<div class="flex items-center justify-between">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Exceptions &amp; Congés</h3>
+<button class="text-primary font-label-md text-label-md flex items-center gap-xs p-xs rounded hover:bg-primary/5">
+<span class="material-symbols-outlined text-[18px]">add</span>
+                    Ajouter
+                </button>
+</div>
+<div class="bg-surface rounded-xl shadow-[0_1px_3px_0_rgba(0,0,0,0.1),0_1px_2px_-1px_rgba(0,0,0,0.1)] border border-surface-container overflow-hidden">
+<div class="flex items-center justify-between p-md border-b border-surface-container-high last:border-0">
+<div class="flex items-center gap-md">
+<div class="w-10 h-10 rounded-full bg-error-container text-on-error-container flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined">flight_takeoff</span>
+</div>
+<div class="flex flex-col">
+<span class="font-body-md text-body-md text-on-surface font-medium">Vacances d'Hiver</span>
+<span class="font-label-md text-label-md text-on-surface-variant">24 Déc - 2 Janvier</span>
+</div>
+</div>
+<button class="text-outline hover:text-error transition-colors p-sm">
+<span class="material-symbols-outlined">delete</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Préférences -->
+<section class="flex flex-col gap-sm">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Préférences</h3>
+<div class="bg-surface rounded-xl shadow-[0_1px_3px_0_rgba(0,0,0,0.1),0_1px_2px_-1px_rgba(0,0,0,0.1)] border border-surface-container p-md flex flex-col gap-md">
+<!-- Toggle 1 -->
+<div class="flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-body-md text-body-md text-on-surface">Notifications d'invitation</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Recevoir un email quand on vous invite.</span>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+<hr class="border-surface-container-high"/>
+<!-- Toggle 2 -->
+<div class="flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-body-md text-body-md text-on-surface">Apparition publique</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Vos amis peuvent voir vos disponibilités.</span>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox" value=""/>
+<div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+</label>
+</div>
+</div>
+</section>
+<!-- Spacer for fixed bottom action -->
+<div class="h-20"></div>
+</main>
+<!-- Fixed Bottom Action & Nav -->
+<div class="fixed bottom-0 left-0 w-full z-50 flex flex-col bg-surface/90 dark:bg-on-surface/90 backdrop-blur-md rounded-t-xl border-t border-outline-variant/30 shadow-[0_-4px_6px_-1px_rgba(124,58,237,0.05)] pb-safe">
+<!-- Main Action Button -->
+<div class="px-md py-sm">
+<button class="w-full bg-primary hover:bg-primary/90 text-on-primary font-headline-sm text-headline-sm py-sm px-md rounded-lg shadow-magical active:scale-[0.98] transition-transform flex items-center justify-center gap-xs">
+<span class="material-symbols-outlined">save</span>
+                Enregistrer
+            </button>
+</div>
+<!-- BottomNavBar (Semantic Shell) -->
+<nav class="flex justify-around items-center px-gutter py-sm">
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant p-3 hover:bg-secondary-container/50 active:scale-90 transition-all duration-200 ease-out rounded-full">
+<span class="material-symbols-outlined">home</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant p-3 hover:bg-secondary-container/50 active:scale-90 transition-all duration-200 ease-out rounded-full">
+<span class="material-symbols-outlined">sports_esports</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant p-3 hover:bg-secondary-container/50 active:scale-90 transition-all duration-200 ease-out rounded-full">
+<span class="material-symbols-outlined">group</span>
+</button>
+<button class="flex flex-col items-center justify-center bg-primary-container dark:bg-primary-fixed text-on-primary-container dark:text-on-primary-fixed rounded-full p-3 active:scale-90 transition-all duration-200 ease-out">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">calendar_today</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant p-3 hover:bg-secondary-container/50 active:scale-90 transition-all duration-200 ease-out rounded-full">
+<span class="material-symbols-outlined">person</span>
+</button>
+</nav>
+</div>
+<!-- Inline script for subtle interactions -->
+<script>
+        // Simple logic to cycle slot states for demonstration
+        document.querySelectorAll('.slot-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const iconContainer = this.querySelector('.material-symbols-outlined:last-child');
+                const titleText = this.querySelector('span.text-headline-sm');
+                const subText = this.querySelector('span.text-label-md');
+                const mainIcon = this.querySelector('.material-symbols-outlined:first-child');
+
+                if (this.classList.contains('slot-unavailable')) {
+                    // Unavailable -> Flexible
+                    this.classList.remove('slot-unavailable', 'text-on-surface-variant', 'bg-surface-container-high', 'border-outline-variant');
+                    this.classList.add('slot-flexible');
+                    
+                    iconContainer.textContent = 'question_mark';
+                    iconContainer.classList.add('text-tertiary-fixed-dim');
+                    
+                    titleText.classList.replace('text-on-surface', 'text-on-surface'); // no change needed usually, but reset just in case
+                    subText.classList.replace('text-on-surface-variant', 'text-on-surface-variant');
+                    mainIcon.classList.replace('text-outline', 'text-tertiary-fixed-dim');
+
+                } else if (this.classList.contains('slot-flexible')) {
+                    // Flexible -> Available
+                    this.classList.remove('slot-flexible');
+                    this.classList.add('slot-available');
+                    
+                    iconContainer.textContent = 'check';
+                    iconContainer.classList.remove('text-tertiary-fixed-dim');
+                    
+                    titleText.classList.replace('text-on-surface', 'text-on-primary');
+                    subText.classList.replace('text-on-surface-variant', 'text-on-primary/80');
+                    mainIcon.classList.replace('text-tertiary-fixed-dim', 'text-on-primary');
+
+                } else if (this.classList.contains('slot-available')) {
+                    // Available -> Unavailable
+                    this.classList.remove('slot-available');
+                    this.classList.add('slot-unavailable');
+                    
+                    iconContainer.textContent = 'close';
+                    
+                    titleText.classList.replace('text-on-primary', 'text-on-surface');
+                    subText.classList.replace('text-on-primary/80', 'text-on-surface-variant');
+                    mainIcon.classList.replace('text-on-primary', 'text-outline');
+                }
+            });
+        });
+    </script>
+</body></html>

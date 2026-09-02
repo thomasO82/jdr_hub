@@ -1,0 +1,29 @@
+# Dépendances
+node_modules/
+
+# Builds
+.next/
+dist/
+build/
+coverage/
+
+# Variables d’environnement
+.env
+.env.*
+!.env.example
+
+# Fichiers temporaires
+*.log
+.DS_Store
+Thumbs.db
+*:Zone.Identifier
+
+# Éditeurs
+.vscode/
+.idea/
+
+# Turborepo
+.turbo/
+
+# Drizzle
+drizzle/meta/_journal.json.lock

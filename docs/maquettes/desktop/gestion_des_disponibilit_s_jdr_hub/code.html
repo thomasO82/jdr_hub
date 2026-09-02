@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+
+<html lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>JDR Hub - Ma Gestion des Disponibilités</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Design System Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-secondary-fixed-variant": "#3a485b",
+                        "on-secondary-container": "#57657a",
+                        "on-background": "#191c1e",
+                        "outline-variant": "#ccc3d8",
+                        "tertiary-container": "#836100",
+                        "on-error-container": "#93000a",
+                        "on-tertiary-fixed-variant": "#5c4300",
+                        "surface-container-highest": "#e0e3e5",
+                        "outline": "#7b7487",
+                        "secondary": "#515f74",
+                        "on-tertiary-fixed": "#261a00",
+                        "inverse-surface": "#2d3133",
+                        "secondary-fixed-dim": "#b9c7df",
+                        "on-surface": "#191c1e",
+                        "primary-fixed-dim": "#d2bbff",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-container": "#eceef0",
+                        "tertiary": "#654a00",
+                        "primary-container": "#7c3aed",
+                        "secondary-container": "#d5e3fc",
+                        "primary": "#630ed4",
+                        "surface-tint": "#732ee4",
+                        "surface-container-high": "#e6e8ea",
+                        "surface": "#f7f9fb",
+                        "primary-fixed": "#eaddff",
+                        "tertiary-fixed": "#ffdf9f",
+                        "surface-container-low": "#f2f4f6",
+                        "inverse-primary": "#d2bbff",
+                        "on-error": "#ffffff",
+                        "surface-bright": "#f7f9fb",
+                        "on-primary": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "surface-variant": "#e0e3e5",
+                        "error": "#ba1a1a",
+                        "error-container": "#ffdad6",
+                        "background": "#f7f9fb",
+                        "on-secondary-fixed": "#0d1c2e",
+                        "secondary-fixed": "#d5e3fc",
+                        "on-surface-variant": "#4a4455",
+                        "on-tertiary-container": "#ffe2ab",
+                        "surface-dim": "#d8dadc",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed-dim": "#f9bd22",
+                        "inverse-on-surface": "#eff1f3",
+                        "on-primary-fixed": "#25005a",
+                        "on-primary-container": "#ede0ff",
+                        "on-primary-fixed-variant": "#5a00c6"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    spacing: {
+                        "sm": "8px",
+                        "xs": "4px",
+                        "container-padding": "24px",
+                        "md": "16px",
+                        "gutter": "16px",
+                        "base": "4px",
+                        "xl": "40px",
+                        "lg": "24px"
+                    },
+                    fontFamily: {
+                        "body-lg": ["Inter", "sans-serif"],
+                        "headline-lg": ["Hanken Grotesk", "sans-serif"],
+                        "headline-md": ["Hanken Grotesk", "sans-serif"],
+                        "label-md": ["Geist", "sans-serif"],
+                        "display-lg": ["Hanken Grotesk", "sans-serif"],
+                        "headline-sm": ["Hanken Grotesk", "sans-serif"],
+                        "body-md": ["Inter", "sans-serif"],
+                        "headline-lg-mobile": ["Hanken Grotesk", "sans-serif"],
+                        "body-sm": ["Inter", "sans-serif"]
+                    },
+                    fontSize: {
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "label-md": ["12px", { "lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-sm": ["20px", { "lineHeight": "1.4", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "1.2", "fontWeight": "600" }],
+                        "body-sm": ["14px", { "lineHeight": "1.5", "fontWeight": "400" }]
+                    },
+                    boxShadow: {
+                        'level-1': '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1)',
+                        'level-2': '0 10px 15px -3px rgba(124, 58, 237, 0.1), 0 4px 6px -4px rgba(124, 58, 237, 0.1)',
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        /* Base styles mapping typography tokens */
+        body { @apply font-body-md text-body-md bg-background text-on-surface antialiased; }
+        h1 { @apply font-headline-lg text-headline-lg; }
+        h2 { @apply font-headline-md text-headline-md; }
+        h3 { @apply font-headline-sm text-headline-sm; }
+        .label { @apply font-label-md text-label-md uppercase tracking-wider; }
+        
+        /* Custom Scrollbar for sleekness */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { @apply bg-surface-variant rounded-full; }
+        ::-webkit-scrollbar-thumb:hover { @apply bg-outline-variant; }
+
+        /* Icon setup */
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .icon-fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="flex min-h-screen w-full">
+<!-- Shared Component: SideNavBar -->
+<nav class="hidden md:flex flex-col h-screen w-64 fixed left-0 top-0 bg-surface shadow-sm py-lg px-md z-50">
+<!-- Brand -->
+<div class="mb-xl px-sm flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center text-on-primary-container shadow-level-1">
+<span class="material-symbols-outlined icon-fill">auto_awesome</span>
+</div>
+<div>
+<div class="font-headline-md text-headline-md font-bold text-primary tracking-tight">JDR Hub</div>
+<div class="font-label-md text-label-md text-on-surface-variant">Digital Dungeon Master</div>
+</div>
+</div>
+<!-- CTA -->
+<button class="w-full mb-lg py-3 px-4 bg-primary text-on-primary rounded-xl font-label-md text-label-md flex items-center justify-center gap-2 shadow-level-1 hover:shadow-level-2 transition-all active:scale-95 duration-200">
+<span class="material-symbols-outlined text-[18px]">add</span>
+            New Campaign
+        </button>
+<!-- Navigation Links -->
+<ul class="flex flex-col gap-2 flex-1">
+<!-- Inactive -->
+<li>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-secondary hover:text-primary hover:bg-surface-container transition-colors duration-200 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="dashboard">dashboard</span>
+                    Dashboard
+                </a>
+</li>
+<!-- Inactive -->
+<li>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-secondary hover:text-primary hover:bg-surface-container transition-colors duration-200 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="casino">casino</span>
+                    Games
+                </a>
+</li>
+<!-- Inactive -->
+<li>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-secondary hover:text-primary hover:bg-surface-container transition-colors duration-200 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="group">group</span>
+                    Players
+                </a>
+</li>
+<!-- ACTIVE TAB (Schedule maps closest to Availability) -->
+<li>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-primary font-bold border-r-4 border-primary bg-primary-container/10 transition-colors duration-200 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined text-[20px] icon-fill" data-icon="calendar_today">calendar_today</span>
+                    Schedule
+                </a>
+</li>
+<!-- Inactive -->
+<li>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-secondary hover:text-primary hover:bg-surface-container transition-colors duration-200 font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined text-[20px]" data-icon="person">person</span>
+                    Profile
+                </a>
+</li>
+</ul>
+</nav>
+<!-- Main Content Wrapper -->
+<div class="flex-1 flex flex-col md:ml-64 min-w-0 bg-background">
+<!-- Shared Component: TopNavBar -->
+<header class="fixed top-0 right-0 w-full md:w-[calc(100%-16rem)] h-16 bg-surface/80 backdrop-blur-md border-b border-outline-variant/30 flex justify-between items-center px-lg z-40 transition-all">
+<!-- Mobile Menu Trigger (hidden on desktop) -->
+<button class="md:hidden text-on-surface-variant p-2 -ml-2 rounded-lg hover:bg-surface-container">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<!-- Search (on_left) -->
+<div class="hidden sm:flex items-center bg-surface-container-low border border-outline-variant/50 rounded-full px-4 py-2 focus-within:ring-2 focus-within:ring-primary focus-within:border-primary transition-all w-64">
+<span class="material-symbols-outlined text-on-surface-variant text-[18px] mr-2">search</span>
+<input class="bg-transparent border-none focus:outline-none focus:ring-0 text-body-sm w-full placeholder:text-on-surface-variant/70" placeholder="Search..." type="text"/>
+</div>
+<!-- Trailing Actions -->
+<div class="flex items-center gap-4 ml-auto">
+<button class="text-on-surface-variant hover:text-primary transition-colors active:opacity-80 relative p-2 rounded-full hover:bg-surface-container">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full ring-2 ring-surface"></span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-colors active:opacity-80 p-2 rounded-full hover:bg-surface-container">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+</button>
+<div class="h-8 w-px bg-outline-variant/30 mx-1"></div>
+<!-- Profile Image -->
+<button class="flex items-center gap-3 active:opacity-80 transition-opacity">
+<img class="w-9 h-9 rounded-full object-cover border-2 border-surface-container-highest shadow-sm" data-alt="A close up portrait of a young woman with modern fantasy elements, styled as an RPG character avatar. She has subtle violet glowing markings on her skin and is wearing sleek, futuristic-yet-medieval clothing. The lighting is bright and ethereal, fitting a clean, professional light-mode UI aesthetic. High quality, smooth rendering." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCE89Kh3eBPRVebvT28PsXU93p6aSIMR4gZMm_yV_OmtGi5TBFXVP1GU_cIPoPy9n2JhKIvXfpaEvihDeetja04xBfZqufuJPfcMouWN9FEc8LflUxyqRqtpDfA4WgTuCCWPJLC_SvAAhZ_M-MlBnaXolhXHyELrEvKWtXLWVYjM55PPvpQaHZHgo1rIFpYAurEnVJEHRGYTZp4H-vuwIAEM2gibjwbWzBEs1QdWiy5ypbsOfpOMLpC"/>
+<span class="hidden lg:block font-label-md text-label-md text-on-surface font-medium">Mélina</span>
+</button>
+</div>
+</header>
+<!-- Canvas / Main Content -->
+<main class="flex-1 mt-16 p-md md:p-container-padding max-w-[1200px] w-full mx-auto space-y-xl">
+<!-- Page Header -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+<div>
+<h1 class="text-on-surface mb-2">Ma Gestion des Disponibilités</h1>
+<p class="text-on-surface-variant text-body-md max-w-2xl">Définissez vos créneaux habituels pour faciliter la planification des campagnes. Vos maîtres du jeu utiliseront ces données pour proposer des dates.</p>
+</div>
+<div class="flex gap-3">
+<button class="px-4 py-2 rounded-lg border border-outline-variant text-on-surface font-label-md text-label-md hover:bg-surface-container transition-colors shadow-sm bg-surface-container-lowest">
+                        Annuler
+                    </button>
+<button class="px-5 py-2 rounded-lg bg-primary text-on-primary font-label-md text-label-md shadow-level-1 hover:shadow-level-2 transition-all flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">save</span>
+                        Enregistrer
+                    </button>
+</div>
+</div>
+<!-- Content Grid Layout -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-lg">
+<!-- Main Schedule Card (Takes up more space) -->
+<div class="lg:col-span-8 bg-surface-container-lowest rounded-xl shadow-level-1 border border-outline-variant/20 overflow-hidden flex flex-col">
+<div class="p-lg border-b border-outline-variant/20 flex justify-between items-center bg-surface/50">
+<h2 class="text-headline-sm text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">event_repeat</span>
+                            Semaine Type
+                        </h2>
+<!-- Legend -->
+<div class="hidden sm:flex gap-4 text-body-sm">
+<div class="flex items-center gap-1">
+<div class="w-3 h-3 rounded-full bg-primary-container border border-primary/20"></div>
+<span class="text-on-surface-variant">Disponible</span>
+</div>
+<div class="flex items-center gap-1">
+<div class="w-3 h-3 rounded-full bg-tertiary-container border border-tertiary/20"></div>
+<span class="text-on-surface-variant">Flexible</span>
+</div>
+<div class="flex items-center gap-1">
+<div class="w-3 h-3 rounded-full bg-surface-container-high border border-outline-variant/30"></div>
+<span class="text-on-surface-variant">Indispo.</span>
+</div>
+</div>
+</div>
+<div class="p-md md:p-lg overflow-x-auto">
+<div class="min-w-[600px]">
+<!-- Grid Header -->
+<div class="grid grid-cols-8 gap-2 mb-4">
+<div></div> <!-- Empty top-left cell -->
+<div class="label text-center text-on-surface-variant">Lun</div>
+<div class="label text-center text-on-surface-variant">Mar</div>
+<div class="label text-center text-on-surface-variant">Mer</div>
+<div class="label text-center text-on-surface-variant">Jeu</div>
+<div class="label text-center text-on-surface-variant">Ven</div>
+<div class="label text-center text-primary font-bold">Sam</div>
+<div class="label text-center text-primary font-bold">Dim</div>
+</div>
+<!-- Row: Matin -->
+<div class="grid grid-cols-8 gap-2 mb-3 items-stretch">
+<div class="flex items-center justify-end pr-4 label text-on-surface-variant">Matin</div>
+<!-- Cells (Mocked Data for Mélina) -->
+<button class="h-12 rounded-lg bg-surface-container-high border border-outline-variant/20 flex items-center justify-center text-on-surface-variant hover:bg-surface-variant transition-colors" title="Indisponible">
+<span class="material-symbols-outlined text-[20px] opacity-50">close</span>
+</button>
+<button class="h-12 rounded-lg bg-surface-container-high border border-outline-variant/20 flex items-center justify-center text-on-surface-variant hover:bg-surface-variant transition-colors" title="Indisponible">
+<span class="material-symbols-outlined text-[20px] opacity-50">close</span>
+</button>
+<button class="h-12 rounded-lg bg-surface-container-high border border-outline-variant/20 flex items-center justify-center text-on-surface-variant hover:bg-surface-variant transition-colors" title="Indisponible">
+<span class="material-symbols-outlined text-[20px] opacity-50">close</span>
+</button>
+<button class="h-12 rounded-lg bg-surface-container-high border border-outline-variant/20 flex items-center justify-center text-on-surface-variant hover:bg-surface-variant transition-colors" title="Indisponible">
+<span class="material-symbols-outlined text-[20px] opacity-50">close</span>
+</button>
+<button class="h-12 rounded-lg bg-surface-container-high border border-outline-variant/20 flex items-center justify-center text-on-surface-variant hover:bg-surface-variant transition-colors" title="Indisponible">
+<span class="material-symbols-outlined text-[20px] opacity-50">close</span>
+</button>
+<button class="h-12 rounded-lg bg-primary-container border-2 border-primary/30 flex items-center justify-center text-primary shadow-sm hover:bg-primary-fixed transition-colors" title="Disponible">
+<span class="material-symbols-outlined text-[20px] icon-fill">check_circle</span>
+</button>
+<button class="h-12 rounded-lg bg-tertiary-container border-2 border-tertiary/20 flex items-center justify-center text-on-tertiary-container shadow-sm hover:opacity-90 transition-opacity" title="Flexible">
+<span class="material-symbols-outlined text-[20px]">help</span>
+</button>
+</div>
+<!-- Row: Après-midi -->
+<div class="grid grid-cols-8 gap-2 mb-3 items-stretch">
+<div class="flex items-center justify-end pr-4 label text-on-surface-variant">Après-midi</div>
+<!-- Cells -->
+<button class="h-12 rounded-lg bg-surface-container-high border border-outline-variant/20 flex items-center justify-center text-on-surface-variant hover:bg-surface-variant transition-colors" title="Indisponible">
+<span class="material-symbols-outlined text-[20px] opacity-50">close</span>
+</button>
+<button class="h-12 rounded-lg bg-surface-container-high border border-outline-variant/20 flex items-center justify-center text-on-surface-variant hover:bg-surface-variant transition-colors" title="Indisponible">
+<span class="material-symbols-outlined text-[20px] opacity-50">close</span>
+</button>
+<button class="h-12 rounded-lg bg-tertiary-container border-2 border-tertiary/20 flex items-center justify-center text-on-tertiary-container shadow-sm hover:opacity-90 transition-opacity" title="Flexible">
+<span class="material-symbols-outlined text-[20px]">help</span>
+</button>
+<button class="h-12 rounded-lg bg-surface-container-high border border-outline-variant/20 flex items-center justify-center text-on-surface-variant hover:bg-surface-variant transition-colors" title="Indisponible">
+<span class="material-symbols-outlined text-[20px] opacity-50">close</span>
+</button>
+<button class="h-12 rounded-lg bg-surface-container-high border border-outline-variant/20 flex items-center justify-center text-on-surface-variant hover:bg-surface-variant transition-colors" title="Indisponible">
+<span class="material-symbols-outlined text-[20px] opacity-50">close</span>
+</button>
+<button class="h-12 rounded-lg bg-primary-container border-2 border-primary/30 flex items-center justify-center text-primary shadow-sm hover:bg-primary-fixed transition-colors" title="Disponible">
+<span class="material-symbols-outlined text-[20px] icon-fill">check_circle</span>
+</button>
+<button class="h-12 rounded-lg bg-primary-container border-2 border-primary/30 flex items-center justify-center text-primary shadow-sm hover:bg-primary-fixed transition-colors" title="Disponible">
+<span class="material-symbols-outlined text-[20px] icon-fill">check_circle</span>
+</button>
+</div>
+<!-- Row: Soir -->
+<div class="grid grid-cols-8 gap-2 items-stretch">
+<div class="flex items-center justify-end pr-4 label text-on-surface-variant">Soir</div>
+<!-- Cells -->
+<button class="h-12 rounded-lg bg-primary-container border-2 border-primary/30 flex items-center justify-center text-primary shadow-sm hover:bg-primary-fixed transition-colors" title="Disponible">
+<span class="material-symbols-outlined text-[20px] icon-fill">check_circle</span>
+</button>
+<button class="h-12 rounded-lg bg-primary-container border-2 border-primary/30 flex items-center justify-center text-primary shadow-sm hover:bg-primary-fixed transition-colors" title="Disponible">
+<span class="material-symbols-outlined text-[20px] icon-fill">check_circle</span>
+</button>
+<button class="h-12 rounded-lg bg-primary-container border-2 border-primary/30 flex items-center justify-center text-primary shadow-sm hover:bg-primary-fixed transition-colors" title="Disponible">
+<span class="material-symbols-outlined text-[20px] icon-fill">check_circle</span>
+</button>
+<button class="h-12 rounded-lg bg-surface-container-high border border-outline-variant/20 flex items-center justify-center text-on-surface-variant hover:bg-surface-variant transition-colors" title="Indisponible">
+<span class="material-symbols-outlined text-[20px] opacity-50">close</span>
+</button>
+<button class="h-12 rounded-lg bg-primary-container border-2 border-primary/30 flex items-center justify-center text-primary shadow-sm hover:bg-primary-fixed transition-colors" title="Disponible">
+<span class="material-symbols-outlined text-[20px] icon-fill">check_circle</span>
+</button>
+<button class="h-12 rounded-lg bg-primary-container border-2 border-primary/30 flex items-center justify-center text-primary shadow-sm hover:bg-primary-fixed transition-colors" title="Disponible">
+<span class="material-symbols-outlined text-[20px] icon-fill">check_circle</span>
+</button>
+<button class="h-12 rounded-lg bg-surface-container-high border border-outline-variant/20 flex items-center justify-center text-on-surface-variant hover:bg-surface-variant transition-colors" title="Indisponible">
+<span class="material-symbols-outlined text-[20px] opacity-50">close</span>
+</button>
+</div>
+</div>
+</div>
+<div class="px-lg py-sm bg-surface/30 border-t border-outline-variant/10 flex justify-end">
+<span class="text-body-sm text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]">touch_app</span> Cliquez sur une case pour changer son état.
+                        </span>
+</div>
+</div>
+<!-- Secondary Column (Exceptions & Preferences) -->
+<div class="lg:col-span-4 flex flex-col gap-lg">
+<!-- Exceptions Card -->
+<div class="bg-surface-container-lowest rounded-xl shadow-level-1 border border-outline-variant/20 p-lg flex-1">
+<div class="flex justify-between items-center mb-md">
+<h3 class="text-headline-sm text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary">event_busy</span>
+                                Exceptions &amp; Congés
+                            </h3>
+<button class="w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center hover:bg-secondary-fixed-dim transition-colors">
+<span class="material-symbols-outlined text-[18px]">add</span>
+</button>
+</div>
+<p class="text-body-sm text-on-surface-variant mb-4">Dates spécifiques où vous ne serez pas disponible, ignorant la semaine type.</p>
+<div class="space-y-3">
+<!-- Exception Item 1 -->
+<div class="group flex items-center justify-between p-3 rounded-lg border border-outline-variant/30 hover:border-outline-variant hover:bg-surface transition-all">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface">24 Déc - 2 Janvier</span>
+<span class="text-body-sm text-on-surface-variant">Vacances d'hiver</span>
+</div>
+<button class="text-outline hover:text-error transition-colors opacity-0 group-hover:opacity-100 p-1">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+<!-- Exception Item 2 -->
+<div class="group flex items-center justify-between p-3 rounded-lg border border-outline-variant/30 hover:border-outline-variant hover:bg-surface transition-all">
+<div class="flex flex-col">
+<span class="font-label-md text-label-md text-on-surface">15 Mars (Soir)</span>
+<span class="text-body-sm text-on-surface-variant">Concert</span>
+</div>
+<button class="text-outline hover:text-error transition-colors opacity-0 group-hover:opacity-100 p-1">
+<span class="material-symbols-outlined text-[20px]">delete</span>
+</button>
+</div>
+</div>
+<!-- Empty State Example (Hidden conceptually, shown if list empty) -->
+<!-- <div class="text-center p-6 border-2 border-dashed border-outline-variant/40 rounded-lg mt-4">
+                            <span class="material-symbols-outlined text-outline text-[32px] mb-2">calendar_month</span>
+                            <p class="text-body-sm text-on-surface-variant">Aucune exception programmée.</p>
+                        </div> -->
+</div>
+<!-- Preferences Card -->
+<div class="bg-surface-container-lowest rounded-xl shadow-level-1 border border-outline-variant/20 p-lg">
+<h3 class="text-headline-sm text-on-surface flex items-center gap-2 mb-md">
+<span class="material-symbols-outlined text-secondary">tune</span>
+                            Préférences
+                        </h3>
+<div class="space-y-4">
+<!-- Toggle 1 -->
+<label class="flex items-start justify-between cursor-pointer group">
+<div class="flex flex-col pr-4">
+<span class="text-body-md text-on-surface font-medium group-hover:text-primary transition-colors">Notifications d'invitation</span>
+<span class="text-body-sm text-on-surface-variant">Être notifié lorsqu'un MJ propose une session sur un de vos créneaux disponibles.</span>
+</div>
+<!-- Mocked Toggle (Active) -->
+<div class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out bg-primary focus:outline-none mt-1 shadow-inner">
+<span aria-hidden="true" class="translate-x-5 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
+</div>
+</label>
+<hr class="border-outline-variant/20"/>
+<!-- Toggle 2 -->
+<label class="flex items-start justify-between cursor-pointer group">
+<div class="flex flex-col pr-4">
+<span class="text-body-md text-on-surface font-medium group-hover:text-primary transition-colors">Apparition publique</span>
+<span class="text-body-sm text-on-surface-variant">Permettre aux autres joueurs de voir vos disponibilités globales sur votre profil.</span>
+</div>
+<!-- Mocked Toggle (Inactive) -->
+<div class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out bg-surface-container-high focus:outline-none mt-1">
+<span aria-hidden="true" class="translate-x-0 pointer-events-none inline-block h-5 w-5 transform rounded-full bg-outline-variant shadow ring-0 transition duration-200 ease-in-out"></span>
+</div>
+</label>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

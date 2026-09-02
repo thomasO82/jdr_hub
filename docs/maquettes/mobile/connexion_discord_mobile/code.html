@@ -1,0 +1,180 @@
+<!DOCTYPE html><html class="dark" lang="fr"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>JDR Hub - Connexion</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&amp;family=Hanken+Grotesk:wght@400;600;700&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-surface": "#191c1e",
+                      "on-secondary-fixed": "#0d1c2e",
+                      "on-secondary-container": "#57657a",
+                      "primary-container": "#7c3aed",
+                      "surface-container-highest": "#e0e3e5",
+                      "secondary-fixed-dim": "#b9c7df",
+                      "inverse-primary": "#d2bbff",
+                      "secondary-container": "#d5e3fc",
+                      "on-surface-variant": "#4a4455",
+                      "on-background": "#191c1e",
+                      "surface-dim": "#d8dadc",
+                      "surface": "#f7f9fb",
+                      "surface-container": "#eceef0",
+                      "tertiary-fixed": "#ffdf9f",
+                      "surface-bright": "#f7f9fb",
+                      "on-primary-container": "#ede0ff",
+                      "tertiary-container": "#836100",
+                      "on-error-container": "#93000a",
+                      "primary-fixed": "#eaddff",
+                      "outline-variant": "#ccc3d8",
+                      "surface-tint": "#732ee4",
+                      "background": "#f7f9fb",
+                      "on-secondary-fixed-variant": "#3a485b",
+                      "tertiary-fixed-dim": "#f9bd22",
+                      "primary-fixed-dim": "#d2bbff",
+                      "surface-container-low": "#f2f4f6",
+                      "surface-variant": "#e0e3e5",
+                      "on-primary-fixed-variant": "#5a00c6",
+                      "secondary": "#515f74",
+                      "inverse-on-surface": "#eff1f3",
+                      "surface-container-high": "#e6e8ea",
+                      "on-primary": "#ffffff",
+                      "secondary-fixed": "#d5e3fc",
+                      "surface-container-lowest": "#ffffff",
+                      "on-primary-fixed": "#25005a",
+                      "on-tertiary": "#ffffff",
+                      "on-secondary": "#ffffff",
+                      "inverse-surface": "#2d3133",
+                      "on-tertiary-fixed": "#261a00",
+                      "on-tertiary-container": "#ffe2ab",
+                      "on-tertiary-fixed-variant": "#5c4300",
+                      "outline": "#7b7487",
+                      "primary": "#630ed4",
+                      "error": "#ba1a1a",
+                      "tertiary": "#654a00",
+                      "error-container": "#ffdad6",
+                      "on-error": "#ffffff"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "sm": "8px",
+                      "gutter": "16px",
+                      "container-padding": "24px",
+                      "xl": "40px",
+                      "lg": "24px",
+                      "xs": "4px",
+                      "base": "4px",
+                      "md": "16px"
+              },
+              "fontFamily": {
+                      "headline-md": ["Hanken Grotesk"],
+                      "display-lg": ["Hanken Grotesk"],
+                      "label-md": ["Geist"],
+                      "headline-sm": ["Hanken Grotesk"],
+                      "body-lg": ["Inter"],
+                      "headline-lg": ["Hanken Grotesk"],
+                      "headline-lg-mobile": ["Hanken Grotesk"],
+                      "body-md": ["Inter"],
+                      "body-sm": ["Inter"]
+              },
+              "fontSize": {
+                      "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                      "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "label-md": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                      "headline-sm": ["20px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                      "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                      "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                      "headline-lg-mobile": ["28px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                      "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                      "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .discord-color {
+            background-color: #5865F2;
+        }
+        .discord-hover:hover {
+            background-color: #4752C4;
+        }
+        
+        /* Subtle animated background gradient */
+        .magical-bg {
+            background: linear-gradient(-45deg, #0f172a, #1e1b4b, #312e81, #172554);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+        
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        /* Glass panel */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="magical-bg min-h-screen text-surface-bright flex flex-col items-center justify-center font-sans antialiased relative overflow-hidden">
+<!-- Ambient glowing orbs (pure CSS) -->
+<div class="absolute top-1/4 left-1/4 w-64 h-64 bg-primary/20 rounded-full blur-[100px] pointer-events-none"></div>
+<div class="absolute bottom-1/4 right-1/4 w-80 h-80 bg-inverse-primary/20 rounded-full blur-[120px] pointer-events-none"></div>
+<main class="w-full max-w-md px-container-padding flex flex-col items-center justify-center relative z-10 flex-1 py-xl">
+<!-- Thematic Illustration / Logo Area -->
+<div class="mb-lg flex flex-col items-center">
+<!-- Replacing with a styling div that acts as an image container -->
+<div class="w-48 h-48 bg-cover bg-center rounded-full mb-md shadow-[0_0_40px_rgba(124,58,237,0.3)] border border-white/10" data-alt="A glowing, ethereal 20-sided die floating above an open grimoire, surrounded by subtle violet and blue magical energies. The style is modern, sleek, and slightly abstract, focusing on high-quality lighting and dark mode aesthetics. Minimalist but deeply thematic for a tabletop roleplaying game hub." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAT_iubcFXol1aUTvc_8KZAvx6oZzi4IYO3Gdsk10VQJpI4rQS-rdiK600s4zCo3VzcNXhJBAbUU_0PjdSkYJEX8XM4PUOsmMlKo5jgSuiz4Y53CdXFhtUffVFkxvrkpKd_TOX7-eLfrUrJd_KiATrtD9jT3oRJdrUr5t8AU4xKWunf8vE_U08gQ73iGC8foTHsYneMwIxe55FBobg7C02E0IOqBBBAG3DWHBzr032dOHPR9f42ueyr')"></div>
+<h1 class="font-display-lg text-display-lg text-center mb-xs text-white">JDR Hub</h1>
+<p class="font-body-lg text-body-lg text-secondary-fixed-dim text-center">L'Aventure Commence Ici</p>
+</div>
+<!-- Glassmorphism Login Card -->
+<div class="glass-panel rounded-xl w-full p-lg flex flex-col items-center shadow-2xl relative overflow-hidden">
+<!-- Subtle accent bar -->
+<div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-inverse-primary"></div>
+<p class="font-body-md text-body-md text-surface-container-high text-center mb-lg">
+                Rejoignez la communauté JDR Hub et retrouvez vos tables de jeu instantanément.
+            </p>
+<!-- Discord Login Button -->
+<button class="w-full discord-color discord-hover text-white font-headline-sm text-headline-sm py-md px-lg rounded-lg flex items-center justify-center gap-sm transition-all duration-300 shadow-md hover:brightness-110 active:scale-95">
+<svg class="bi bi-discord" fill="currentColor" height="24" viewBox="0 0 16 16" width="24" xmlns="http://www.w3.org/2000/svg">
+<path d="M13.545 2.907a13.227 13.227 0 0 0-3.257-1.011.05.05 0 0 0-.052.025c-.141.25-.297.577-.406.833a12.19 12.19 0 0 0-3.658 0 8.258 8.258 0 0 0-.412-.833.051.051 0 0 0-.052-.025c-1.125.194-2.22.534-3.257 1.011a.041.041 0 0 0-.021.018C.356 6.024-.213 9.047.066 12.032c.001.014.01.028.021.037a13.276 13.276 0 0 0 3.995 2.02.05.05 0 0 0 .056-.019c.308-.42.582-.863.818-1.329a.05.05 0 0 0-.01-.059.051.051 0 0 0-.018-.011 8.875 8.875 0 0 1-1.248-.595.05.05 0 0 1-.02-.066.051.051 0 0 1 .015-.019c.084-.063.168-.129.248-.195a.05.05 0 0 1 .051-.007c2.619 1.196 5.454 1.196 8.041 0a.052.052 0 0 1 .053.007c.08.066.164.132.248.195a.051.051 0 0 1-.004.085 8.254 8.254 0 0 1-1.249.594.05.05 0 0 0-.03.03.052.052 0 0 0 .003.041c.24.465.515.909.817 1.329a.05.05 0 0 0 .056.019 13.235 13.235 0 0 0 4.001-2.02.049.049 0 0 0 .021-.037c.334-3.451-.559-6.449-2.366-9.106a.034.034 0 0 0-.02-.019Zm-8.198 7.307c-.789 0-1.438-.724-1.438-1.612 0-.889.637-1.613 1.438-1.613.807 0 1.45.73 1.438 1.613 0 .888-.637 1.612-1.438 1.612Zm5.316 0c-.788 0-1.438-.724-1.438-1.612 0-.889.637-1.613 1.438-1.613.807 0 1.451.73 1.438 1.613 0 .888-.631 1.612-1.438 1.612Z"></path>
+</svg>
+                Se connecter avec Discord
+            </button>
+<div class="mt-md flex items-center gap-xs text-secondary-fixed-dim font-label-md text-label-md">
+<span class="material-symbols-outlined" style="font-size: 16px;">lock</span>
+                Connexion sécurisée via OAuth2
+            </div>
+</div>
+</main>
+<!-- Footer Links -->
+<footer class="w-full pb-container-padding flex flex-col items-center gap-sm mt-auto relative z-10">
+<div class="flex gap-lg">
+<a class="font-body-sm text-body-sm text-surface-variant hover:text-white transition-colors" href="#">Besoin d'aide ?</a>
+<a class="font-body-sm text-body-sm text-surface-variant hover:text-white transition-colors" href="#">Politique de confidentialité</a>
+</div>
+<p class="font-label-md text-label-md text-secondary-container/50">© 2024 JDR Hub</p>
+</footer>
+
+
+</body></html>

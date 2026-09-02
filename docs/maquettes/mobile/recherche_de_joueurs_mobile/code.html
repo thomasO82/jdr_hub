@@ -1,0 +1,308 @@
+<!DOCTYPE html><html class="dark" lang="fr"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>JDR Hub - Recherche de Joueurs</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700&amp;family=Inter:wght@400;500;600&amp;family=Geist:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+                "on-surface-variant": "#4a4455",
+                "inverse-on-surface": "#eff1f3",
+                "primary-fixed-dim": "#d2bbff",
+                "error-container": "#ffdad6",
+                "tertiary-fixed-dim": "#f9bd22",
+                "surface-container-high": "#e6e8ea",
+                "secondary-container": "#d5e3fc",
+                "on-primary": "#ffffff",
+                "on-primary-fixed-variant": "#5a00c6",
+                "on-primary-container": "#ede0ff",
+                "primary-fixed": "#eaddff",
+                "on-secondary": "#ffffff",
+                "on-tertiary-fixed-variant": "#5c4300",
+                "inverse-surface": "#2d3133",
+                "surface-container-highest": "#e0e3e5",
+                "tertiary": "#654a00",
+                "background": "#f7f9fb",
+                "on-tertiary": "#ffffff",
+                "surface-container": "#eceef0",
+                "surface-container-lowest": "#ffffff",
+                "on-secondary-container": "#57657a",
+                "secondary": "#515f74",
+                "error": "#ba1a1a",
+                "tertiary-container": "#836100",
+                "on-secondary-fixed-variant": "#3a485b",
+                "tertiary-fixed": "#ffdf9f",
+                "surface-bright": "#f7f9fb",
+                "secondary-fixed-dim": "#b9c7df",
+                "surface-container-low": "#f2f4f6",
+                "on-background": "#191c1e",
+                "surface-tint": "#732ee4",
+                "outline": "#7b7487",
+                "on-surface": "#191c1e",
+                "surface-dim": "#d8dadc",
+                "inverse-primary": "#d2bbff",
+                "primary": "#630ed4",
+                "on-primary-fixed": "#25005a",
+                "on-tertiary-container": "#ffe2ab",
+                "on-error": "#ffffff",
+                "surface-variant": "#e0e3e5",
+                "surface": "#f7f9fb",
+                "secondary-fixed": "#d5e3fc",
+                "on-error-container": "#93000a",
+                "on-secondary-fixed": "#0d1c2e",
+                "primary-container": "#7c3aed",
+                "outline-variant": "#ccc3d8",
+                "on-tertiary-fixed": "#261a00"
+        },
+        "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+        },
+        "spacing": {
+                "md": "16px",
+                "xs": "4px",
+                "xl": "40px",
+                "gutter": "16px",
+                "container-padding": "24px",
+                "lg": "24px",
+                "sm": "8px",
+                "base": "4px"
+        },
+        "fontFamily": {
+                "body-lg": [
+                        "Inter"
+                ],
+                "headline-lg": [
+                        "Hanken Grotesk"
+                ],
+                "headline-md": [
+                        "Hanken Grotesk"
+                ],
+                "body-md": [
+                        "Inter"
+                ],
+                "headline-lg-mobile": [
+                        "Hanken Grotesk"
+                ],
+                "headline-sm": [
+                        "Hanken Grotesk"
+                ],
+                "display-lg": [
+                        "Hanken Grotesk"
+                ],
+                "body-sm": [
+                        "Inter"
+                ],
+                "label-md": [
+                        "Geist"
+                ]
+        },
+        "fontSize": {
+                "body-lg": [
+                        "18px",
+                        {
+                                "lineHeight": "1.6",
+                                "fontWeight": "400"
+                        }
+                ],
+                "headline-lg": [
+                        "32px",
+                        {
+                                "lineHeight": "1.2",
+                                "letterSpacing": "-0.01em",
+                                "fontWeight": "600"
+                        }
+                ],
+                "headline-md": [
+                        "24px",
+                        {
+                                "lineHeight": "1.3",
+                                "fontWeight": "600"
+                        }
+                ],
+                "body-md": [
+                        "16px",
+                        {
+                                "lineHeight": "1.6",
+                                "fontWeight": "400"
+                        }
+                ],
+                "headline-lg-mobile": [
+                        "28px",
+                        {
+                                "lineHeight": "1.2",
+                                "fontWeight": "600"
+                        }
+                ],
+                "headline-sm": [
+                        "20px",
+                        {
+                                "lineHeight": "1.4",
+                                "fontWeight": "600"
+                        }
+                ],
+                "display-lg": [
+                        "48px",
+                        {
+                                "lineHeight": "1.1",
+                                "letterSpacing": "-0.02em",
+                                "fontWeight": "700"
+                        }
+                ],
+                "body-sm": [
+                        "14px",
+                        {
+                                "lineHeight": "1.5",
+                                "fontWeight": "400"
+                        }
+                ],
+                "label-md": [
+                        "12px",
+                        {
+                                "lineHeight": "1",
+                                "letterSpacing": "0.05em",
+                                "fontWeight": "500"
+                        }
+                ]
+        }
+},
+    },
+  }
+</script>
+<style>
+        body {
+            background-color: theme('colors.background');
+            color: theme('colors.on-background');
+        }
+        /* Custom scrollbar for chips */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="md:hidden pb-[100px] pt-[80px]">
+<!-- TopAppBar -->
+<header class="bg-background/80 dark:bg-background/80 backdrop-blur-md fixed top-0 w-full z-50 border-b border-outline-variant/30 dark:border-outline/20 shadow-sm dark:shadow-none flex justify-between items-center h-16 px-gutter">
+<button class="hover:bg-primary/5 dark:hover:bg-primary-fixed-dim/10 rounded-full transition-colors active:scale-95 transition-transform duration-150 p-2 text-on-surface-variant dark:text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="auto_fix_high">auto_fix_high</span>
+</button>
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed-dim tracking-tight">JDR Hub</h1>
+<button class="hover:bg-primary/5 dark:hover:bg-primary-fixed-dim/10 rounded-full transition-colors active:scale-95 transition-transform duration-150 p-2 text-on-surface-variant dark:text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+</header>
+<main class="px-gutter flex flex-col gap-lg">
+<!-- Search and Filter Section -->
+<section class="flex flex-col gap-md pt-sm">
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-sm top-1/2 -translate-y-1/2 text-outline" data-icon="search">search</span>
+<input class="w-full pl-xl pr-sm py-sm rounded-xl border border-surface-variant bg-surface-container-lowest focus:ring-2 focus:ring-primary focus:border-transparent font-body-md text-body-md text-on-surface shadow-[0_1px_3px_0_rgba(0,0,0,0.1),0_1px_2px_-1px_rgba(0,0,0,0.1)] outline-none transition-all" placeholder="Rechercher des joueurs..." type="text">
+</div>
+<div class="flex gap-sm overflow-x-auto hide-scrollbar pb-1">
+<button class="shrink-0 px-4 py-2 rounded-full bg-primary/10 text-primary font-label-md text-label-md font-semibold border border-primary/20">Tous</button>
+<button class="shrink-0 px-4 py-2 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md hover:bg-surface-container-high transition-colors">Disponibles</button>
+<button class="shrink-0 px-4 py-2 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md hover:bg-surface-container-high transition-colors">MJ</button>
+<button class="shrink-0 px-4 py-2 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md hover:bg-surface-container-high transition-colors">D&amp;D 5e</button>
+<button class="shrink-0 px-4 py-2 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md hover:bg-surface-container-high transition-colors">Pathfinder</button>
+<button class="shrink-0 px-4 py-2 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md hover:bg-surface-container-high transition-colors">Cyberpunk</button><button class="shrink-0 px-4 py-2 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md hover:bg-surface-container-high transition-colors">Horreur</button><button class="shrink-0 px-4 py-2 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md hover:bg-surface-container-high transition-colors">Roleplay</button><button class="shrink-0 px-4 py-2 rounded-full bg-surface-container text-on-surface-variant font-label-md text-label-md hover:bg-surface-container-high transition-colors">Débutants</button></div>
+</section>
+<!-- Player Cards List -->
+<section class="flex flex-col gap-md">
+<!-- Card 1 -->
+<article class="bg-surface-container-lowest rounded-xl p-md shadow-[0_1px_3px_0_rgba(0,0,0,0.1),0_1px_2px_-1px_rgba(0,0,0,0.1)] flex flex-col gap-sm">
+<div class="flex items-center gap-md pb-sm border-b border-surface-variant">
+<img class="w-12 h-12 rounded-full object-cover" data-alt="A detailed, modern digital portrait of a fantasy character avatar. A stern-looking human warrior with dark hair, wearing subtle leather and plate armor. The background is a clean, minimal gradient. The art style is high-quality digital illustration suitable for a modern RPG app interface, bright and clean." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD81fdxkf6WECnHCmUkLlAf9Z2eRZ8Kaeh0hOFuzyhQLAv0rPguXGuQpfVwIleTHkpgjrblvZVT4NXuhzimKL-hN1t7aB2hxZG3Dbgyd33Mnjc2kynRjUFL3G1usPMiEVdMmJHKnc-arEzp6LjaXR0h3tRW5ZJJtzYikQBW5Bs4tFk-UWhC7aDkLpbl_YqklG21q3BHhqLMwCmqVFK3h3J-PLznKcTmkJ_oKf6xA6kM91ld9MoR7XGy">
+<div class="flex-1">
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Arkanis</h2>
+<p class="font-body-sm text-body-sm text-secondary flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="swords">swords</span> Joueur Vétéran
+                        </p>
+</div>
+</div>
+<div class="flex flex-wrap gap-xs">
+<span class="px-2 py-1 bg-surface-variant rounded-md font-label-md text-label-md text-on-surface-variant">D&amp;D 5e</span>
+<span class="px-2 py-1 bg-surface-variant rounded-md font-label-md text-label-md text-on-surface-variant">Call of Cthulhu</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
+                    Cherche une campagne longue durée, de préférence orientée roleplay et intrigue politique.
+                </p>
+<div class="flex flex-wrap gap-xs mt-1">
+<span class="px-2 py-1 bg-primary/10 text-primary rounded-full font-label-md text-label-md border border-primary/20">Soirées en semaine</span>
+</div>
+<button class="mt-2 w-full bg-primary text-on-primary py-2 rounded-lg font-label-md text-label-md hover:bg-primary/90 transition-colors shadow-sm">
+                    Inviter
+                </button>
+</article>
+<!-- Card 2 -->
+<article class="bg-surface-container-lowest rounded-xl p-md shadow-[0_1px_3px_0_rgba(0,0,0,0.1),0_1px_2px_-1px_rgba(0,0,0,0.1)] flex flex-col gap-sm">
+<div class="flex items-center gap-md pb-sm border-b border-surface-variant">
+<img class="w-12 h-12 rounded-full object-cover border-2 border-primary" data-alt="A detailed, modern digital portrait of a fantasy character avatar. An enigmatic elven game master surrounded by subtle magical energy, holding a glowing 20-sided die. Clean, bright background. High-quality digital illustration tailored for a premium RPG management app." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC6f5zxDx7pl1vtD0fITK2NxvD0YuA1VCEWTXXkBH8xt51aZE3l5f5N3dORnnFXWiMOGHG75SVdEsb0TMu07WZqAgfZaiQKd2BuUv542qY_HeepAZQIa2ByzlZbHhv1lTQvgJgiMoacT9aUWRIQiG2DdjaGMlxi3iL4dTmp5ZKptLt-Nbx7sqR1MhYuS-VIghhhBQuYhkMSxWWr-tWOi6Y2ipx_y0GTwpvsmKGQ5nd72-y0577-JaGG">
+<div class="flex-1">
+<h2 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-2">
+                            Elara_MJ
+                            <span class="px-2 py-0.5 bg-tertiary-container/20 text-tertiary-container rounded text-[10px] uppercase font-bold tracking-wider">MJ</span>
+</h2>
+<p class="font-body-sm text-body-sm text-secondary flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="book">book</span> Créatrice d'univers
+                        </p>
+</div>
+</div>
+<div class="flex flex-wrap gap-xs">
+<span class="px-2 py-1 bg-surface-variant rounded-md font-label-md text-label-md text-on-surface-variant">Pathfinder 2e</span>
+<span class="px-2 py-1 bg-surface-variant rounded-md font-label-md text-label-md text-on-surface-variant">Cyberpunk RED</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
+                    Prépare une nouvelle campagne Cyberpunk. Cherche 2 joueurs expérimentés pour compléter le groupe.
+                </p>
+<div class="flex flex-wrap gap-xs mt-1">
+<span class="px-2 py-1 bg-primary/10 text-primary rounded-full font-label-md text-label-md border border-primary/20">Week-ends</span>
+</div>
+<button class="mt-2 w-full border border-secondary text-secondary py-2 rounded-lg font-label-md text-label-md hover:bg-surface-variant transition-colors">
+                    Voir le profil
+                </button>
+</article>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="bg-surface-container-lowest/90 dark:bg-inverse-surface/90 backdrop-blur-lg fixed bottom-0 w-full z-50 rounded-t-xl shadow-[0_-1px_3px_0_rgba(0,0,0,0.1)] dark:bg-surface-container-high flex justify-around items-center h-20 pb-safe px-2">
+<!-- Inactive Tab -->
+<a class="flex flex-col items-center justify-center text-on-secondary-container dark:text-on-secondary-fixed-variant hover:text-primary dark:hover:text-primary-fixed-dim active:scale-90 transition-all duration-200 ease-out font-label-md text-label-md p-2" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="dashboard">dashboard</span>
+            Dashboard
+        </a>
+<!-- Inactive Tab -->
+<a class="flex flex-col items-center justify-center text-on-secondary-container dark:text-on-secondary-fixed-variant hover:text-primary dark:hover:text-primary-fixed-dim active:scale-90 transition-all duration-200 ease-out font-label-md text-label-md p-2" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="casino">casino</span>
+            Games
+        </a>
+<!-- Active Tab: Players -->
+<a class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed-dim font-semibold bg-primary-container/20 dark:bg-primary-container/30 rounded-full px-4 py-1 active:scale-90 transition-all duration-200 ease-out font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="group" data-weight="fill" style="font-variation-settings: 'FILL' 1;">group</span>
+            Players
+        </a>
+<!-- Inactive Tab -->
+<a class="flex flex-col items-center justify-center text-on-secondary-container dark:text-on-secondary-fixed-variant hover:text-primary dark:hover:text-primary-fixed-dim active:scale-90 transition-all duration-200 ease-out font-label-md text-label-md p-2" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="calendar_today">calendar_today</span>
+            Calendar
+        </a>
+<!-- Inactive Tab -->
+<a class="flex flex-col items-center justify-center text-on-secondary-container dark:text-on-secondary-fixed-variant hover:text-primary dark:hover:text-primary-fixed-dim active:scale-90 transition-all duration-200 ease-out font-label-md text-label-md p-2" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="person">person</span>
+            Profile
+        </a>
+</nav>
+
+
+</body></html>

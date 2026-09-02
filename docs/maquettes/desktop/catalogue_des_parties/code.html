@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+
+<html class="light" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>JDR Hub - Catalogue de Parties</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700&amp;family=Geist:wght@400;500;600&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-container": "#836100",
+                        "on-secondary-fixed-variant": "#3a485b",
+                        "secondary-fixed": "#d5e3fc",
+                        "surface-container-low": "#f2f4f6",
+                        "tertiary": "#654a00",
+                        "on-primary-fixed-variant": "#5a00c6",
+                        "error-container": "#ffdad6",
+                        "inverse-on-surface": "#eff1f3",
+                        "primary-fixed": "#eaddff",
+                        "secondary-fixed-dim": "#b9c7df",
+                        "inverse-surface": "#2d3133",
+                        "on-primary-fixed": "#25005a",
+                        "background": "#f7f9fb",
+                        "surface-dim": "#d8dadc",
+                        "error": "#ba1a1a",
+                        "surface-bright": "#f7f9fb",
+                        "on-tertiary": "#ffffff",
+                        "surface": "#f7f9fb",
+                        "surface-tint": "#732ee4",
+                        "surface-container-high": "#e6e8ea",
+                        "on-surface-variant": "#4a4455",
+                        "primary": "#630ed4",
+                        "primary-container": "#7c3aed",
+                        "secondary": "#515f74",
+                        "surface-variant": "#e0e3e5",
+                        "tertiary-fixed": "#ffdf9f",
+                        "secondary-container": "#d5e3fc",
+                        "on-tertiary-fixed": "#261a00",
+                        "outline-variant": "#ccc3d8",
+                        "on-secondary-fixed": "#0d1c2e",
+                        "tertiary-fixed-dim": "#f9bd22",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary": "#ffffff",
+                        "on-primary-container": "#ede0ff",
+                        "surface-container": "#eceef0",
+                        "on-background": "#191c1e",
+                        "on-error": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "surface-container-highest": "#e0e3e5",
+                        "inverse-primary": "#d2bbff",
+                        "on-surface": "#191c1e",
+                        "on-tertiary-container": "#ffe2ab",
+                        "on-secondary": "#ffffff",
+                        "primary-fixed-dim": "#d2bbff",
+                        "on-tertiary-fixed-variant": "#5c4300",
+                        "outline": "#7b7487",
+                        "on-secondary-container": "#57657a"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container-padding": "24px",
+                        "xl": "40px",
+                        "md": "16px",
+                        "base": "4px",
+                        "xs": "4px",
+                        "lg": "24px",
+                        "sm": "8px",
+                        "gutter": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-sm": ["Hanken Grotesk"],
+                        "label-md": ["Geist"],
+                        "headline-md": ["Hanken Grotesk"],
+                        "body-lg": ["Inter"],
+                        "headline-lg-mobile": ["Hanken Grotesk"],
+                        "body-md": ["Inter"],
+                        "display-lg": ["Hanken Grotesk"],
+                        "headline-lg": ["Hanken Grotesk"],
+                        "body-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-sm": ["20px", { "lineHeight": "1.4", "fontWeight": "600" }],
+                        "label-md": ["12px", { "lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "1.2", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-sm": ["14px", { "lineHeight": "1.5", "fontWeight": "400" }]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined[data-weight="fill"] {
+            font-variation-settings: 'FILL' 1;
+        }
+        
+        .shadow-level-1 {
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+        }
+        .shadow-level-2 {
+            box-shadow: 0 10px 15px -3px rgba(124, 58, 237, 0.1), 0 4px 6px -4px rgba(124, 58, 237, 0.1);
+        }
+        
+        body {
+            background-color: theme('colors.background');
+        }
+    </style>
+</head>
+<body class="flex min-h-screen font-body-md text-on-background bg-background text-body-md">
+<!-- SideNavBar -->
+<nav class="hidden md:flex flex-col h-full py-lg px-md docked h-screen w-64 left-0 top-0 bg-surface dark:bg-inverse-surface border-r border-outline-variant dark:border-outline shadow-sm dark:shadow-none fixed z-30">
+<!-- Header -->
+<div class="flex items-center gap-md mb-xl px-sm">
+<img alt="User Profile Avatar" class="w-10 h-10 rounded-xl object-cover shadow-level-1" data-alt="A clean, minimalist 3D rendering of a geometric D20 die floating in a softly lit, high-key studio environment. The palette is dominated by pristine white and subtle slate blue, with glowing fantasy violet accents emanating from the die's numbers. Modern corporate avatar style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBtySXU0jdy3Pz3vIIKpQ98iwZ7i_CFVKu7tulEQWuweMApsypBr7EtC5QDcUGe7NV3BL6NvuBmTjxyuB_YTkIvF_i-LGmi5MHC-en_4QXGLB4L-v-Bh35bAuvJfnxX7bNbNcNQrrdrTTTYbOCRLQHW4wRlQ9GUMWpnfJhetfeBlnQlVFcBz_-rlukGVbKkzfgtVVnPeUnugJtBkgfscHGiOm51x4r-YKE4YoAWeh7lgdA3hXhwDi7u"/>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-inverse-primary tracking-tight">JDR Hub</h1>
+<p class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">Digital Dungeon Master</p>
+</div>
+</div>
+<!-- Navigation Links -->
+<div class="flex flex-col gap-sm flex-1">
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-surface-variant hover:text-primary hover:bg-surface-container-high dark:hover:bg-surface-container transition-colors active:scale-95 duration-150 group" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-body-sm text-body-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-primary dark:text-inverse-primary font-bold border-r-4 border-primary dark:border-inverse-primary bg-primary-container/10 hover:bg-surface-container-high dark:hover:bg-surface-container transition-colors active:scale-95 duration-150" href="#">
+<span class="material-symbols-outlined" data-icon="casino" data-weight="fill">casino</span>
+<span class="font-body-sm text-body-sm">Games</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-surface-variant hover:text-primary hover:bg-surface-container-high dark:hover:bg-surface-container transition-colors active:scale-95 duration-150 group" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-body-sm text-body-sm font-medium">Players</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-surface-variant hover:text-primary hover:bg-surface-container-high dark:hover:bg-surface-container transition-colors active:scale-95 duration-150 group" href="#">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+<span class="font-body-sm text-body-sm font-medium">Schedule</span>
+</a>
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-on-surface-variant dark:text-surface-variant hover:text-primary hover:bg-surface-container-high dark:hover:bg-surface-container transition-colors active:scale-95 duration-150 group mt-auto" href="#">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+<span class="font-body-sm text-body-sm font-medium">Profile</span>
+</a>
+</div>
+<!-- CTA -->
+<button class="mt-lg w-full bg-primary text-on-primary font-body-md text-body-md font-semibold py-sm px-md rounded-xl shadow-level-1 hover:shadow-level-2 transition-all duration-200 active:scale-95 flex items-center justify-center gap-sm">
+<span class="material-symbols-outlined text-sm">add</span>
+            New Game
+        </button>
+</nav>
+<!-- BottomNavBar (Mobile) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-4 pt-2 docked full-width bottom-0 rounded-t-xl backdrop-blur-lg bg-surface/90 dark:bg-inverse-surface/90 border-t border-outline-variant/20 shadow-lg">
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container/50 active:scale-90 transition-transform p-2 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-label-md text-label-md mt-1">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 hover:bg-secondary-container/50 active:scale-90 transition-transform" href="#">
+<span class="material-symbols-outlined" data-icon="casino" data-weight="fill">casino</span>
+<span class="font-label-md text-label-md mt-1 font-bold">Games</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container/50 active:scale-90 transition-transform p-2 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-label-md text-label-md mt-1">Players</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container/50 active:scale-90 transition-transform p-2 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="event">event</span>
+<span class="font-label-md text-label-md mt-1">Calendar</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-secondary-fixed-variant hover:bg-secondary-container/50 active:scale-90 transition-transform p-2 rounded-lg" href="#">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-label-md text-label-md mt-1">Profile</span>
+</a>
+</nav>
+<!-- Main Content Area -->
+<main class="flex-1 md:ml-64 p-lg md:p-xl flex flex-col lg:flex-row gap-lg pb-24 md:pb-xl max-w-[1440px] mx-auto w-full">
+<!-- Filter Sidebar -->
+<aside class="w-full lg:w-72 flex-shrink-0 flex flex-col gap-md">
+<div class="bg-surface rounded-xl shadow-level-1 p-md border border-outline-variant/30">
+<div class="flex items-center justify-between mb-sm pb-sm border-b border-surface-variant">
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Filtres</h2>
+<button class="text-primary font-label-md text-label-md hover:underline">Réinitialiser</button>
+</div>
+<!-- Active Filters Badges -->
+<div class="flex flex-wrap gap-sm mb-md">
+<span class="inline-flex items-center gap-xs bg-primary-container/20 text-primary px-2 py-1 rounded-full font-label-md text-label-md">
+                        One-shot
+                        <button class="hover:text-error"><span class="material-symbols-outlined text-[14px]">close</span></button>
+</span>
+<span class="inline-flex items-center gap-xs bg-primary-container/20 text-primary px-2 py-1 rounded-full font-label-md text-label-md">
+                        En ligne
+                        <button class="hover:text-error"><span class="material-symbols-outlined text-[14px]">close</span></button>
+</span>
+</div>
+<div class="space-y-lg">
+<!-- Système -->
+<div>
+<h3 class="font-body-sm text-body-sm font-semibold text-on-surface-variant mb-sm uppercase tracking-wide">Système</h3>
+<div class="space-y-sm">
+<label class="flex items-center gap-sm cursor-pointer group">
+<input class="form-checkbox text-primary border-outline-variant rounded focus:ring-primary focus:ring-offset-surface w-4 h-4 transition-colors" type="checkbox"/>
+<span class="font-body-sm text-body-sm text-on-surface group-hover:text-primary transition-colors">D&amp;D 5e</span>
+</label>
+<label class="flex items-center gap-sm cursor-pointer group">
+<input class="form-checkbox text-primary border-outline-variant rounded focus:ring-primary focus:ring-offset-surface w-4 h-4 transition-colors" type="checkbox"/>
+<span class="font-body-sm text-body-sm text-on-surface group-hover:text-primary transition-colors">L'Appel de Cthulhu</span>
+</label>
+<label class="flex items-center gap-sm cursor-pointer group">
+<input class="form-checkbox text-primary border-outline-variant rounded focus:ring-primary focus:ring-offset-surface w-4 h-4 transition-colors" type="checkbox"/>
+<span class="font-body-sm text-body-sm text-on-surface group-hover:text-primary transition-colors">Cyberpunk RED</span>
+</label>
+</div>
+</div>
+<!-- Type -->
+<div>
+<h3 class="font-body-sm text-body-sm font-semibold text-on-surface-variant mb-sm uppercase tracking-wide">Type</h3>
+<div class="flex flex-col gap-sm">
+<label class="flex items-center gap-sm cursor-pointer group">
+<input checked="" class="form-radio text-primary border-outline-variant focus:ring-primary focus:ring-offset-surface w-4 h-4 transition-colors" name="type" type="radio"/>
+<span class="font-body-sm text-body-sm text-on-surface group-hover:text-primary transition-colors">One-shot</span>
+</label>
+<label class="flex items-center gap-sm cursor-pointer group">
+<input class="form-radio text-primary border-outline-variant focus:ring-primary focus:ring-offset-surface w-4 h-4 transition-colors" name="type" type="radio"/>
+<span class="font-body-sm text-body-sm text-on-surface group-hover:text-primary transition-colors">Campagne</span>
+</label>
+</div>
+</div>
+<!-- Format -->
+<div>
+<h3 class="font-body-sm text-body-sm font-semibold text-on-surface-variant mb-sm uppercase tracking-wide">Format</h3>
+<div class="flex gap-sm">
+<button class="flex-1 bg-primary-container/20 text-primary border border-primary/30 font-body-sm text-body-sm py-1 px-3 rounded-lg font-medium">En ligne</button>
+<button class="flex-1 bg-surface-container-low text-on-surface-variant border border-outline-variant/30 hover:bg-surface-variant font-body-sm text-body-sm py-1 px-3 rounded-lg transition-colors">Sur table</button>
+</div>
+</div>
+</div>
+</div>
+</aside>
+<!-- Game Grid Canvas -->
+<section class="flex-1 flex flex-col gap-lg">
+<header class="flex justify-between items-end pb-sm border-b border-outline-variant/30">
+<div>
+<h2 class="font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-background font-bold tracking-tight">Catalogue de Parties</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1">Trouvez votre prochaine aventure.</p>
+</div>
+<div class="hidden sm:flex items-center gap-sm bg-surface rounded-lg border border-outline-variant/50 p-1 shadow-sm">
+<button class="p-1 rounded bg-surface-variant text-on-surface"><span class="material-symbols-outlined text-sm">grid_view</span></button>
+<button class="p-1 rounded text-on-surface-variant hover:bg-surface-container-low transition-colors"><span class="material-symbols-outlined text-sm">view_list</span></button>
+</div>
+</header>
+<!-- Bento Grid / Card Layout -->
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-md lg:gap-lg">
+<!-- Game Card 1 -->
+<article class="bg-surface rounded-xl shadow-level-1 hover:shadow-level-2 transition-all duration-300 border border-outline-variant/20 overflow-hidden flex flex-col group cursor-pointer">
+<div class="h-40 w-full relative overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10"></div>
+<img alt="Cover art for La Crypte Maudite" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A dark, atmospheric digital painting of an ancient, ruined gothic crypt illuminated by eerie, bioluminescent green moss and a solitary shaft of pale moonlight. High-end modern fantasy art style, emphasizing shadows and mystery. Deep blacks, cool slate grays, and toxic green accents." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAw60ncy_tYCpHy_yBAPrgnkQa_PGxLUCjY4fa0nk4NCFdJEX15csOGk1DMizrSg5PlJ8mG0c-qaG_lPiX5x0aENKam1ClxXElZ8l9Piu8lSueOb9cGxHCeLHjswxdXpbFDlszGD1OKkTYL-LJojtaO75_OtYwdRtMik3DDt1OU1VTXvCPOSqLrobpCq-OlXBfi6Fxnj-Frvo_a-B87l3fh3BD5df6-WskzGXu78UCzwixN5fG_Z12A"/>
+<div class="absolute top-sm right-sm z-20">
+<span class="bg-surface/90 backdrop-blur-md text-on-surface font-label-md text-label-md px-2 py-1 rounded-md shadow-sm border border-outline-variant/20 flex items-center gap-xs">
+<span class="material-symbols-outlined text-[14px] text-tertiary">group</span> 3/5
+                            </span>
+</div>
+<div class="absolute bottom-sm left-sm z-20">
+<span class="bg-primary/90 text-on-primary font-label-md text-label-md px-2 py-1 rounded-md uppercase tracking-wider">D&amp;D 5e</span>
+</div>
+</div>
+<div class="p-md flex flex-col flex-1">
+<div class="flex justify-between items-start mb-sm">
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold group-hover:text-primary transition-colors line-clamp-1">La Crypte Maudite</h3>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2 mb-md">Une expédition de routine tourne au cauchemar lorsque les aventuriers réveillent une entité assoupie depuis des millénaires sous les ruines de Valéria.</p>
+<div class="mt-auto space-y-sm">
+<div class="flex items-center gap-sm text-on-surface-variant">
+<img alt="GM Avatar" class="w-6 h-6 rounded-full bg-surface-variant object-cover" data-alt="A simple, minimalist 3D rendering of a cloaked figure's silhouette in profile against a soft white background. Modern UI avatar style, neutral slate blue colors." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCoMDm3Iz87GPPygG2nR4GqZCHDs6emBbTxivcWJYBmMrDkAoMheELfucA9VwzMo88oIIwZk4ml7ZwPHyOViJQE6AADUIrFQ6U60R7JolLsINLCw2jM83yAiu9im0TEy7MSOIoYfu3t-de4zG99rAXoQXUqDmc-z5_pa3ghsKgYb75FUKelYSm7ho11LyEzGaOsJi2pfQzM3A3vVSrX2M9HfNiP_0k2IAq9VF8NTTwy4L4XaozHvfLp"/>
+<span class="font-body-sm text-body-sm font-medium">Par MaîtreHibou</span>
+</div>
+<div class="flex items-center gap-md font-label-md text-label-md text-secondary">
+<span class="flex items-center gap-xs"><span class="material-symbols-outlined text-[16px]">calendar_today</span> 12 Nov, 20:00</span>
+<span class="flex items-center gap-xs"><span class="material-symbols-outlined text-[16px]">language</span> En ligne (Discord)</span>
+</div>
+</div>
+</div>
+</article>
+<!-- Game Card 2 -->
+<article class="bg-surface rounded-xl shadow-level-1 hover:shadow-level-2 transition-all duration-300 border border-outline-variant/20 overflow-hidden flex flex-col group cursor-pointer">
+<div class="h-40 w-full relative overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10"></div>
+<img alt="Cover art for Signal perdu sur Epsilon-9" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A sleek, futuristic digital illustration of a derelict space station interior. Dim emergency red lighting casts long shadows across metallic corridors. Modern sci-fi aesthetic, clean lines, high contrast. Slate gray, deep obsidian, and neon crimson accents." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAHz81ajfpKQkRkoVlGLI1UaInd9MknRagn5jDU05DiI2DDhRHyPaqMzSM9mWqack5wS3QynzfrOIXuM6IR25Y6ouIH5M7FkziWeXGT4beiRb7BBuMn2mao4kzQ39VcfxLMl4EqSwF7gDvk_HY8XrDPKyofy6A6s-88E3VKR79TDkWL8wEGJ1M6BFnyyQHOZzunv1TYEUjQAucWGYz5xpG_s0YoZz8xKlmP3wsRqm19BOK9F6Ev4Vdr"/>
+<div class="absolute top-sm right-sm z-20">
+<span class="bg-surface/90 backdrop-blur-md text-on-surface font-label-md text-label-md px-2 py-1 rounded-md shadow-sm border border-outline-variant/20 flex items-center gap-xs">
+<span class="material-symbols-outlined text-[14px] text-tertiary">group</span> 4/4
+                            </span>
+</div>
+<div class="absolute bottom-sm left-sm z-20 flex gap-xs">
+<span class="bg-secondary/90 text-on-secondary font-label-md text-label-md px-2 py-1 rounded-md uppercase tracking-wider">Mothership</span>
+<span class="bg-surface-variant/90 backdrop-blur-md text-on-surface font-label-md text-label-md px-2 py-1 rounded-md shadow-sm border border-outline-variant/20">Complet</span>
+</div>
+</div>
+<div class="p-md flex flex-col flex-1">
+<div class="flex justify-between items-start mb-sm">
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold group-hover:text-primary transition-colors line-clamp-1">Signal perdu sur Epsilon-9</h3>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2 mb-md">Le contact a été rompu avec la station de recherche minière. Votre équipe de "nettoyeurs" est envoyée pour évaluer la situation et récupérer les données. Priorité absolue.</p>
+<div class="mt-auto space-y-sm">
+<div class="flex items-center gap-sm text-on-surface-variant">
+<img alt="GM Avatar" class="w-6 h-6 rounded-full bg-surface-variant object-cover" data-alt="A sleek, modern 3D rendering of a futuristic cyborg eye in profile against a soft white background. Modern UI avatar style, neutral slate blue and subtle violet colors." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBn04Ij8zEaJo4RthwC8ztQtuSq4rZ2DiERsabBA6CjhLYZ5FJSpRUVBEe-l1TXERB0aD-vkiJCF0U_uZ9cJ5F8fAwNLXwvg-ZW7owKLWVwRWQQU9avt24j3jEwXywVoXzu4Y5cgwlbRhaBKmudpM0AMZPDoAT91ycSSQenJ52DHVZ7T3Nu_H58ViRGHS42y7t86A4mnPTfQ3zg1oC61Q6m3ZkKTovVopH1OdRnLd50h8h4AqVmOXxe"/>
+<span class="font-body-sm text-body-sm font-medium">Par NovaStrider</span>
+</div>
+<div class="flex items-center gap-md font-label-md text-label-md text-secondary">
+<span class="flex items-center gap-xs"><span class="material-symbols-outlined text-[16px]">calendar_today</span> 15 Nov, 21:00</span>
+<span class="flex items-center gap-xs"><span class="material-symbols-outlined text-[16px]">language</span> En ligne (Foundry VTT)</span>
+</div>
+</div>
+</div>
+</article>
+<!-- Game Card 3 -->
+<article class="bg-surface rounded-xl shadow-level-1 hover:shadow-level-2 transition-all duration-300 border border-outline-variant/20 overflow-hidden flex flex-col group cursor-pointer">
+<div class="h-40 w-full relative overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10"></div>
+<img alt="Cover art for Les Ombres de Marseille" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A stylish, neo-noir digital painting of a modern Mediterranean city street at night, slick with rain. Neon lights reflect in puddles. Urban fantasy aesthetic, high contrast. Deep indigo blues, slate, and vibrant magenta neon accents." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDv13fch1Ov1DQYi-eBVySHUyKyEdPUjMTawSgGk8c7zJszlUAbIezXdMj1mKdTaUeDJlbBEEmnfUMpj2abLDBj6KlURSadifpSv94R7OZAcKrOcax0sP_YiZ05jv9SlAIgSaE2k8A0Z39jY-PPJ1H-rpPIL7IFG6ibYkS3asX6YpuSpDfxLut2umq343hP24VgWhmIOVlReqN8MlAlKso40sHSjX86iQLVeOaZGt2LY-AmpiXJo8Dr"/>
+<div class="absolute top-sm right-sm z-20">
+<span class="bg-surface/90 backdrop-blur-md text-on-surface font-label-md text-label-md px-2 py-1 rounded-md shadow-sm border border-outline-variant/20 flex items-center gap-xs">
+<span class="material-symbols-outlined text-[14px] text-tertiary">group</span> 1/5
+                            </span>
+</div>
+<div class="absolute bottom-sm left-sm z-20">
+<span class="bg-tertiary-container/90 text-on-tertiary-container font-label-md text-label-md px-2 py-1 rounded-md uppercase tracking-wider">Vampire: La Mascarade</span>
+</div>
+</div>
+<div class="p-md flex flex-col flex-1">
+<div class="flex justify-between items-start mb-sm">
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-semibold group-hover:text-primary transition-colors line-clamp-1">Les Ombres de Marseille</h3>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-2 mb-md">Le Prince a disparu. Les différents clans de la cité phocéenne se préparent à une guerre ouverte. Votre coterie parviendra-t-elle à tirer son épingle du jeu dans ce chaos politique ?</p>
+<div class="mt-auto space-y-sm">
+<div class="flex items-center gap-sm text-on-surface-variant">
+<img alt="GM Avatar" class="w-6 h-6 rounded-full bg-surface-variant object-cover" data-alt="A moody, minimalist 3D rendering of a raven perched on a skull against a soft white background. Modern UI avatar style, dark slate and subtle red colors." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBthbi5OS9VjZ43MBVdsIpkNmL8HmWDIz9vnR8lc04lR8Pl2W48Bh0xJxFgAUik27iykDPf_Kvpk1JzI9ecsh6tJyY3Deol3MSFTTg_c9t53ZlY4pWbnOKqPmSv-1pCClAYUIRhhGBRJ8lyWprjqo4oevOPocmOBXgzSkDEbJ9_w96RdWhDGdIwIRWY2h6p7adNari0Z5zyShX1cUtmXoW8uD31UbF0DEFvU8n1TChJ_K2CCYpGNC6W"/>
+<span class="font-body-sm text-body-sm font-medium">Par ComteVlad</span>
+</div>
+<div class="flex items-center gap-md font-label-md text-label-md text-secondary">
+<span class="flex items-center gap-xs"><span class="material-symbols-outlined text-[16px]">calendar_today</span> 18 Nov, 14:00</span>
+<span class="flex items-center gap-xs"><span class="material-symbols-outlined text-[16px]">location_on</span> Paris, 11e arr.</span>
+</div>
+</div>
+</div>
+</article>
+</div>
+</section>
+</main>
+</body></html>

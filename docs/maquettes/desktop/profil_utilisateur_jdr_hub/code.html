@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>JDR Hub - Profile</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@500&amp;family=Hanken+Grotesk:wght@600;700&amp;family=Inter:wght@400&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config from Guidelines -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "tertiary-container": "#836100",
+                        "inverse-surface": "#2d3133",
+                        "on-background": "#191c1e",
+                        "surface-container-high": "#e6e8ea",
+                        "secondary-fixed-dim": "#b9c7df",
+                        "on-secondary": "#ffffff",
+                        "surface-dim": "#d8dadc",
+                        "outline-variant": "#ccc3d8",
+                        "primary-fixed-dim": "#d2bbff",
+                        "on-error": "#ffffff",
+                        "on-secondary-fixed-variant": "#3a485b",
+                        "on-surface": "#191c1e",
+                        "on-primary-fixed-variant": "#5a00c6",
+                        "on-error-container": "#93000a",
+                        "surface-variant": "#e0e3e5",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-container": "#57657a",
+                        "primary-fixed": "#eaddff",
+                        "on-tertiary-fixed-variant": "#5c4300",
+                        "secondary-container": "#d5e3fc",
+                        "on-primary-container": "#ede0ff",
+                        "on-surface-variant": "#4a4455",
+                        "outline": "#7b7487",
+                        "tertiary-fixed-dim": "#f9bd22",
+                        "surface-tint": "#732ee4",
+                        "on-primary": "#ffffff",
+                        "surface-container": "#eceef0",
+                        "surface-container-lowest": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "on-tertiary-fixed": "#261a00",
+                        "secondary-fixed": "#d5e3fc",
+                        "primary": "#630ed4",
+                        "on-secondary-fixed": "#0d1c2e",
+                        "surface-container-low": "#f2f4f6",
+                        "on-primary-fixed": "#25005a",
+                        "tertiary-fixed": "#ffdf9f",
+                        "tertiary": "#654a00",
+                        "primary-container": "#7c3aed",
+                        "error": "#ba1a1a",
+                        "on-tertiary-container": "#ffe2ab",
+                        "surface-container-highest": "#e0e3e5",
+                        "surface-bright": "#f7f9fb",
+                        "surface": "#f7f9fb",
+                        "background": "#f7f9fb",
+                        "inverse-primary": "#d2bbff",
+                        "inverse-on-surface": "#eff1f3",
+                        "secondary": "#515f74"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "16px",
+                        "xl": "40px",
+                        "container-padding": "24px",
+                        "sm": "8px",
+                        "xs": "4px",
+                        "lg": "24px",
+                        "gutter": "16px",
+                        "base": "4px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "display-lg": ["Hanken Grotesk"],
+                        "label-md": ["Geist"],
+                        "body-md": ["Inter"],
+                        "headline-lg": ["Hanken Grotesk"],
+                        "headline-lg-mobile": ["Hanken Grotesk"],
+                        "headline-md": ["Hanken Grotesk"],
+                        "headline-sm": ["Hanken Grotesk"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "body-sm": ["14px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-md": ["12px", { "lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "1.2", "fontWeight": "600" }],
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "headline-sm": ["20px", { "lineHeight": "1.4", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        /* Base typography application for elements that might not get explicit classes */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f9fb;
+            color: #191c1e;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background flex h-screen overflow-hidden">
+<!-- SideNavBar (Shared Component) -->
+<nav class="bg-surface dark:bg-inverse-surface h-screen w-64 fixed left-0 top-0 shadow-sm flex flex-col py-lg px-md z-40 hidden md:flex border-r border-outline-variant/20">
+<!-- Header -->
+<div class="mb-xl flex flex-col items-start px-sm">
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-inverse-primary tracking-tight">JDR Hub</h1>
+<p class="font-label-md text-label-md text-secondary mt-xs">Digital Dungeon Master</p>
+</div>
+<!-- CTA -->
+<button class="w-full bg-primary text-on-primary rounded-lg py-sm px-md mb-lg font-label-md text-label-md hover:bg-primary/90 transition-colors shadow-sm flex items-center justify-center gap-sm">
+<span class="material-symbols-outlined" style="font-size: 18px;">add</span>
+            New Campaign
+        </button>
+<!-- Navigation Links -->
+<div class="flex flex-col gap-xs flex-grow">
+<!-- Inactive Tab: Dashboard -->
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-secondary dark:text-secondary-fixed-dim hover:text-primary dark:hover:text-inverse-primary hover:bg-surface-container dark:hover:bg-surface-container-high transition-colors duration-200 active:scale-95 font-body-md text-body-md group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">dashboard</span>
+                Dashboard
+            </a>
+<!-- Inactive Tab: Games -->
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-secondary dark:text-secondary-fixed-dim hover:text-primary dark:hover:text-inverse-primary hover:bg-surface-container dark:hover:bg-surface-container-high transition-colors duration-200 active:scale-95 font-body-md text-body-md group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">casino</span>
+                Games
+            </a>
+<!-- Inactive Tab: Players -->
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-secondary dark:text-secondary-fixed-dim hover:text-primary dark:hover:text-inverse-primary hover:bg-surface-container dark:hover:bg-surface-container-high transition-colors duration-200 active:scale-95 font-body-md text-body-md group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">group</span>
+                Players
+            </a>
+<!-- Inactive Tab: Schedule -->
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-secondary dark:text-secondary-fixed-dim hover:text-primary dark:hover:text-inverse-primary hover:bg-surface-container dark:hover:bg-surface-container-high transition-colors duration-200 active:scale-95 font-body-md text-body-md group" href="#">
+<span class="material-symbols-outlined group-hover:text-primary transition-colors">calendar_today</span>
+                Schedule
+            </a>
+<!-- Active Tab: Profile -->
+<a class="flex items-center gap-md px-md py-sm rounded-lg text-primary dark:text-inverse-primary font-bold border-r-4 border-primary dark:border-inverse-primary bg-primary-container/10 active:scale-95 transition-transform font-body-md text-body-md" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person</span>
+                Profile
+            </a>
+</div>
+</nav>
+<!-- Main Content Wrapper -->
+<div class="flex-1 flex flex-col md:ml-64 relative min-h-screen">
+<!-- TopNavBar (Shared Component) -->
+<header class="bg-surface/80 dark:bg-inverse-surface/80 backdrop-blur-md fixed top-0 right-0 w-full md:w-[calc(100%-16rem)] h-16 border-b border-outline-variant/30 flex justify-between items-center px-lg z-30">
+<!-- Search / Left Area -->
+<div class="flex items-center bg-surface-container-low rounded-full px-md py-sm border border-outline-variant/50 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary transition-all w-64 hidden sm:flex">
+<span class="material-symbols-outlined text-secondary text-sm mr-sm">search</span>
+<input class="bg-transparent border-none focus:ring-0 text-body-sm font-body-sm text-on-surface placeholder:text-secondary w-full p-0" placeholder="Search compendium..." type="text"/>
+</div>
+<!-- Mobile Menu Toggle (Visible only on small screens) -->
+<button class="md:hidden text-on-surface p-sm">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<!-- Trailing Actions -->
+<div class="flex items-center gap-md">
+<button class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-inverse-primary transition-colors active:opacity-80 p-sm rounded-full hover:bg-surface-container">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-on-surface-variant dark:text-surface-variant hover:text-primary dark:hover:text-inverse-primary transition-colors active:opacity-80 p-sm rounded-full hover:bg-surface-container mr-sm">
+<span class="material-symbols-outlined">settings</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-surface-container overflow-hidden border border-outline-variant/50 cursor-pointer">
+<img alt="User profile avatar" class="w-full h-full object-cover" data-alt="A small circular avatar thumbnail of a modern, ethereal female dungeon master looking confident, set against a pristine white background. High contrast, minimalist fantasy UI aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDSeoQZW0tQ-CXBtOIuZFPZpF39UjY2Amy2dk8bczAfVau-rn64rQHRKbmOYYIuRW5F1Godrw-WBehek6SxhWvqGxGepqqmzHDB4gKTE-qymxM10Vch_GNBWCDdouzgSJvidv-Ua9FgTjqj2e92cKjfl5gQhCRcRlrCkmJmdcc3hcgu2clynvVAan4WkYQmVGr_8gW7Sh5Ok7ob3OJrly2SR0bOlEUNQ7nSBCv7KhuB2CM3J2HzdxAm"/>
+</div>
+</div>
+</header>
+<!-- Main Scrollable Canvas -->
+<main class="flex-1 overflow-y-auto pt-[80px] p-md md:p-lg">
+<div class="max-w-[1024px] mx-auto w-full space-y-lg pb-xl">
+<!-- Profile Header Bento Card -->
+<section class="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant/20 p-lg md:p-xl relative overflow-hidden flex flex-col md:flex-row items-center md:items-start gap-lg md:gap-xl">
+<!-- Decorative subtle background element -->
+<div class="absolute -top-24 -right-24 w-64 h-64 bg-primary-container rounded-full blur-[80px] opacity-20 pointer-events-none"></div>
+<!-- Avatar -->
+<div class="relative shrink-0 z-10">
+<div class="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-surface shadow-sm overflow-hidden bg-surface-container">
+<img alt="Mélina Avatar" class="w-full h-full object-cover" data-alt="A high-quality, professional digital portrait of a female dungeon master named Mélina. She is drawn in a modern minimalist style with subtle fantasy violet undertones and glowing magical elements in her eyes. The background is a clean, bright light-mode surface. She looks intelligent, creative, and welcoming, fitting perfectly into a high-end TTRPG management application." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCaC5i3PpXptLPwkZg8nFchbnlOQQvlhw3LDyc57pd5wh_oehPPo5K2qMyatThV27ETXOmWFktP9mGZIlCxS68tAHBeISKCPd1A76uszOH-GnPbAXoGWI4BFmvEU9wHdv3znM0ELO1Um5uAXhO5wrUmO4z4lvYI91wyVIFpTQLmD6lYscxECF7qRgErj3nIeRsI7D_1CTvQ4fLUPwbAjjLTfUxCOw_AZgPes1FxATYOtfCnwjk5DyiX"/>
+</div>
+<div class="absolute bottom-2 right-2 bg-primary text-on-primary w-8 h-8 rounded-full flex items-center justify-center font-label-md text-label-md border-2 border-surface shadow-sm" title="Level 14">
+                            14
+                        </div>
+</div>
+<!-- Info & Progression -->
+<div class="flex-1 flex flex-col items-center md:items-start text-center md:text-left z-10 w-full mt-sm md:mt-0">
+<h2 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg text-on-surface mb-xs">Mélina</h2>
+<p class="font-label-md text-label-md text-primary tracking-widest uppercase mb-lg">Maître de Légendes</p>
+<!-- XP Bar -->
+<div class="w-full max-w-md mb-md">
+<div class="flex justify-between items-end mb-xs">
+<span class="font-label-md text-label-md text-secondary">Experience</span>
+<span class="font-label-md text-label-md text-secondary">24,500 / 30,000 XP</span>
+</div>
+<div class="h-2 w-full bg-surface-container rounded-full overflow-hidden">
+<div class="h-full bg-gradient-to-r from-primary to-primary-container w-[81%] rounded-full"></div>
+</div>
+</div>
+<!-- Actions -->
+<div class="flex flex-wrap gap-md mt-sm justify-center md:justify-start">
+<button class="bg-primary text-on-primary px-md py-sm rounded-lg font-label-md text-label-md hover:bg-primary/90 transition-colors flex items-center gap-sm shadow-sm">
+<span class="material-symbols-outlined text-[18px]">edit</span>
+                                Edit Profile
+                            </button>
+<button class="border border-outline-variant text-secondary hover:text-on-surface hover:bg-surface-container-low px-md py-sm rounded-lg font-label-md text-label-md transition-colors flex items-center gap-sm">
+<span class="material-symbols-outlined text-[18px]">forum</span>
+                                Link Discord
+                            </button>
+</div>
+</div>
+</section>
+<!-- Grid Layout for Details -->
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-lg">
+<!-- Left Column: Bio & Systems (8 cols) -->
+<div class="lg:col-span-8 space-y-lg">
+<!-- Bio Card -->
+<section class="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant/20 p-lg">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-md pb-sm border-b border-outline-variant/20 flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">auto_stories</span>
+                                Adventurer's Chronicle
+                            </h3>
+<p class="font-body-md text-body-md text-secondary leading-relaxed mb-md">
+                                Crafting intricate narratives and challenging encounters since 2018. My campaigns focus heavily on character-driven storytelling, political intrigue, and consequential choices rather than pure dungeon crawling. I prefer a collaborative world-building approach where players help shape the lore of the realms we explore together.
+                            </p>
+<!-- Preferred Systems Badges -->
+<div class="mt-lg pt-md border-t border-outline-variant/20">
+<h4 class="font-label-md text-label-md text-secondary mb-sm">Preferred Systems</h4>
+<div class="flex flex-wrap gap-sm">
+<span class="bg-primary-container/10 text-primary px-sm py-xs rounded-md font-label-md text-label-md border border-primary/20">D&amp;D 5E</span>
+<span class="bg-primary-container/10 text-primary px-sm py-xs rounded-md font-label-md text-label-md border border-primary/20">Pathfinder 2e</span>
+<span class="bg-primary-container/10 text-primary px-sm py-xs rounded-md font-label-md text-label-md border border-primary/20">Alien RPG</span>
+<span class="bg-surface-container text-secondary px-sm py-xs rounded-md font-label-md text-label-md border border-outline-variant/30">Blades in the Dark</span>
+</div>
+</div>
+</section>
+<!-- Games Lists Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-lg">
+<!-- Active Campaigns -->
+<section class="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant/20 p-lg">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-md flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">swords</span>
+                                    Active Campaigns
+                                </h3>
+<div class="space-y-md">
+<!-- Campaign Item -->
+<div class="flex items-center gap-md group cursor-pointer p-sm -mx-sm rounded-lg hover:bg-surface-container-low transition-colors">
+<div class="w-12 h-12 rounded-lg overflow-hidden shrink-0 shadow-sm border border-outline-variant/20">
+<img alt="Shadows of the Spire thumbnail" class="w-full h-full object-cover" data-alt="A stylized minimalist illustration of a dark, crystalline fantasy spire piercing a starry night sky, rendered in cool slate blues and deep violets. UI thumbnail asset." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCIajmvFUsmCZH7DSHbfSC_qyV4caMquv2IbPftuFa5jMNEpjonFjhZkWmWqQslOBy7va8KctikEgrnge4A_zitWiBP9sTqAgLt1dkV3ZiFdRNCEEQaxFln_Y5iVnCTGugSeEM7NhPDoWO8HUqv6GMSOtm3F1fHjBy-ht5wvCWE4c-20xZtWsUwrKf36-zLtkNcvynCSxEPJWS3xbLHNndM-QSK-sUXbD8qDRKA8vNHgw5idr91QXuy"/>
+</div>
+<div class="flex-1 min-w-0">
+<h4 class="font-body-md text-body-md font-medium text-on-surface truncate group-hover:text-primary transition-colors">Shadows of the Spire</h4>
+<p class="font-label-md text-label-md text-secondary truncate">D&amp;D 5E • Weekly</p>
+</div>
+<span class="bg-tertiary-container/20 text-tertiary px-xs py-xs rounded font-label-md text-[10px] uppercase tracking-wider shrink-0">GM</span>
+</div>
+<!-- Campaign Item -->
+<div class="flex items-center gap-md group cursor-pointer p-sm -mx-sm rounded-lg hover:bg-surface-container-low transition-colors">
+<div class="w-12 h-12 rounded-lg overflow-hidden shrink-0 shadow-sm border border-outline-variant/20">
+<img alt="USCSS Prometheus thumbnail" class="w-full h-full object-cover" data-alt="A sleek, modern minimalist illustration of a derelict spaceship drifting in deep space, rendered in slate blue and sterile white with stark lighting. UI thumbnail asset." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD3gi1XxHf7lFbOJ0VO6CgrSpaDcRI7TSSfRu0gx9Y8WK2g4Etz5eztAxHL2-hcNm-1CxqAgayxl2Qm3Hf07Wp98AE6uU0AnZyYw9qiPZGwUxcXoo3Vz-B0PKilSUDhl-ETCm1mpUW99aqHB7i7UvGolZeNPPUW4dMO9BjqGXu2yj5xh1PPxha4-j66Ngw3qpMWblJOKSd48FTlqfzRbhLAW4I4K53X09VQGE1I_r6Q2e5uXOsjjSG5"/>
+</div>
+<div class="flex-1 min-w-0">
+<h4 class="font-body-md text-body-md font-medium text-on-surface truncate group-hover:text-primary transition-colors">USCSS Prometheus</h4>
+<p class="font-label-md text-label-md text-secondary truncate">Alien RPG • Bi-weekly</p>
+</div>
+<span class="bg-primary-container/10 text-primary px-xs py-xs rounded font-label-md text-[10px] uppercase tracking-wider shrink-0">Player</span>
+</div>
+</div>
+</section>
+<!-- Past Games -->
+<section class="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant/20 p-lg">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-md flex items-center gap-sm">
+<span class="material-symbols-outlined text-secondary">history</span>
+                                    Past Games
+                                </h3>
+<div class="space-y-md">
+<!-- Past Game Item -->
+<div class="flex items-center gap-md p-sm -mx-sm rounded-lg opacity-80 hover:opacity-100 transition-opacity">
+<div class="w-10 h-10 rounded-md overflow-hidden shrink-0 bg-surface-container grayscale">
+<img alt="Tomb of Annihilation thumbnail" class="w-full h-full object-cover" data-alt="A minimalist flat illustration of a ruined ancient temple overgrown with glowing vines, muted colors. UI thumbnail asset." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAxaXFyhkZ0wdNTKUduLr74gn8qCi64Da6x9ePD-xwABghmOerTzRiTQaFs_orNmnwxMoQCGrb4Gw6jMnRHPO-z36IbmOTdOZ6BpHb9tFZcTMpWwHm45KTA5MQ6765PihRJtWZwiG1BzfKMFmP5-pDR-PeRX5t_A0CWk07t8s01S9g-6Gm4rLfRsU8bG6xI3KZDvCUNHTIfQISkCqpxtjJp5cHCigMraLEswtbRBeAXqYnUe31bBjhr"/>
+</div>
+<div class="flex-1 min-w-0">
+<h4 class="font-body-sm text-body-sm text-on-surface truncate">Tomb of Annihilation</h4>
+<p class="font-label-md text-[10px] text-secondary truncate">Completed 2023</p>
+</div>
+</div>
+<!-- Past Game Item -->
+<div class="flex items-center gap-md p-sm -mx-sm rounded-lg opacity-80 hover:opacity-100 transition-opacity">
+<div class="w-10 h-10 rounded-md overflow-hidden shrink-0 bg-surface-container grayscale">
+<img alt="Rime of the Frostmaiden thumbnail" class="w-full h-full object-cover" data-alt="A simple iconic representation of a frost-covered landscape under an aurora, rendered in minimalist vector style. UI thumbnail asset." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAtdoelKlJIXBgNdoX2CMod7MaKDwPOabwU1TGCz5UvnhNEHwOuAspMgWlEwrBaFRH2FeU4_uUNSp7X6daf0pwQjGJMzReBSUD9UbouGUyFCz78kiMB5iUXtuptBqBmGjazbbusTOBmQO60dQiECtGCJrzNHCx5QIX7dqUGbQGWJPbU34WVPn-TY9z8Yxb6inGsuWXBtpe2dexoBgVi-TqUwm1sWZnqCH6LATVU140LoV6Vk1_xmrNh"/>
+</div>
+<div class="flex-1 min-w-0">
+<h4 class="font-body-sm text-body-sm text-on-surface truncate">Rime of the Frostmaiden</h4>
+<p class="font-label-md text-[10px] text-secondary truncate">Completed 2022</p>
+</div>
+</div>
+</div>
+</section>
+</div>
+</div>
+<!-- Right Column: Stats (4 cols) -->
+<div class="lg:col-span-4">
+<section class="bg-surface-container-lowest rounded-xl shadow-sm border border-outline-variant/20 p-lg sticky top-24">
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-lg flex items-center gap-sm">
+<span class="material-symbols-outlined text-primary">query_stats</span>
+                                Career Stats
+                            </h3>
+<div class="grid grid-cols-2 gap-sm mb-lg">
+<!-- Stat Block -->
+<div class="bg-surface-container-low rounded-lg p-md border border-outline-variant/10 text-center flex flex-col justify-center">
+<span class="font-display-lg text-display-lg text-primary mb-xs">42</span>
+<span class="font-label-md text-label-md text-secondary uppercase tracking-widest">Games Run</span>
+</div>
+<!-- Stat Block -->
+<div class="bg-surface-container-low rounded-lg p-md border border-outline-variant/10 text-center flex flex-col justify-center">
+<span class="font-display-lg text-display-lg text-on-surface mb-xs">18</span>
+<span class="font-label-md text-label-md text-secondary uppercase tracking-widest">Games Played</span>
+</div>
+</div>
+<!-- Community Praise -->
+<div>
+<h4 class="font-label-md text-label-md text-secondary mb-md border-b border-outline-variant/20 pb-xs">Community Praise</h4>
+<ul class="space-y-sm">
+<li class="flex items-start gap-sm">
+<span class="material-symbols-outlined text-tertiary-fixed-dim text-[18px] mt-[2px]">star</span>
+<p class="font-body-sm text-body-sm text-on-surface">"Incredible world-building and voices!"</p>
+</li>
+<li class="flex items-start gap-sm">
+<span class="material-symbols-outlined text-tertiary-fixed-dim text-[18px] mt-[2px]">star</span>
+<p class="font-body-sm text-body-sm text-on-surface">"Always prepared, sessions flow perfectly."</p>
+</li>
+<li class="flex items-start gap-sm">
+<span class="material-symbols-outlined text-tertiary-fixed-dim text-[18px] mt-[2px]">star</span>
+<p class="font-body-sm text-body-sm text-on-surface">"Made my first time playing D&amp;D completely stress-free."</p>
+</li>
+</ul>
+</div>
+</section>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

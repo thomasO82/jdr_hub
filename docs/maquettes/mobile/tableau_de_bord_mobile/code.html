@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Dashboard - JDR Hub</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@600;700&amp;family=Inter:wght@400&amp;family=Geist:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline": "#7b7487",
+                        "on-error-container": "#93000a",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary-fixed": "#261a00",
+                        "on-secondary": "#ffffff",
+                        "primary-fixed-dim": "#d2bbff",
+                        "error": "#ba1a1a",
+                        "inverse-surface": "#2d3133",
+                        "inverse-primary": "#d2bbff",
+                        "secondary": "#515f74",
+                        "tertiary-fixed": "#ffdf9f",
+                        "surface-variant": "#e0e3e5",
+                        "secondary-fixed-dim": "#b9c7df",
+                        "outline-variant": "#ccc3d8",
+                        "on-primary-fixed-variant": "#5a00c6",
+                        "on-secondary-fixed-variant": "#3a485b",
+                        "on-tertiary-container": "#ffe2ab",
+                        "surface-tint": "#732ee4",
+                        "on-secondary-fixed": "#0d1c2e",
+                        "on-background": "#191c1e",
+                        "secondary-fixed": "#d5e3fc",
+                        "surface-container-low": "#f2f4f6",
+                        "on-tertiary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "on-error": "#ffffff",
+                        "on-surface": "#191c1e",
+                        "on-tertiary-fixed-variant": "#5c4300",
+                        "primary-container": "#7c3aed",
+                        "secondary-container": "#d5e3fc",
+                        "surface-container-high": "#e6e8ea",
+                        "surface-dim": "#d8dadc",
+                        "on-primary-fixed": "#25005a",
+                        "surface-container-highest": "#e0e3e5",
+                        "tertiary-fixed-dim": "#f9bd22",
+                        "primary": "#630ed4",
+                        "inverse-on-surface": "#eff1f3",
+                        "on-primary": "#ffffff",
+                        "surface-bright": "#f7f9fb",
+                        "background": "#f7f9fb",
+                        "primary-fixed": "#eaddff",
+                        "on-surface-variant": "#4a4455",
+                        "tertiary": "#654a00",
+                        "tertiary-container": "#836100",
+                        "on-primary-container": "#ede0ff",
+                        "surface-container": "#eceef0",
+                        "on-secondary-container": "#57657a",
+                        "surface": "#f7f9fb"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "md": "16px",
+                        "base": "4px",
+                        "lg": "24px",
+                        "gutter": "16px",
+                        "sm": "8px",
+                        "xl": "40px",
+                        "xs": "4px",
+                        "container-padding": "24px",
+                        "safe": "env(safe-area-inset-bottom, 0px)"
+                    },
+                    "fontFamily": {
+                        "headline-lg-mobile": ["Hanken Grotesk"],
+                        "headline-sm": ["Hanken Grotesk"],
+                        "body-sm": ["Inter"],
+                        "headline-lg": ["Hanken Grotesk"],
+                        "body-md": ["Inter"],
+                        "display-lg": ["Hanken Grotesk"],
+                        "label-md": ["Geist"],
+                        "headline-md": ["Hanken Grotesk"],
+                        "body-lg": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg-mobile": ["28px", { "lineHeight": "1.2", "fontWeight": "600" }],
+                        "headline-sm": ["20px", { "lineHeight": "1.4", "fontWeight": "600" }],
+                        "body-sm": ["14px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-md": ["12px", { "lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            -webkit-tap-highlight-color: transparent;
+        }
+        /* Custom scrollbar for horizontal lists */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface-container-low text-on-surface font-body-md min-h-screen pb-24 pt-16">
+<!-- TopAppBar (From JSON) -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-md shadow-sm border-b border-outline-variant flex items-center justify-between px-md h-16 transition-colors">
+<button class="text-primary hover:bg-primary-container/10 p-2 rounded-full transition-colors active:scale-95 flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="auto_awesome">auto_awesome</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-primary font-bold tracking-tight">JDR Hub</h1>
+<button class="text-primary hover:bg-primary-container/10 p-2 rounded-full transition-colors active:scale-95 flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+</header>
+<!-- Main Content Canvas -->
+<main class="px-4 py-6 space-y-lg md:hidden">
+<!-- Next Session Card (Hero) -->
+<section aria-labelledby="next-session-title">
+<div class="flex items-center justify-between mb-sm">
+<h2 class="font-headline-sm text-headline-sm text-on-surface" id="next-session-title">Up Next</h2>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-md shadow-[0_1px_3px_0_rgba(0,0,0,0.1),0_1px_2px_-1px_rgba(0,0,0,0.1)] relative overflow-hidden group">
+<!-- Subtle decorative background element -->
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary-container/20 rounded-full blur-2xl -mr-16 -mt-16 pointer-events-none"></div>
+<div class="relative z-10 flex flex-col gap-4">
+<div class="flex justify-between items-start border-b border-surface-container pb-3">
+<div>
+<span class="inline-block bg-primary-container/30 text-on-primary-fixed-variant font-label-md text-label-md px-2 py-1 rounded-md mb-2">Campaign</span>
+<h3 class="font-headline-md text-headline-md text-on-surface">The Sunless Citadel</h3>
+</div>
+<div class="flex flex-col items-end text-right">
+<span class="font-headline-sm text-headline-sm text-primary">Today</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">19:00 - 23:00</span>
+</div>
+</div>
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full overflow-hidden border-2 border-surface-container-lowest shadow-sm">
+<img alt="DM Avatar" class="w-full h-full object-cover" data-alt="A detailed headshot portrait of a fantasy game master, modern digital art style, soft lighting, sharp focus, professional setup. Deep blacks, pristine whites, vibrant violet accents." src="https://lh3.googleusercontent.com/aida-public/AB6AXuATuB0ss6UTl-PBOfZvSfBgaxU9xah8ZWD5ZY-7hqkzU8ptm6d-_6ZTnqM2phy-P8KKhwgm4UNxz-gvRmXl_POdej9F_iySVUWYf487eHpT7wRMWcTRy4xrE4eCWScEMmhO4jIxnXaCGqM5K0OUUjM5gghuwZfviMLV1PDW0eujv60mfjK4CZ1l4pECay7Pa1sUK-7qM8pPLnXIgs0fFdrZxK5e2V6d4NWZHmBVomHxd_gCgqdqnpke"/>
+</div>
+<div class="flex-1">
+<p class="font-body-sm text-body-sm text-on-surface-variant">DM: <span class="font-body-md text-body-md text-on-surface font-medium">Alex M.</span></p>
+</div>
+<button class="bg-primary text-on-primary px-4 py-2 rounded-lg font-body-sm text-body-sm font-medium shadow-[0_4px_6px_-1px_rgba(124,58,237,0.2)] active:scale-95 transition-transform flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]">videocam</span>
+                            Join
+                        </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Active Campaigns Vertical List -->
+<section aria-labelledby="active-campaigns-title">
+<div class="flex items-center justify-between mb-sm">
+<h2 class="font-headline-sm text-headline-sm text-on-surface" id="active-campaigns-title">Active Campaigns</h2>
+<a class="font-body-sm text-body-sm text-primary font-medium flex items-center" href="#">
+                    See All <span class="material-symbols-outlined text-[16px] ml-1">chevron_right</span>
+</a>
+</div>
+<div class="space-y-4">
+<!-- Campaign Item 1 -->
+<div class="bg-surface-container-lowest rounded-xl p-md shadow-[0_1px_3px_0_rgba(0,0,0,0.1),0_1px_2px_-1px_rgba(0,0,0,0.1)] flex gap-4 active:scale-[0.98] transition-transform">
+<div class="w-20 h-20 rounded-lg overflow-hidden shrink-0 shadow-sm relative">
+<img alt="Curse of Strahd Cover" class="w-full h-full object-cover" data-alt="A dark and moody fantasy landscape illustration showing an ancient ruined castle overgrown with vines. Modern digital art style, soft glowing ethereal lighting. Deep blacks, pristine whites, vibrant violet accents." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAZWoDuSLHK73GN1UgoDQvyJITP0486bUbQpVKX1digNhKcx7xU1d0Bujz1PWhUifwYFPmy6z_GrxY9wDYhnWYSIFimUgwf0IymYj8MCrJvMlphbiCRWWJqJPGbsag81gXuPd-sIWczKMQzBjPssVRUIjHq19U49t6Obxk7IL406MJUSjWBBxwzcp3SkRaVwcVoeYlo_IFA5HFcPyXJMc76axJVU0JcUzLjyqEbfAN3stxpPNWGskuW"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+</div>
+<div class="flex-1 flex flex-col justify-center">
+<div class="flex justify-between items-start">
+<h3 class="font-headline-sm text-headline-sm text-on-surface line-clamp-1">Curse of Strahd</h3>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-2">Level 5 • 4 Players</p>
+<div class="w-full bg-surface-container rounded-full h-1.5 overflow-hidden">
+<div class="bg-gradient-to-r from-primary to-secondary h-1.5 rounded-full" style="width: 60%"></div>
+</div>
+</div>
+</div>
+<!-- Campaign Item 2 -->
+<div class="bg-surface-container-lowest rounded-xl p-md shadow-[0_1px_3px_0_rgba(0,0,0,0.1),0_1px_2px_-1px_rgba(0,0,0,0.1)] flex gap-4 active:scale-[0.98] transition-transform">
+<div class="w-20 h-20 rounded-lg overflow-hidden shrink-0 shadow-sm relative">
+<img alt="Waterdeep Cover" class="w-full h-full object-cover" data-alt="A bright, high-key fantasy illustration of a floating magical city in the clouds. Modern digital art style, clean lines, serene atmosphere. Deep blacks, pristine whites, vibrant violet accents." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA0m_em3RtvwcNX1ue2W75BCp0Brm4N_TG-gut49Qh2Z60NWzAxCbZe7UXqL3As0eQnCnhERT4hMfF356-MYJHe8yjcX5pTpkl6pRO-dbWVlxp8sxv6IoX21257v2FQGeGW8zSSEjYBU5YKrtTe9cvl9aYO14zWcS4r1DlH4tudyGZUqSgiPAIuUS5yZ1VfeE1c-YPbix4JUOMupXgb4RBe3T8OV2vmHoTy25CrYsmHjbHX45O2EoOz"/>
+</div>
+<div class="flex-1 flex flex-col justify-center">
+<div class="flex justify-between items-start">
+<h3 class="font-headline-sm text-headline-sm text-on-surface line-clamp-1">Waterdeep Heist</h3>
+<span aria-label="Unread updates" class="w-2 h-2 rounded-full bg-error mt-1.5"></span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-2">Level 2 • 5 Players</p>
+<div class="w-full bg-surface-container rounded-full h-1.5 overflow-hidden">
+<div class="bg-gradient-to-r from-primary to-secondary h-1.5 rounded-full" style="width: 25%"></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar (From JSON) -->
+<nav class="fixed bottom-0 left-0 w-full flex justify-around items-center px-4 py-2 pb-safe bg-surface/90 backdrop-blur-lg bg-surface shadow-[0_-4px_12px_rgba(115,46,228,0.08)] rounded-t-xl z-50 md:hidden">
+<!-- Dashboard (Active) -->
+<button class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-4 py-1.5 active:scale-90 transition-all duration-300 ease-out">
+<span class="material-symbols-outlined" data-icon="dashboard" data-weight="fill" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+<span class="font-label-md text-label-md mt-1">Dashboard</span>
+</button>
+<!-- Games (Inactive) -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 hover:text-primary active:scale-90 transition-all duration-300 ease-out">
+<span class="material-symbols-outlined" data-icon="casino">casino</span>
+<span class="font-label-md text-label-md mt-1">Games</span>
+</button>
+<!-- Players (Inactive) -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 hover:text-primary active:scale-90 transition-all duration-300 ease-out">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-label-md text-label-md mt-1">Players</span>
+</button>
+<!-- Calendar (Inactive) -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 hover:text-primary active:scale-90 transition-all duration-300 ease-out">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+<span class="font-label-md text-label-md mt-1">Calendar</span>
+</button>
+<!-- Profile (Inactive) -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 hover:text-primary active:scale-90 transition-all duration-300 ease-out">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-label-md text-label-md mt-1">Profile</span>
+</button>
+</nav>
+</body></html>

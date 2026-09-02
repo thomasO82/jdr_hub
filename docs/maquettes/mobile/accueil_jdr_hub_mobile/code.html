@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>JDR Hub - Accueil</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700&amp;family=Inter:wght@400;500&amp;family=Geist:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "outline": "#7b7487",
+                      "on-error-container": "#93000a",
+                      "surface-container-lowest": "#ffffff",
+                      "on-tertiary-fixed": "#261a00",
+                      "on-secondary": "#ffffff",
+                      "primary-fixed-dim": "#d2bbff",
+                      "error": "#ba1a1a",
+                      "inverse-surface": "#2d3133",
+                      "inverse-primary": "#d2bbff",
+                      "secondary": "#515f74",
+                      "tertiary-fixed": "#ffdf9f",
+                      "surface-variant": "#e0e3e5",
+                      "secondary-fixed-dim": "#b9c7df",
+                      "outline-variant": "#ccc3d8",
+                      "on-primary-fixed-variant": "#5a00c6",
+                      "on-secondary-fixed-variant": "#3a485b",
+                      "on-tertiary-container": "#ffe2ab",
+                      "surface-tint": "#732ee4",
+                      "on-secondary-fixed": "#0d1c2e",
+                      "on-background": "#191c1e",
+                      "secondary-fixed": "#d5e3fc",
+                      "surface-container-low": "#f2f4f6",
+                      "on-tertiary": "#ffffff",
+                      "error-container": "#ffdad6",
+                      "on-error": "#ffffff",
+                      "on-surface": "#191c1e",
+                      "on-tertiary-fixed-variant": "#5c4300",
+                      "primary-container": "#7c3aed",
+                      "secondary-container": "#d5e3fc",
+                      "surface-container-high": "#e6e8ea",
+                      "surface-dim": "#d8dadc",
+                      "on-primary-fixed": "#25005a",
+                      "surface-container-highest": "#e0e3e5",
+                      "tertiary-fixed-dim": "#f9bd22",
+                      "primary": "#630ed4",
+                      "inverse-on-surface": "#eff1f3",
+                      "on-primary": "#ffffff",
+                      "surface-bright": "#f7f9fb",
+                      "background": "#f7f9fb",
+                      "primary-fixed": "#eaddff",
+                      "on-surface-variant": "#4a4455",
+                      "tertiary": "#654a00",
+                      "tertiary-container": "#836100",
+                      "on-primary-container": "#ede0ff",
+                      "surface-container": "#eceef0",
+                      "on-secondary-container": "#57657a",
+                      "surface": "#f7f9fb"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "md": "16px",
+                      "base": "4px",
+                      "lg": "24px",
+                      "gutter": "16px",
+                      "sm": "8px",
+                      "xl": "40px",
+                      "xs": "4px",
+                      "container-padding": "24px"
+              },
+              "fontFamily": {
+                      "headline-lg-mobile": [
+                              "Hanken Grotesk"
+                      ],
+                      "headline-sm": [
+                              "Hanken Grotesk"
+                      ],
+                      "body-sm": [
+                              "Inter"
+                      ],
+                      "headline-lg": [
+                              "Hanken Grotesk"
+                      ],
+                      "body-md": [
+                              "Inter"
+                      ],
+                      "display-lg": [
+                              "Hanken Grotesk"
+                      ],
+                      "label-md": [
+                              "Geist"
+                      ],
+                      "headline-md": [
+                              "Hanken Grotesk"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "headline-lg-mobile": [
+                              "28px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "headline-sm": [
+                              "20px",
+                              {
+                                      "lineHeight": "1.4",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-sm": [
+                              "14px",
+                              {
+                                      "lineHeight": "1.5",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-lg": [
+                              "32px",
+                              {
+                                      "lineHeight": "1.2",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-md": [
+                              "16px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "display-lg": [
+                              "48px",
+                              {
+                                      "lineHeight": "1.1",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "label-md": [
+                              "12px",
+                              {
+                                      "lineHeight": "1",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "headline-md": [
+                              "24px",
+                              {
+                                      "lineHeight": "1.3",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-lg": [
+                              "18px",
+                              {
+                                      "lineHeight": "1.6",
+                                      "fontWeight": "400"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
+        
+        .magic-shadow:hover {
+            box-shadow: 0 10px 15px -3px rgba(124, 58, 237, 0.1), 0 4px 6px -4px rgba(124, 58, 237, 0.1);
+            transform: translateY(-2px);
+            transition: all 0.3s ease;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #630ed4, #7c3aed);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-surface font-body-md min-h-screen flex flex-col md:hidden pb-safe antialiased">
+<!-- TopAppBar from JSON -->
+<header class="fixed top-0 w-full z-50 bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-md border-b border-outline-variant shadow-sm h-16">
+<div class="flex items-center justify-between px-md h-full w-full">
+<button class="text-on-surface-variant hover:bg-primary-container/10 active:scale-95 transition-transform duration-200 p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="auto_awesome">auto_awesome</span>
+</button>
+<div class="font-headline-md text-headline-md text-primary font-bold tracking-tight">
+                JDR Hub
+            </div>
+<button class="text-on-surface-variant hover:bg-primary-container/10 active:scale-95 transition-transform duration-200 p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+</div>
+</header>
+<!-- Main Content -->
+<main class="flex-grow pt-[88px] px-md pb-24">
+<!-- Hero Section -->
+<section class="relative rounded-xl overflow-hidden mb-lg glass-panel magic-shadow">
+<div class="bg-cover bg-center w-full h-64 absolute inset-0 z-0 opacity-80" data-alt="A vivid, modern fantasy illustration of a glowing, ethereal magical gateway opening in a sleek, minimalist stone archway. Bright daylight filters through, casting soft shadows. The scene is rendered in a clean, high-end digital art style with vibrant violet and slate blue accents, maintaining a light-mode friendly and professional aesthetic suitable for a modern RPG platform." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBpXNNqXcMtuei-0zt061WZxaXOAAuVHkFTY63_vZnvyynGXMRYDq1wrdO9NH8Qbum3GPJAMW8wXG75PvKlhlEk8BYdYKMf5A-HfTdLaxookPALHjE5P_h0y-xBXWDBB3DjBfg23AZT7O1lJYX2D4pRkpwbexzpSYEc64fNq_Fos2WLKLlBJvMEnUqwg7TXXr0wJ58veDCay-lyFrfTVUwo_DH-np6KoGShpoBsgaltQWga2ZxoHY_A')"></div>
+<div class="relative z-10 p-lg bg-gradient-to-t from-surface-container-lowest via-surface-container-lowest/80 to-transparent pt-32">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-sm tracking-tight leading-tight">
+                    Your Next <span class="gradient-text">Adventure</span> Awaits
+                </h1>
+<p class="font-body-md text-body-md text-on-surface-variant mb-lg">
+                    Discover new worlds, organize epic campaigns, and connect with players in a modern, streamlined environment designed for the digital tabletop.
+                </p>
+<button class="w-full bg-primary text-on-primary font-label-md text-label-md py-3 rounded-lg flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-[0_4px_14px_0_rgba(99,14,212,0.39)]">
+<span class="material-symbols-outlined" data-icon="discord">swap_horizontal_circle</span>
+                    Join our Discord
+                </button>
+</div>
+</section>
+<!-- Features Bento Grid -->
+<section class="grid grid-cols-2 gap-md mb-lg">
+<div class="glass-panel rounded-xl p-md flex flex-col justify-between magic-shadow col-span-2">
+<div class="flex items-center gap-sm mb-sm text-primary">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+<h2 class="font-headline-sm text-headline-sm">Find Games</h2>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-md">
+                    Browse open tables and find the perfect group for your playstyle.
+                </p>
+<div class="h-24 rounded-lg bg-surface-container-low flex items-center justify-center border border-outline-variant/30 overflow-hidden relative">
+<div class="absolute inset-0 bg-gradient-to-r from-primary/5 to-secondary/5"></div>
+<span class="material-symbols-outlined text-outline text-4xl opacity-50" data-icon="map">map</span>
+</div>
+</div>
+<div class="glass-panel rounded-xl p-md flex flex-col justify-between magic-shadow">
+<div class="flex flex-col mb-sm text-secondary">
+<span class="material-symbols-outlined mb-2" data-icon="menu_book">menu_book</span>
+<h2 class="font-headline-sm text-headline-sm leading-tight">Manage Lore</h2>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                    Keep your campaign notes organized.
+                </p>
+</div>
+<div class="glass-panel rounded-xl p-md flex flex-col justify-between magic-shadow">
+<div class="flex flex-col mb-sm text-tertiary-container">
+<span class="material-symbols-outlined mb-2" data-icon="bar_chart">bar_chart</span>
+<h2 class="font-headline-sm text-headline-sm leading-tight">Track Stats</h2>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+                    Modern stat blocks and tracking.
+                </p>
+</div>
+</section>
+<!-- Community Highlights -->
+<section class="glass-panel rounded-xl p-md magic-shadow mb-md">
+<h2 class="font-headline-sm text-headline-sm text-on-surface mb-md flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" data-icon="star">star</span>
+                Featured Campaigns
+            </h2>
+<div class="flex flex-col gap-sm">
+<div class="flex items-center gap-md p-sm rounded-lg hover:bg-surface-container transition-colors border border-transparent hover:border-outline-variant/50">
+<img class="w-12 h-12 rounded-full object-cover border border-outline-variant/30" data-alt="A small, circular profile image icon showing a stylized fantasy crest with a glowing crystal motif, rendered in a modern, clean digital illustration style against a white background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBqWkSYSn7h69808ZzbbuJ7TvSVecXHSI2d1Ky4uLuldJQCdiWCswaAHuE1F6SLWb4omBvnNWAtTAmMjdjtb9YC0I6SgqaXCYDgp4POWp5qc8eiTXkIncgs_tErIJVfKjXyrdW4mgRmBpS4foz0f_3dnGJs874QCoHTvcoxrMeacTnf0b4Ge8LRKYBz2i4-TlakF10KBX86zeXfvtnm143e4m3WFT6YgRbvxdhU29dRG1f3rTDyvLzo"/>
+<div class="flex-1">
+<h3 class="font-body-md text-body-md font-semibold text-on-surface">The Crystal Spire</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-1">Looking for 2 players • D&amp;D 5e</p>
+</div>
+<span class="px-2 py-1 bg-primary/10 text-primary font-label-md text-[10px] rounded-full">New</span>
+</div>
+<div class="flex items-center gap-md p-sm rounded-lg hover:bg-surface-container transition-colors border border-transparent hover:border-outline-variant/50">
+<img class="w-12 h-12 rounded-full object-cover border border-outline-variant/30" data-alt="A small, circular profile image icon showing a dark, modern sci-fi emblem with subtle neon accents, rendered in a clean vector style suitable for a high-end UI interface." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAo2LRMUOkypOL78Tfm8biF959earJ9-O4NrVnVXtunnAZfvykIV2vx_-YCGe9DpTsDX9ZHdAasZSSaj79A3DesLqn4chk7Q5Ne6jZXXIYA8klcAJYi5BZ9G6q9prc5ed1CKvLrGBDSUBE_kVG0JO9t6gHpSBUo4ANgyjfc7YTKmbWVhfLDgSQbyroGjrg0CgUD6ZDRIk77ezAMJ-jNLt5wd--n99RUqfY1DKpmWKyGgMNTSNfBxSUP"/>
+<div class="flex-1">
+<h3 class="font-body-md text-body-md font-semibold text-on-surface">Neon Shadows</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant line-clamp-1">Starting soon • Cyberpunk</p>
+</div>
+</div>
+</div>
+<button class="w-full mt-md text-primary font-label-md text-label-md py-2 text-center hover:bg-primary-container/10 rounded-lg transition-colors">
+                View All Games
+            </button>
+</section>
+</main>
+<!-- BottomNavBar from JSON -->
+<nav class="fixed bottom-0 w-full z-50 rounded-t-xl bg-surface/90 dark:bg-surface-dim/90 backdrop-blur-lg shadow-[0_-4px_12px_rgba(115,46,228,0.08)] pb-safe">
+<div class="flex justify-around items-center px-4 py-2">
+<!-- Active Tab: Dashboard (Home mapping) -->
+<button class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-xl px-4 py-1.5 active:scale-90 transition-all duration-300 ease-out">
+<span class="material-symbols-outlined mb-1" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</button>
+<!-- Inactive Tabs -->
+<button class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 hover:text-primary active:scale-90 transition-all duration-300 ease-out">
+<span class="material-symbols-outlined mb-1" data-icon="casino">casino</span>
+<span class="font-label-md text-label-md">Games</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 hover:text-primary active:scale-90 transition-all duration-300 ease-out">
+<span class="material-symbols-outlined mb-1" data-icon="group">group</span>
+<span class="font-label-md text-label-md">Players</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 hover:text-primary active:scale-90 transition-all duration-300 ease-out">
+<span class="material-symbols-outlined mb-1" data-icon="calendar_today">calendar_today</span>
+<span class="font-label-md text-label-md">Calendar</span>
+</button>
+<button class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1.5 hover:text-primary active:scale-90 transition-all duration-300 ease-out">
+<span class="material-symbols-outlined mb-1" data-icon="person">person</span>
+<span class="font-label-md text-label-md">Profile</span>
+</button>
+</div>
+</nav>
+</body></html>

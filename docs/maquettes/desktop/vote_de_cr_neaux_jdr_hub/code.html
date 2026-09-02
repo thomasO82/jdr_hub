@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+
+<html class="light" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>JDR Hub - Vote de Créneaux</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;600;700&amp;family=Inter:wght@400;500;600&amp;family=Geist:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-error": "#ffffff",
+                        "primary-fixed": "#eaddff",
+                        "on-surface": "#191c1e",
+                        "on-tertiary-container": "#ffe2ab",
+                        "on-primary-container": "#ede0ff",
+                        "surface-container-highest": "#e0e3e5",
+                        "on-error-container": "#93000a",
+                        "surface-variant": "#e0e3e5",
+                        "on-tertiary-fixed-variant": "#5c4300",
+                        "surface": "#f7f9fb",
+                        "outline-variant": "#ccc3d8",
+                        "on-surface-variant": "#4a4455",
+                        "surface-tint": "#732ee4",
+                        "on-primary": "#ffffff",
+                        "on-secondary-fixed": "#0d1c2e",
+                        "inverse-primary": "#d2bbff",
+                        "secondary-fixed-dim": "#b9c7df",
+                        "tertiary-fixed": "#ffdf9f",
+                        "tertiary-fixed-dim": "#f9bd22",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-dim": "#d8dadc",
+                        "error-container": "#ffdad6",
+                        "surface-bright": "#f7f9fb",
+                        "primary-container": "#7c3aed",
+                        "inverse-surface": "#2d3133",
+                        "on-tertiary": "#ffffff",
+                        "background": "#f7f9fb",
+                        "on-background": "#191c1e",
+                        "on-tertiary-fixed": "#261a00",
+                        "surface-container-high": "#e6e8ea",
+                        "secondary-fixed": "#d5e3fc",
+                        "surface-container": "#eceef0",
+                        "outline": "#7b7487",
+                        "on-primary-fixed-variant": "#5a00c6",
+                        "primary": "#630ed4",
+                        "secondary-container": "#d5e3fc",
+                        "on-secondary": "#ffffff",
+                        "tertiary-container": "#836100",
+                        "tertiary": "#654a00",
+                        "on-secondary-container": "#57657a",
+                        "secondary": "#515f74",
+                        "on-primary-fixed": "#25005a",
+                        "on-secondary-fixed-variant": "#3a485b",
+                        "error": "#ba1a1a",
+                        "inverse-on-surface": "#eff1f3",
+                        "primary-fixed-dim": "#d2bbff",
+                        "surface-container-low": "#f2f4f6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "sm": "8px",
+                        "base": "4px",
+                        "gutter": "16px",
+                        "container-padding": "24px",
+                        "xl": "40px",
+                        "md": "16px",
+                        "xs": "4px",
+                        "lg": "24px"
+                    },
+                    "fontFamily": {
+                        "headline-md": ["Hanken Grotesk"],
+                        "body-md": ["Inter"],
+                        "headline-sm": ["Hanken Grotesk"],
+                        "display-lg": ["Hanken Grotesk"],
+                        "body-sm": ["Inter"],
+                        "label-md": ["Geist"],
+                        "body-lg": ["Inter"],
+                        "headline-lg-mobile": ["Hanken Grotesk"],
+                        "headline-lg": ["Hanken Grotesk"]
+                    },
+                    "fontSize": {
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-sm": ["20px", { "lineHeight": "1.4", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-sm": ["14px", { "lineHeight": "1.5", "fontWeight": "400" }],
+                        "label-md": ["12px", { "lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "body-lg": ["18px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["28px", { "lineHeight": "1.2", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined[data-weight="fill"] {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        /* Level 1 Shadow */
+        .shadow-level-1 {
+            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+        }
+        /* Level 2 Shadow */
+        .shadow-level-2 {
+            box-shadow: 0 10px 15px -3px rgba(124, 58, 237, 0.1), 0 4px 6px -4px rgba(124, 58, 237, 0.1);
+        }
+        
+        .stat-block {
+            background-color: #f1f5f9;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md text-body-md min-h-screen flex flex-col md:flex-row">
+<!-- SideNavBar (Desktop) -->
+<nav class="hidden md:flex h-screen w-64 fixed left-0 top-0 bg-surface-container-low shadow-md flex-col p-md border-r border-outline-variant z-40">
+<div class="flex items-center gap-md mb-xl px-sm">
+<div class="w-10 h-10 rounded-xl overflow-hidden bg-primary-container flex items-center justify-center text-on-primary-container">
+<span class="material-symbols-outlined" data-icon="auto_awesome">auto_awesome</span>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary">JDR Hub</h1>
+<p class="font-label-md text-label-md text-on-surface-variant">Digital DM Console</p>
+</div>
+</div>
+<div class="flex-1 space-y-sm">
+<a class="flex items-center gap-md text-on-surface-variant hover:text-primary px-md py-sm hover:bg-surface-container-high rounded-xl transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-headline-sm text-headline-sm">Dashboard</span>
+</a>
+<a class="flex items-center gap-md bg-primary-container text-on-primary-container rounded-xl px-md py-sm" href="#">
+<span class="material-symbols-outlined" data-icon="casino">casino</span>
+<span class="font-headline-sm text-headline-sm">Games</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant hover:text-primary px-md py-sm hover:bg-surface-container-high rounded-xl transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="group">group</span>
+<span class="font-headline-sm text-headline-sm">Players</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant hover:text-primary px-md py-sm hover:bg-surface-container-high rounded-xl transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="event_available">event_available</span>
+<span class="font-headline-sm text-headline-sm">Schedule</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant hover:text-primary px-md py-sm hover:bg-surface-container-high rounded-xl transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+<span class="font-headline-sm text-headline-sm">Profile</span>
+</a>
+</div>
+<div class="mt-auto space-y-sm">
+<button class="w-full bg-primary text-on-primary font-headline-sm text-headline-sm py-sm rounded-xl hover:opacity-90 transition-opacity mb-lg shadow-level-2">
+                New Session
+            </button>
+<a class="flex items-center gap-md text-on-surface-variant hover:text-primary px-md py-sm hover:bg-surface-container-high rounded-xl transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-headline-sm text-headline-sm">Settings</span>
+</a>
+<a class="flex items-center gap-md text-on-surface-variant hover:text-primary px-md py-sm hover:bg-surface-container-high rounded-xl transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+<span class="font-headline-sm text-headline-sm">Support</span>
+</a>
+</div>
+</nav>
+<!-- TopNavBar (Mobile) -->
+<header class="md:hidden flex justify-between items-center w-full px-lg py-sm sticky top-0 z-50 bg-surface/80 backdrop-blur-md shadow-sm">
+<div class="font-headline-lg-mobile text-headline-lg-mobile font-bold text-primary">JDR Hub</div>
+<div class="flex gap-md text-primary">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span>
+<div class="w-8 h-8 rounded-full bg-primary-container overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A highly detailed close-up of a fantasy wizard's ethereal purple glowing staff crystal, modern digital illustration style, bright light mode aesthetic, clean lines, professional rpg art." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAUBD2H_w6Mf5VGOy76MlJ_PvHPYMz_rZQ-UAahrBzhR4ReY075wMBCqd1v27mwi-hQz8euCBIC9M4qVVjrZQZ5GqBUgbot3u6RJ3iiQhQyPzixs_OV5qaWHIQU6WxYkV_UHndKVyvcunqLzKQmdjM4PMbgSVqMxcZ0AJ1KTaBiQKiobDT_OCPYacY2yMP8W-zaYvv5wlcvxkXrMX42vkt2nT-Bxm_u6QljWhONUf7FEe3yGthCCrVu"/>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-1 md:ml-64 p-container-padding flex flex-col max-w-[1200px] mx-auto w-full">
+<!-- Breadcrumbs & Header -->
+<div class="mb-lg">
+<div class="flex items-center gap-sm text-on-surface-variant font-body-sm text-body-sm mb-md">
+<a class="hover:text-primary transition-colors" href="#">Jeux</a>
+<span class="material-symbols-outlined text-[16px]" data-icon="chevron_right">chevron_right</span>
+<a class="hover:text-primary transition-colors" href="#">La Malédiction de Strahd</a>
+<span class="material-symbols-outlined text-[16px]" data-icon="chevron_right">chevron_right</span>
+<span class="text-primary font-medium">Vote de créneaux</span>
+</div>
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-md">
+<div>
+<h1 class="font-display-lg text-display-lg text-on-surface mb-sm">Vote de Créneaux pour la Session 5</h1>
+<div class="inline-flex items-center gap-sm px-sm py-xs rounded-full bg-primary/10 text-primary font-label-md text-label-md border border-primary/20">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+                        En cours
+                    </div>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-1 lg:grid-cols-12 gap-lg items-start">
+<!-- Central Content: Voting Grid -->
+<div class="lg:col-span-8 space-y-lg">
+<div class="bg-surface-container-lowest rounded-xl shadow-level-1 overflow-hidden border border-outline-variant/30">
+<div class="p-lg border-b border-outline-variant/30 bg-surface-bright flex justify-between items-center">
+<h2 class="font-headline-md text-headline-md text-on-surface">Créneaux Proposés</h2>
+<button class="text-secondary hover:text-primary transition-colors">
+<span class="material-symbols-outlined" data-icon="add_circle">add_circle</span>
+</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-b border-outline-variant/30 font-label-md text-label-md text-on-surface-variant uppercase tracking-wider">
+<th class="p-md font-medium">Date &amp; Heure</th>
+<th class="p-md font-medium text-center">Mélina</th>
+<th class="p-md font-medium text-center">Thomas</th>
+<th class="p-md font-medium text-center">Dorian</th>
+<th class="p-md font-medium text-center">Sasha</th>
+<th class="p-md font-medium text-right">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/20">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-container-low/50 transition-colors group">
+<td class="p-md">
+<div class="font-headline-sm text-headline-sm text-on-surface">Ven. 20 Oct</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">20:00 - 23:30</div>
+</td>
+<td class="p-md text-center"><span class="material-symbols-outlined text-primary" data-icon="check_circle">check_circle</span></td>
+<td class="p-md text-center"><span class="material-symbols-outlined text-error" data-icon="cancel">cancel</span></td>
+<td class="p-md text-center"><span class="material-symbols-outlined text-primary" data-icon="check_circle">check_circle</span></td>
+<td class="p-md text-center"><span class="material-symbols-outlined text-tertiary-fixed-dim" data-icon="help">help</span></td>
+<td class="p-md text-right">
+<button class="px-md py-sm rounded-lg border border-secondary text-secondary font-headline-sm text-headline-sm hover:bg-secondary/5 transition-colors opacity-0 group-hover:opacity-100">
+                                            Valider
+                                        </button>
+</td>
+</tr>
+<!-- Row 2 (Popular) -->
+<tr class="hover:bg-surface-container-low/50 transition-colors bg-primary/5 border-l-4 border-l-primary group">
+<td class="p-md">
+<div class="font-headline-sm text-headline-sm text-on-surface">Sam. 21 Oct</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">14:00 - 18:00</div>
+</td>
+<td class="p-md text-center"><span class="material-symbols-outlined text-primary" data-icon="check_circle">check_circle</span></td>
+<td class="p-md text-center"><span class="material-symbols-outlined text-primary" data-icon="check_circle">check_circle</span></td>
+<td class="p-md text-center"><span class="material-symbols-outlined text-primary" data-icon="check_circle">check_circle</span></td>
+<td class="p-md text-center"><span class="material-symbols-outlined text-primary" data-icon="check_circle">check_circle</span></td>
+<td class="p-md text-right">
+<button class="px-md py-sm rounded-lg bg-primary text-on-primary font-headline-sm text-headline-sm hover:bg-primary-fixed-variant transition-colors shadow-level-2">
+                                            Valider
+                                        </button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-container-low/50 transition-colors group">
+<td class="p-md">
+<div class="font-headline-sm text-headline-sm text-on-surface">Dim. 22 Oct</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">20:00 - 23:00</div>
+</td>
+<td class="p-md text-center"><span class="material-symbols-outlined text-error" data-icon="cancel">cancel</span></td>
+<td class="p-md text-center"><span class="material-symbols-outlined text-tertiary-fixed-dim" data-icon="help">help</span></td>
+<td class="p-md text-center"><span class="material-symbols-outlined text-error" data-icon="cancel">cancel</span></td>
+<td class="p-md text-center"><span class="material-symbols-outlined text-primary" data-icon="check_circle">check_circle</span></td>
+<td class="p-md text-right">
+<button class="px-md py-sm rounded-lg border border-secondary text-secondary font-headline-sm text-headline-sm hover:bg-secondary/5 transition-colors opacity-0 group-hover:opacity-100">
+                                            Valider
+                                        </button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- Sidebar -->
+<div class="lg:col-span-4 space-y-lg">
+<!-- Status Card -->
+<div class="bg-surface-container-lowest rounded-xl shadow-level-1 p-lg border border-outline-variant/30">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-md">Résumé des votes</h3>
+<div class="flex items-center gap-md mb-lg">
+<div class="flex-1 bg-surface-container h-2 rounded-full overflow-hidden">
+<div class="bg-gradient-to-r from-primary to-secondary-fixed h-full w-[75%] rounded-full"></div>
+</div>
+<span class="font-headline-sm text-headline-sm text-primary font-bold">3/4</span>
+</div>
+<div class="space-y-sm font-body-sm text-body-sm">
+<div class="flex justify-between items-center p-sm bg-surface rounded-lg">
+<span class="text-on-surface-variant">Clôture des votes</span>
+<span class="font-medium text-on-surface">Jeu. 19 Oct, 18:00</span>
+</div>
+<div class="flex justify-between items-center p-sm bg-surface rounded-lg">
+<span class="text-on-surface-variant">Joueurs en attente</span>
+<span class="font-medium text-error">Thomas</span>
+</div>
+</div>
+</div>
+<!-- Activity Feed -->
+<div class="bg-surface-container-lowest rounded-xl shadow-level-1 p-lg border border-outline-variant/30">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-md">Activité Récente</h3>
+<div class="space-y-md relative before:absolute before:inset-y-0 before:left-4 before:w-px before:bg-outline-variant/30">
+<div class="flex gap-md relative z-10">
+<div class="w-8 h-8 rounded-full bg-primary-container flex-shrink-0 border-2 border-surface-container-lowest overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A stylized minimalist digital portrait avatar of a female rogue character, pale modern colors, light mode ui design system." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBT9-4gGTPBdioXgQIpIVVePrqDknHpnjCvr_5FGoYSjcqHJglkRbpve2T-4wbFHkd1a3s5_0KRz40_FwnjhqQhR3UQGBQYMpexpYozgK3KY_MTbx95O-5YC90SIO6HiKoFnQoq9ijcWLgB_1e3MkObOit9RZuByrVPgddmufcBk0OMiWbclygmD6owLtUeZLoehaNkZwQw1VZLTG9XBUGseZUGtw2c9SmZtmX9x1RaAwIiLLS-LqMX"/>
+</div>
+<div>
+<p class="font-body-sm text-body-sm text-on-surface"><span class="font-medium">Mélina</span> a voté pour 3 créneaux.</p>
+<span class="font-label-md text-label-md text-on-surface-variant">Il y a 2 heures</span>
+</div>
+</div>
+<div class="flex gap-md relative z-10">
+<div class="w-8 h-8 rounded-full bg-secondary-container flex-shrink-0 border-2 border-surface-container-lowest overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="A stylized minimalist digital portrait avatar of a male cleric character, pale modern colors, light mode ui design system." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB34m693Ek7mCJeg9KefT5vwUAYOVpG-RJFB3xgkaSruFzp_ilHt0oJPZ_gjo6MeR9YSkBWokYBZ-MyzymGm2fgrJdgrV0SOurduPMxyToSz6preRoDG673kWNDkw5hsTQCb2-MFL3GvgOupdt-6tXrpyr6Nf5dwW7EDlFGdO3_6lg5Ijx-DBz0IKEUs1nxgmnZNtQgKxhfo6p5oPo6HsThsF7SobC-fnLsyQJZ1GJDqMCbPBDhHAuc"/>
+</div>
+<div>
+<p class="font-body-sm text-body-sm text-on-surface"><span class="font-medium">Sasha</span> a mis à jour ses disponibilités.</p>
+<span class="font-label-md text-label-md text-on-surface-variant">Hier, 14:30</span>
+</div>
+</div>
+<div class="flex gap-md relative z-10">
+<div class="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center flex-shrink-0 border-2 border-surface-container-lowest text-on-surface-variant">
+<span class="material-symbols-outlined text-[16px]" data-icon="add">add</span>
+</div>
+<div>
+<p class="font-body-sm text-body-sm text-on-surface">Vote créé par <span class="font-medium">MJ</span>.</p>
+<span class="font-label-md text-label-md text-on-surface-variant">Lun. 16 Oct</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>
