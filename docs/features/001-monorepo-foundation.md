@@ -201,7 +201,7 @@ Ajouter la connectivité de test minimale sans introduire prématurément le mod
 | Commande | Résultat | Date |
 | --- | --- | --- |
 | `CI=true pnpm install --frozen-lockfile` | Réussi avec pnpm 11.25.0 | 2026-09-02 |
-| `CI=true pnpm exec vitest run tests/architecture/workspace.test.ts tests/architecture/database-boundary.test.ts` | Réussi : 7 tests dans 3 fichiers | 2026-09-02 |
+| `CI=true pnpm exec vitest run tests/architecture/workspace.test.ts tests/architecture/database-boundary.test.ts` | Réussi : 5 tests dans 2 fichiers | 2026-09-02 |
 | `CI=true pnpm typecheck` | Réussi | 2026-09-02 |
 | `git diff --check` | Réussi | 2026-09-02 |
 
@@ -223,7 +223,7 @@ Ajouter la connectivité de test minimale sans introduire prématurément le mod
 
 - Implémentation minimale : manifests, tsconfigs et points d’entrée vides des
   deux packages, plus les tests de frontière.
-- Résultat : 7 tests passants et `pnpm typecheck` réussi.
+- Résultat : 5 tests passants dans 2 fichiers et `pnpm typecheck` réussi.
 
 ### Refactor
 

@@ -22,8 +22,13 @@ describe('package boundaries', () => {
   })
 
   it('detects server database imports in browser source', () => {
-    expect(hasServerDatabaseImport("import { db } from '@jdr-hub/database'"))
-      .toBe(true)
+    for (const source of [
+      "import { db } from '@jdr-hub/database'",
+      "import { db } from 'packages/database'",
+      "import { drizzle } from 'drizzle-orm'",
+    ]) {
+      expect(hasServerDatabaseImport(source)).toBe(true)
+    }
     expect(hasServerDatabaseImport('import { health } from "@jdr-hub/shared"'))
       .toBe(false)
   })
