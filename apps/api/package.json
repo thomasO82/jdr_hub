@@ -17,6 +17,8 @@
   },
   "dependencies": {
     "@hono/node-server": "^2.1.1",
+    "@jdr-hub/database": "workspace:*",
+    "@jdr-hub/shared": "workspace:*",
     "hono": "^4.13.5",
     "zod": "^4.5.4"
   }
