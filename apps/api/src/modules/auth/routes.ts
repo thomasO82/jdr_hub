@@ -18,11 +18,13 @@ type RouteDependencies = {
   repository: AuthRepository
 }
 
+export type AuthRouteEnv = { Variables: { requestId: string } }
+
 function error(c: Context, status: 400 | 401 | 403) {
   return c.json({ data: null, error: { code: 'AUTH_ERROR', message: 'Authentication failed' }, meta: {} }, status)
 }
 
-export function registerAuthRoutes(app: Hono, dependencies: RouteDependencies): void {
+export function registerAuthRoutes(app: Hono<AuthRouteEnv>, dependencies: RouteDependencies): void {
   const now = dependencies.now ?? (() => new Date())
   const fetchDiscordIdentity = dependencies.fetchDiscordIdentity ?? defaultFetchDiscordIdentity
   app.get('/auth/discord', async (c) => {

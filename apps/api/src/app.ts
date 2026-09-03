@@ -1,4 +1,7 @@
 import { Hono } from 'hono'
+import { registerAuthRoutes } from './modules/auth/routes.js'
+import type { AuthConfig } from './modules/auth/config.js'
+import type { AuthRepository } from './modules/auth/repository.js'
 
 type ApiVariables = {
   requestId: string
@@ -17,7 +20,7 @@ const SECURITY_HEADERS = {
   'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
 } as const
 
-export function createApiApp(): ApiApp {
+export function createApiApp(options?: { auth: { config: AuthConfig; repository: AuthRepository } }): ApiApp {
   const app = new Hono<{ Variables: ApiVariables }>()
 
   app.use('*', async (c, next) => {
@@ -67,6 +70,10 @@ export function createApiApp(): ApiApp {
       meta: { requestId: c.get('requestId') },
     }),
   )
+
+  if (options?.auth) {
+    registerAuthRoutes(app, options.auth)
+  }
 
   app.notFound((c) =>
     c.json(

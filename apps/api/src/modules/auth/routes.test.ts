@@ -2,7 +2,7 @@ import { Hono } from 'hono'
 import { describe, expect, it } from 'vitest'
 import { parseAuthConfig } from './config.js'
 import { createInMemoryAuthRepository } from './repository.js'
-import { registerAuthRoutes } from './routes.js'
+import { registerAuthRoutes, type AuthRouteEnv } from './routes.js'
 
 const config = parseAuthConfig({
   APP_ORIGIN: 'https://jdr-hub.example.test',
@@ -13,7 +13,7 @@ const config = parseAuthConfig({
 })
 
 function createTestApp() {
-  const app = new Hono()
+  const app = new Hono<AuthRouteEnv>()
   const repository = createInMemoryAuthRepository()
   registerAuthRoutes(app, {
     config,
