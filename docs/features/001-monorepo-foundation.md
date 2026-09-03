@@ -317,8 +317,10 @@ Ajouter la connectivité de test minimale sans introduire prématurément le mod
  - Les conteneurs applicatifs s’exécutent avec l’utilisateur non-root `node`,
    abandonnent toutes les capacités Linux et activent `no-new-privileges` ; le
    proxy n’ajoute que `NET_BIND_SERVICE` pour son binaire officiel.
-- Les images utilisent des versions précises, des builds multi-stage et des
-  dépendances runtime séparées des dépendances de construction.
+ - Les images utilisent des versions précises, des builds multi-stage et des
+   dépendances runtime séparées des dépendances de construction.
+ - Next.js envoie une baseline CSP, anti-clickjacking, `nosniff`, referrer et
+   permissions ; `unsafe-inline` reste limité au bootstrap Next.js et documenté.
 - `.dockerignore` exclut environnements, journaux, dumps et artefacts locaux ;
   `.env.example` contient uniquement des valeurs locales factices.
 - Les healthchecks ont été observés verts sans lecture des logs de conteneurs.
