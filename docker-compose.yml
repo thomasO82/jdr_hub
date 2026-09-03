@@ -1,4 +1,35 @@
 services:
+  proxy-caddy:
+    image: caddy:2.10.2-alpine
+    init: true
+    ports:
+      - "127.0.0.1:18080:8080"
+    volumes:
+      - ./docker/Caddyfile:/etc/caddy/Caddyfile:ro
+    networks:
+      - application
+    depends_on:
+      web-next:
+        condition: service_healthy
+      api-hono:
+        condition: service_healthy
+    healthcheck:
+      test:
+        - CMD
+        - wget
+        - --spider
+        - --timeout=2
+        - http://127.0.0.1:8080/
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+    security_opt:
+      - no-new-privileges:true
+
   web-next:
     build:
       context: .
