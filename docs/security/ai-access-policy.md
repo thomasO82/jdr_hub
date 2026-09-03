@@ -539,4 +539,3 @@ Toute modification de cette politique doit être relue et validée humainement.
 **Emplacement attendu :** `docs/security/ai-access-policy.md`
 
 **Statut :** obligatoire pour tous les agents et outils automatisés intervenant sur JDR Hub.
-
