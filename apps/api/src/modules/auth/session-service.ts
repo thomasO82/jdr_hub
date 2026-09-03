@@ -49,6 +49,11 @@ export function createSessionCredential({
   }
 }
 
+/** Slides inactivity expiry while never extending the absolute session cap. */
+export function getNextIdleExpiry(now: Date, absoluteExpiresAt: Date): Date {
+  return new Date(Math.min(now.getTime() + SESSION_IDLE_TTL_MS, absoluteExpiresAt.getTime()))
+}
+
 /** Confirms that an opaque credential is current, unrevoked and matches its digest. */
 export function validateSessionCredential(
   session: StoredSessionCredential,

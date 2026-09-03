@@ -7,6 +7,7 @@ import type {
   NewSessionCredential,
   StoredSessionCredential,
 } from './session-service.js'
+import { getNextIdleExpiry } from './session-service.js'
 
 export type AuthenticatedUser = {
   avatarUrl: string | null
@@ -26,6 +27,7 @@ export interface AuthRepository {
   findSession(tokenDigest: string): Promise<StoredSession | null>
   findUser(userId: string): Promise<AuthenticatedUser | null>
   revokeSession(tokenDigest: string, now: Date): Promise<void>
+  touchSession(tokenDigest: string, now: Date): Promise<void>
   upsertDiscordUser(identity: DiscordIdentity, now: Date): Promise<AuthenticatedUser>
 }
 
@@ -87,6 +89,18 @@ export function createPostgresAuthRepository(database: AuthDatabase): AuthReposi
     async revokeSession(tokenDigest, now) {
       await database.update(sessions).set({ revokedAt: now }).where(and(eq(sessions.tokenDigest, tokenDigest), isNull(sessions.revokedAt)))
     },
+    async touchSession(tokenDigest, now) {
+      const [session] = await database
+        .select({ absoluteExpiresAt: sessions.absoluteExpiresAt })
+        .from(sessions)
+        .where(and(eq(sessions.tokenDigest, tokenDigest), isNull(sessions.revokedAt), gt(sessions.absoluteExpiresAt, now)))
+        .limit(1)
+      if (!session) return
+      await database
+        .update(sessions)
+        .set({ idleExpiresAt: getNextIdleExpiry(now, session.absoluteExpiresAt), lastSeenAt: now })
+        .where(and(eq(sessions.tokenDigest, tokenDigest), isNull(sessions.revokedAt)))
+    },
   }
 }
 
@@ -144,6 +158,14 @@ export function createInMemoryAuthRepository(): AuthRepository & {
       if (session && !session.revokedAt) {
         sessions.set(tokenDigest, { ...session, revokedAt: now })
       }
+    },
+    async touchSession(tokenDigest, now) {
+      const session = sessions.get(tokenDigest)
+      if (!session || session.revokedAt || session.absoluteExpiresAt.getTime() <= now.getTime()) return
+      sessions.set(tokenDigest, {
+        ...session,
+        idleExpiresAt: getNextIdleExpiry(now, session.absoluteExpiresAt),
+      })
     },
     debugStoredValues() {
       return JSON.stringify({ attempts: [...attempts.values()], sessions: [...sessions.values()] })

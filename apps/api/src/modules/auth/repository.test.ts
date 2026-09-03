@@ -44,4 +44,24 @@ describe('authentication repository', () => {
     })
     expect(repository.debugStoredValues()).not.toContain(credential.token)
   })
+
+  it('slides the idle expiry without extending the absolute session lifetime', async () => {
+    const repository = createInMemoryAuthRepository()
+    const credential = createSessionCredential({
+      now,
+      randomBytes: () => new Uint8Array(32).fill(7),
+    })
+    const user = await repository.upsertDiscordUser(
+      { discordId: '123456789012345678', username: 'Aventurier', avatarUrl: null },
+      now,
+    )
+    await repository.createSession(user.id, credential)
+
+    await repository.touchSession(credential.tokenDigest, new Date('2026-09-09T12:00:00.000Z'))
+
+    expect(await repository.findSession(credential.tokenDigest)).toMatchObject({
+      idleExpiresAt: new Date('2026-09-16T12:00:00.000Z'),
+      absoluteExpiresAt: credential.absoluteExpiresAt,
+    })
+  })
 })

@@ -58,8 +58,10 @@ export function registerAuthRoutes(app: Hono<AuthRouteEnv>, dependencies: RouteD
   app.get('/me', async (c) => {
     const token = getCookie(c, COOKIE_NAME)
     if (!token) return error(c, 401)
+    const currentTime = now()
     const session = await dependencies.repository.findSession(hashOAuthState(token))
-    if (!session || !validateSessionCredential(session, token, now())) return error(c, 401)
+    if (!session || !validateSessionCredential(session, token, currentTime)) return error(c, 401)
+    await dependencies.repository.touchSession(session.tokenDigest, currentTime)
     const user = await dependencies.repository.findUser(session.userId)
     return user ? c.json({ data: user, error: null, meta: {} }) : error(c, 401)
   })
