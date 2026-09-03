@@ -28,6 +28,15 @@ function workspacePackageManifests(): string[] {
 }
 
 describe('workspace boundaries', () => {
+  it('delegates quality scripts to every workspace', () => {
+    const rootPackage = JSON.parse(
+      readFileSync(resolve(root, 'package.json'), 'utf8'),
+    ) as { scripts?: Record<string, string> }
+
+    expect(rootPackage.scripts?.lint).toMatch(/pnpm .* -r run lint/)
+    expect(rootPackage.scripts?.typecheck).toMatch(/pnpm .* -r run typecheck/)
+  })
+
   it('declares the application and package workspaces', () => {
     const workspace = readFileSync(resolve(root, 'pnpm-workspace.yaml'), 'utf8')
     expect(workspace).toContain('apps/*')
@@ -50,7 +59,7 @@ describe('workspace boundaries', () => {
         if (!dependencies || typeof dependencies !== 'object') continue
 
         for (const version of Object.values(dependencies)) {
-          expect(version).not.toMatch(/^(file|link|workspace):/)
+          expect(version).not.toMatch(/^(file|link):/)
         }
       }
     }

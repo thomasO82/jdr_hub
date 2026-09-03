@@ -4,8 +4,8 @@
   "type": "module",
   "packageManager": "pnpm@11.25.0",
   "scripts": {
-    "lint": "tsc -p tsconfig.base.json",
-    "typecheck": "tsc -p tsconfig.base.json",
+    "lint": "pnpm --filter @jdr-hub/api --filter @jdr-hub/web --filter @jdr-hub/shared --filter @jdr-hub/database -r run lint",
+    "typecheck": "pnpm --filter @jdr-hub/api --filter @jdr-hub/web --filter @jdr-hub/shared --filter @jdr-hub/database -r run typecheck",
     "test": "vitest run",
     "build": "pnpm --filter @jdr-hub/api build && pnpm --filter @jdr-hub/web build",
     "audit": "pnpm audit"
