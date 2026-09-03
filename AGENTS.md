@@ -170,6 +170,9 @@ Ne pas mettre les règles métier dans React, exposer Drizzle au navigateur, dup
 
 Chaque fonctionnalité utilise une branche dédiée créée depuis un `develop` propre et à jour. Les Pull Requests de fonctionnalité ciblent `develop`, puis une promotion séparée et validée peut rejoindre `main`. Il est interdit de développer directement sur `main`.
 
+Ne jamais créer ni utiliser de Git worktree pour ce dépôt. Tout travail doit
+être effectué dans l'espace de travail courant, sur la branche dédiée active.
+
 Convention : `feat/`, `fix/`, `refactor/`, `docs/`, `test/` ou `chore/` suivi d'une description courte, par exemple `feat/discord-auth` ou `feat/games-and-tags`.
 
 Une branche correspond à une seule fonctionnalité cohérente. Ne jamais réutiliser une ancienne branche pour une nouvelle fonctionnalité.
