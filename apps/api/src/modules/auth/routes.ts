@@ -20,8 +20,15 @@ type RouteDependencies = {
 
 export type AuthRouteEnv = { Variables: { requestId: string } }
 
-function error(c: Context, status: 400 | 401 | 403) {
-  return c.json({ data: null, error: { code: 'AUTH_ERROR', message: 'Authentication failed' }, meta: {} }, status)
+function error(c: Context<AuthRouteEnv>, status: 400 | 401 | 403) {
+  return c.json(
+    {
+      data: null,
+      error: { code: 'AUTH_ERROR', message: 'Authentication failed' },
+      meta: { requestId: c.get('requestId') },
+    },
+    status,
+  )
 }
 
 export function registerAuthRoutes(app: Hono<AuthRouteEnv>, dependencies: RouteDependencies): void {

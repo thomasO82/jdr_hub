@@ -27,5 +27,8 @@ Thumbs.db
 # Turborepo
 .turbo/
 
+# Contexte local du plugin de conception
+.superdesign/
+
 # Drizzle
 drizzle/meta/_journal.json.lock

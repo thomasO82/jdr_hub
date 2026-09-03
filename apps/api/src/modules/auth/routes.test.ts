@@ -14,6 +14,10 @@ const config = parseAuthConfig({
 
 function createTestApp() {
   const app = new Hono<AuthRouteEnv>()
+  app.use('*', async (c, next) => {
+    c.set('requestId', 'test-request-id')
+    await next()
+  })
   const repository = createInMemoryAuthRepository()
   registerAuthRoutes(app, {
     config,
@@ -66,6 +70,7 @@ describe('authentication routes', () => {
     const replay = await app.request(`/auth/discord/callback?code=test-code&state=${state}`)
 
     expect(replay.status).toBe(400)
+    expect(await replay.json()).toMatchObject({ meta: { requestId: 'test-request-id' } })
     expect((await app.request('/me')).status).toBe(401)
   })
 

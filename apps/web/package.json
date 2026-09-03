@@ -9,9 +9,12 @@
     "build": "next build"
   },
   "dependencies": {
+    "@tailwindcss/postcss": "4.2.2",
+    "lucide-react": "0.576.0",
     "next": "16.2.11",
     "react": "19.2.0",
-    "react-dom": "19.2.0"
+    "react-dom": "19.2.0",
+    "tailwindcss": "4.2.2"
   },
   "devDependencies": {
     "@types/react": "^19.2.7",

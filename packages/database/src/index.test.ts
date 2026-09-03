@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { createDatabase, parseDatabaseUrl } from './index.js'
+import { createDatabase, getMigrationsFolder, parseDatabaseUrl } from './index.js'
 
 describe('database configuration', () => {
   it('rejects a missing connection URL', () => {
@@ -33,5 +33,9 @@ describe('database configuration', () => {
     expect(database.db).toBeDefined()
     expect(database.client).toBeDefined()
     void database.client.end()
+  })
+
+  it('resolves the packaged migration directory without depending on the process directory', () => {
+    expect(getMigrationsFolder()).toMatch(/packages\/database\/migrations$/)
   })
 })
