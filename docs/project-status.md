@@ -25,7 +25,7 @@ Seuls les statuts suivants sont autorisés :
 | Identifiant | Fonctionnalité | Statut | Branche | Pull Request | Tests | Sécurité | Fiche détaillée |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | DOC-001 | Mise en place du suivi documentaire | `IN_PROGRESS` | `docs/feature-tracking` | Non créée | Documentation uniquement — à consigner dans la fiche | Contrôles documentaires à renseigner | [README du registre](features/README.md) |
-| F00 | Socle monorepo, Docker et CI sécurisée | `IN_PROGRESS` | `develop` — reprise directe demandée par le propriétaire | Sans PR à ce stade | 18 tests verts ; Docker Compose couvert | Réseau DB interne, non-root et healthchecks vérifiés | [Fiche F00](features/001-monorepo-foundation.md) |
+| F00 | Socle monorepo, Docker et CI sécurisée | `IN_PROGRESS` | `fix/f00-hardening` | Sans PR à ce stade | Tests ciblés verts ; vérification finale en cours | Audit hautes vulnérabilités vide, réseau DB interne, non-root, digests et healthchecks | [Fiche F00](features/001-monorepo-foundation.md) |
 
 ## Blocages
 

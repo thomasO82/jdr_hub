@@ -10,18 +10,16 @@ F00
 
 ## Branche
 
-`develop` — reprise directe demandée explicitement par le propriétaire le
-2026-09-03, sans worktree. Les 16 commits de `chore/monorepo-foundation` ont
-été intégrés localement par fast-forward avant la reprise.
+`fix/f00-hardening`, créée depuis l’état vérifié de `develop` le 2026-09-03.
 
 ## Lien ou numéro de Pull Request
 
-Non créée — la Pull Request ciblera `develop`.
+Non créée à ce stade — la Pull Request ciblera `develop` après les vérifications finales.
 
 ## Dates de début et de fin
 
 - Début : 2026-09-02
-- Fin : Non terminée
+- Fin : Non terminée — PR non créée
 
 ## Dépendances
 
@@ -53,7 +51,8 @@ la séparation du code navigateur et du code de base de données.
 
 ### Restant à faire
 
-Créer les conteneurs, le routage local et la CI.
+La pile Docker, le routage same-origin, la couche Drizzle minimale et les
+gates CI sont implémentés ; l’ouverture de la PR reste à faire.
 
 ## Besoin utilisateur
 
@@ -99,6 +98,12 @@ Rendre le socle complet exécutable localement et vérifiable par CI.
   n’expose aucun port hôte et reste isolé sur un réseau interne.
 - Les images web et API utilisent des builds multi-stage et un runtime
   non-root. Les trois services disposent de healthchecks.
+- Caddy publie un unique point d’entrée local et route `/` vers Next.js et
+  `/api/*` vers Hono.
+- Drizzle et PostgreSQL disposent d’une fabrique serveur validant
+  `DATABASE_URL` ; aucun schéma métier n’est ajouté.
+- La CI GitHub Actions exécute les contrôles qualité, audit, scans de secrets,
+  code et images avec permissions minimales.
 
 ## Parcours utilisateur
 
@@ -108,14 +113,13 @@ Un développeur clone le dépôt, fournit uniquement des valeurs factices ou des
 
 ### Réalisé
 
-Le parcours développeur est partiellement disponible : installation pnpm,
-tests d’architecture, API `/health`, shell web, vérifications TypeScript/
-Next.js et démarrage des trois services Docker sont reproductibles. Le routage
-same-origin reste à implémenter.
+Le parcours développeur est disponible : installation pnpm, tests d’architecture,
+API `/health`, shell web, routage same-origin, vérifications TypeScript/Next.js
+et démarrage des quatre services Docker sont reproductibles.
 
 ### Restant à faire
 
-Valider le parcours local et le parcours CI après implémentation.
+Relancer le parcours complet sur la branche finale avant la PR.
 
 ## Règles métier
 
@@ -141,14 +145,15 @@ Monorepo pnpm avec Next.js App Router, Hono REST, packages TypeScript partagés,
 
 ### Réalisé
 
-Le workspace pnpm, les options TypeScript strictes et les frontières
-`@jdr-hub/shared`/`@jdr-hub/database` sont implémentés. Le package database
-reste vide de modèle métier, l’API Hono possède son endpoint de santé et le
-shell Next.js rend la page technique avec le logo officiel.
+ Le workspace pnpm, les options TypeScript strictes et les frontières
+ `@jdr-hub/shared`/`@jdr-hub/database` sont implémentés. Le package database
+ fournit une fabrique Drizzle validée sans modèle métier, l’API Hono possède
+ son endpoint de santé et sa limite de corps, le proxy route le trafic local et
+ le shell Next.js rend la page technique avec le logo officiel.
 
 ### Restant à faire
 
-Implémenter le reverse proxy, la connectivité Drizzle minimale et la CI.
+Maintenir les versions et les scans à jour lors des fonctionnalités suivantes.
 
 ## Modèle de données et migrations
 
@@ -180,8 +185,8 @@ Ajouter la connectivité de test minimale sans introduire prématurément le mod
 
 ### Restantes
 
-- Publication de l’endpoint interne sous `/api/health` via le reverse proxy,
-  validation de taille de corps et intégration complète du format d’erreur.
+ - Ajouter les routes métier et leur autorisation dans les fonctionnalités
+   suivantes.
 
 ## Interface et composants
 
@@ -223,10 +228,11 @@ Ajouter la connectivité de test minimale sans introduire prématurément le mod
 | `CI=true pnpm --filter @jdr-hub/web build` | Réussi ; route statique `/` générée | 2026-09-02 |
 | `CI=true pnpm build` | Réussi ; builds API et web exécutés via les workspaces | 2026-09-02 |
 | `CI=true pnpm exec vitest run tests/architecture/workspace.test.ts tests/architecture/database-boundary.test.ts --exclude '.superpowers/**'` | Réussi : 5 tests dans 2 fichiers | 2026-09-02 |
-| `CI=true pnpm typecheck` | Réussi | 2026-09-02 |
+ | `CI=true pnpm typecheck` | Réussi | 2026-09-02 |
+ | `pnpm audit --audit-level=high` | Réussi : aucune vulnérabilité connue | 2026-09-03 |
 | `git diff --check` | Réussi | 2026-09-02 |
 | `pnpm vitest run tests/infrastructure/compose-config.test.ts` | Réussi : 5 tests | 2026-09-03 |
-| `pnpm test` | Réussi : 18 tests dans 6 fichiers | 2026-09-03 |
+| `pnpm test` | Réussi : 27 tests dans 10 fichiers | 2026-09-03 |
 | `pnpm typecheck` | Réussi | 2026-09-03 |
 | `pnpm build` | Réussi : builds API et Next.js | 2026-09-03 |
 | `docker compose -f docker-compose.yml config --quiet` | Réussi, aucune sortie sensible | 2026-09-03 |
@@ -235,8 +241,8 @@ Ajouter la connectivité de test minimale sans introduire prématurément le mod
 
 ### Restants
 
-- Les tests du reverse proxy, de la connectivité Drizzle et de la CI restent à
-  réaliser.
+- Les tests d’intégration PostgreSQL réelle et l’exécution sur GitHub Actions
+  doivent être confirmés dans l’environnement cible.
 
 ## Preuve TDD Red, Green, Refactor
 
@@ -305,8 +311,9 @@ Ajouter la connectivité de test minimale sans introduire prématurément le mod
 - La politique d’accès de l’IA a été consultée.
 - Aucun motif de secret n’a été détecté dans les documents de cette phase.
 - PostgreSQL n’a aucun port publié et utilise un réseau Docker interne.
-- Les conteneurs applicatifs s’exécutent avec l’utilisateur non-root `node`,
-  abandonnent toutes les capacités Linux et activent `no-new-privileges`.
+ - Les conteneurs applicatifs s’exécutent avec l’utilisateur non-root `node`,
+   abandonnent toutes les capacités Linux et activent `no-new-privileges` ; le
+   proxy n’ajoute que `NET_BIND_SERVICE` pour son binaire officiel.
 - Les images utilisent des versions précises, des builds multi-stage et des
   dépendances runtime séparées des dépendances de construction.
 - `.dockerignore` exclut environnements, journaux, dumps et artefacts locaux ;
@@ -317,7 +324,7 @@ Ajouter la connectivité de test minimale sans introduire prématurément le mod
 
 - Le compte PostgreSQL local d’amorçage reste à séparer explicitement d’un
   futur compte applicatif à privilèges minimaux lors de l’ajout de Drizzle.
-- Les scans CI de secrets, code et images restent à implémenter.
+- Les scans CI sont définis ; leur exécution dépend de l’environnement GitHub.
 
 ## Documentation technique consultée
 
@@ -344,8 +351,8 @@ Ajouter la connectivité de test minimale sans introduire prématurément le mod
 
 ## Limites connues
 
-- Le reverse proxy, la connectivité Drizzle et la CI restent à implémenter ;
-  la pile Docker de base est en place.
+- La connectivité PostgreSQL réelle reste à confirmer dans un environnement de
+  test dédié ; la pile Docker et le proxy local sont en place.
 - L’API actuelle se limite à la santé technique ; aucune route métier n’est
   incluse.
 - La protection de la frontière database est un garde-fou d’architecture par
@@ -367,14 +374,13 @@ Après implémentation : installer avec pnpm, démarrer Compose, vérifier les h
 ### Réalisée
 
 - Vérification documentaire et de branche réalisée le 2026-09-02.
-- Construction des images, démarrage avec attente et observation des trois
+- Construction des images, démarrage avec attente et observation des quatre
   healthchecks verts le 2026-09-03 ; arrêt sans suppression du volume de
   développement.
 
 ### Restante
 
-- Vérification same-origin via le futur reverse proxy et exécution réelle de la
-  CI.
+- Exécution réelle de la CI GitHub et scan Docker Scout à confirmer après PR.
 
 ## Commits importants
 
@@ -384,6 +390,10 @@ Après implémentation : installer avec pnpm, démarrer Compose, vérifier les h
 - `62a1edc feat: add Hono health endpoint`.
 - `e503d58 fix: harden Hono API bootstrap`.
 - `02e5d2d feat: add Next.js web shell`.
+- `8f42fe1 feat: add same-origin caddy routing`.
+- `458fd58 feat: add validated drizzle database boundary`.
+- `83bdf04 fix: harden api limits and container images`.
+- `14e70ca ci: add pinned quality and security gates`.
 
 ## Décisions associées
 
