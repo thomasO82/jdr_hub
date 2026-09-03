@@ -10,7 +10,9 @@ F00
 
 ## Branche
 
-`chore/monorepo-foundation`, créée depuis `develop`
+`develop` — reprise directe demandée explicitement par le propriétaire le
+2026-09-03, sans worktree. Les 16 commits de `chore/monorepo-foundation` ont
+été intégrés localement par fast-forward avant la reprise.
 
 ## Lien ou numéro de Pull Request
 
@@ -93,6 +95,10 @@ Rendre le socle complet exécutable localement et vérifiable par CI.
   requête et un bootstrap Node validant `PORT`.
 - Les tests d’architecture vérifient les workspaces, les dépendances locales
   interdites et l’absence d’import serveur depuis les sources navigateur.
+- Docker Compose définit `web-next`, `api-hono` et `postgres`; PostgreSQL
+  n’expose aucun port hôte et reste isolé sur un réseau interne.
+- Les images web et API utilisent des builds multi-stage et un runtime
+  non-root. Les trois services disposent de healthchecks.
 
 ## Parcours utilisateur
 
@@ -103,8 +109,9 @@ Un développeur clone le dépôt, fournit uniquement des valeurs factices ou des
 ### Réalisé
 
 Le parcours développeur est partiellement disponible : installation pnpm,
-tests d’architecture, API `/health`, shell web et vérifications TypeScript/
-Next.js sont reproductibles. Docker et le routage public restent à implémenter.
+tests d’architecture, API `/health`, shell web, vérifications TypeScript/
+Next.js et démarrage des trois services Docker sont reproductibles. Le routage
+same-origin reste à implémenter.
 
 ### Restant à faire
 
@@ -141,7 +148,7 @@ shell Next.js rend la page technique avec le logo officiel.
 
 ### Restant à faire
 
-Implémenter les services, les vérifications Compose, le reverse proxy et la CI.
+Implémenter le reverse proxy, la connectivité Drizzle minimale et la CI.
 
 ## Modèle de données et migrations
 
@@ -218,10 +225,18 @@ Ajouter la connectivité de test minimale sans introduire prématurément le mod
 | `CI=true pnpm exec vitest run tests/architecture/workspace.test.ts tests/architecture/database-boundary.test.ts --exclude '.superpowers/**'` | Réussi : 5 tests dans 2 fichiers | 2026-09-02 |
 | `CI=true pnpm typecheck` | Réussi | 2026-09-02 |
 | `git diff --check` | Réussi | 2026-09-02 |
+| `pnpm vitest run tests/infrastructure/compose-config.test.ts` | Réussi : 5 tests | 2026-09-03 |
+| `pnpm test` | Réussi : 18 tests dans 6 fichiers | 2026-09-03 |
+| `pnpm typecheck` | Réussi | 2026-09-03 |
+| `pnpm build` | Réussi : builds API et Next.js | 2026-09-03 |
+| `docker compose -f docker-compose.yml config --quiet` | Réussi, aucune sortie sensible | 2026-09-03 |
+| `docker compose -f docker-compose.yml build web-next api-hono` | Réussi : 2 images construites | 2026-09-03 |
+| `docker compose -f docker-compose.yml up -d --wait` | Réussi : 3 services sains | 2026-09-03 |
 
 ### Restants
 
-- Tous les tests F00 d’architecture, intégration, API, Compose, CI et builds.
+- Les tests du reverse proxy, de la connectivité Drizzle et de la CI restent à
+  réaliser.
 
 ## Preuve TDD Red, Green, Refactor
 
@@ -262,6 +277,18 @@ Ajouter la connectivité de test minimale sans introduire prématurément le mod
 - Refactor : le `requestId` est produit par middleware, le bootstrap est
   séparé de l’export package, et `PORT` est validé dans un module dédié.
 
+### Évolution datée — Docker Compose, 2026-09-03
+
+- Red : `pnpm vitest run tests/infrastructure/compose-config.test.ts`
+  échouait avec 5 assertions car `docker-compose.yml` était absent.
+- Green : les 5 tests passent après ajout des trois services, de l’isolation
+  PostgreSQL et des healthchecks. Les images web/API se construisent et les
+  trois conteneurs atteignent l’état `healthy`.
+- Refactor : le helper de test a été corrigé après reproduction d’un défaut
+  d’extraction sur les lignes YAML vides. `next.config.ts` a été remplacé par
+  `next.config.mjs`, format officiellement supporté, afin que le runtime web
+  n’installe aucune dépendance de développement au démarrage.
+
 ## Contrôles de sécurité
 
 ### Prévus
@@ -277,10 +304,20 @@ Ajouter la connectivité de test minimale sans introduire prématurément le mod
 
 - La politique d’accès de l’IA a été consultée.
 - Aucun motif de secret n’a été détecté dans les documents de cette phase.
+- PostgreSQL n’a aucun port publié et utilise un réseau Docker interne.
+- Les conteneurs applicatifs s’exécutent avec l’utilisateur non-root `node`,
+  abandonnent toutes les capacités Linux et activent `no-new-privileges`.
+- Les images utilisent des versions précises, des builds multi-stage et des
+  dépendances runtime séparées des dépendances de construction.
+- `.dockerignore` exclut environnements, journaux, dumps et artefacts locaux ;
+  `.env.example` contient uniquement des valeurs locales factices.
+- Les healthchecks ont été observés verts sans lecture des logs de conteneurs.
 
 ### Restants ou limites
 
-- Tous les contrôles techniques seront exécutés après implémentation et consignés avant la Pull Request.
+- Le compte PostgreSQL local d’amorçage reste à séparer explicitement d’un
+  futur compte applicatif à privilèges minimaux lors de l’ajout de Drizzle.
+- Les scans CI de secrets, code et images restent à implémenter.
 
 ## Documentation technique consultée
 
@@ -289,21 +326,26 @@ Ajouter la connectivité de test minimale sans introduire prématurément le mod
 - `docs/design-audit.md` et `docs/design-system.md` — sources design consultées pour les frontières du shell.
 - `docs/implementation-plan.md` — F00 et règles de livraison.
 - `docs/security/ai-access-policy.md` — politique d’accès appliquée, sans modification.
+- Documentation officielle Next.js — format ESM `next.config.mjs`, consultée
+  le 2026-09-03 faute de Context7 disponible dans la session.
 
 ## Fichiers principaux
 
 - `package.json`, `pnpm-workspace.yaml`, `pnpm-lock.yaml` et `tsconfig.base.json`.
 - `apps/api/package.json`, `apps/api/tsconfig.json` et `apps/api/src/`.
-- `apps/web/package.json`, `apps/web/tsconfig.json`, `apps/web/next.config.ts`,
+- `apps/web/package.json`, `apps/web/tsconfig.json`, `apps/web/next.config.mjs`,
   `apps/web/app/` et `apps/web/public/branding/logo.svg`.
+- `docker-compose.yml`, `.dockerignore`, `.env.example`, les Dockerfiles web/API
+  et `docker/postgres/healthcheck.sh`.
+- `tests/infrastructure/compose-config.test.ts`.
 - `packages/shared/` et `packages/database/`.
 - `tests/architecture/workspace.test.ts`.
 - `tests/architecture/database-boundary.test.ts` et son helper.
 
 ## Limites connues
 
-- Le reverse proxy, Docker et la CI restent à implémenter ; l’API technique
-  et le shell web initiaux sont en place.
+- Le reverse proxy, la connectivité Drizzle et la CI restent à implémenter ;
+  la pile Docker de base est en place.
 - L’API actuelle se limite à la santé technique ; aucune route métier n’est
   incluse.
 - La protection de la frontière database est un garde-fou d’architecture par
@@ -325,10 +367,14 @@ Après implémentation : installer avec pnpm, démarrer Compose, vérifier les h
 ### Réalisée
 
 - Vérification documentaire et de branche réalisée le 2026-09-02.
+- Construction des images, démarrage avec attente et observation des trois
+  healthchecks verts le 2026-09-03 ; arrêt sans suppression du volume de
+  développement.
 
 ### Restante
 
-- Toute vérification d’exécution locale et CI.
+- Vérification same-origin via le futur reverse proxy et exécution réelle de la
+  CI.
 
 ## Commits importants
 

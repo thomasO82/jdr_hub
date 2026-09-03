@@ -1,0 +1,79 @@
+services:
+  web-next:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    init: true
+    expose:
+      - "3000"
+    networks:
+      - application
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - fetch('http://127.0.0.1:3000/').then((response) => { if (!response.ok) process.exit(1) }).catch(() => process.exit(1))
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 20s
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+
+  api-hono:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    init: true
+    expose:
+      - "8787"
+    networks:
+      - application
+      - database-internal
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - fetch('http://127.0.0.1:8787/health').then((response) => { if (!response.ok) process.exit(1) }).catch(() => process.exit(1))
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+
+  postgres:
+    image: postgres:17.6-alpine3.22
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-jdr_hub_dev}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-local-development-only}
+      POSTGRES_USER: ${POSTGRES_USER:-jdr_hub_app}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./docker/postgres/healthcheck.sh:/usr/local/bin/jdr-healthcheck:ro
+    networks:
+      - database-internal
+    healthcheck:
+      test:
+        - CMD
+        - /usr/local/bin/jdr-healthcheck
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    security_opt:
+      - no-new-privileges:true
+
+networks:
+  application:
+  database-internal:
+    internal: true
+
+volumes:
+  postgres-data:
