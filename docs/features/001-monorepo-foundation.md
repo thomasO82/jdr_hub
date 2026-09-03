@@ -6,7 +6,7 @@ F00
 
 ## Statut
 
-`IN_PROGRESS`
+`MERGED`
 
 ## Branche
 
@@ -14,12 +14,17 @@ F00
 
 ## Lien ou numéro de Pull Request
 
-Non créée à ce stade — la Pull Request ciblera `develop` après les vérifications finales.
+[PR #3](https://github.com/thomasO82/jdr_hub/pull/3), fusionnée dans `develop` le 2026-09-03 par le propriétaire.
 
 ## Dates de début et de fin
 
 - Début : 2026-09-02
-- Fin : Non terminée — PR non créée
+- Fin : 2026-09-03 — PR #3 fusionnée
+
+### Synchronisation post-fusion — 2026-09-03
+
+La PR #3 a été fusionnée dans `develop`. Cette fiche reste historique ; les
+évolutions ultérieures sont suivies dans les fiches suivantes.
 
 ## Dépendances
 
