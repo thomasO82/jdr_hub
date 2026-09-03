@@ -23,6 +23,8 @@ describe('continuous integration security gates', () => {
     expect(workflow).toContain('pnpm audit --audit-level=high')
     expect(workflow.toLowerCase()).toContain('secret')
     expect(workflow).toContain('docker scout cves')
+    expect(workflow).toContain('--only-severity high,critical')
+    expect(workflow).not.toContain('--only-fixed')
 
     for (const useLine of workflow.match(/^\s*- uses: .*$/gm) ?? []) {
       expect(useLine).toMatch(/@[0-9a-f]{40}/)

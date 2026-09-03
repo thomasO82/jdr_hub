@@ -14,6 +14,7 @@ describe('same-origin routing', () => {
     expect(caddy).toContain('handle_path /api/*')
     expect(caddy).toContain('reverse_proxy api-hono:8787')
     expect(caddy).toContain('reverse_proxy web-next:3000')
+    expect(caddy).toContain('max_size 1MB')
     expect(compose).toContain('proxy-caddy:')
     expect(compose).toMatch(/proxy-caddy:[\s\S]*?ports:/)
     expect(compose).toMatch(/127\.0\.0\.1:18080:8080/)

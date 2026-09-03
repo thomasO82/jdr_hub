@@ -57,5 +57,5 @@ jobs:
 
       - name: Scan images
         run: |
-          docker scout cves --only-fixed --exit-code 1 jdr_hub-web-next:latest
-          docker scout cves --only-fixed --exit-code 1 jdr_hub-api-hono:latest
+          docker scout cves --only-severity high,critical --exit-code 1 jdr_hub-web-next:latest
+          docker scout cves --only-severity high,critical --exit-code 1 jdr_hub-api-hono:latest

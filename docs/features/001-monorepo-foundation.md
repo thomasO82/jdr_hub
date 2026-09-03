@@ -85,7 +85,7 @@ Rendre le socle complet exécutable localement et vérifiable par CI.
 
 ## Fonctionnalités effectivement réalisées
 
-- La branche `chore/monorepo-foundation` a été créée depuis `develop`.
+- La branche `fix/f00-hardening` a été créée depuis `develop`.
 - La conception et les critères de F00 sont documentés.
 - Le workspace pnpm et sa configuration TypeScript stricte sont implémentés.
 - `packages/shared` et `packages/database` disposent de manifests, tsconfigs
@@ -97,7 +97,7 @@ Rendre le socle complet exécutable localement et vérifiable par CI.
 - Docker Compose définit `web-next`, `api-hono` et `postgres`; PostgreSQL
   n’expose aucun port hôte et reste isolé sur un réseau interne.
 - Les images web et API utilisent des builds multi-stage et un runtime
-  non-root. Les trois services disposent de healthchecks.
+  non-root. Les quatre services disposent de healthchecks.
 - Caddy publie un unique point d’entrée local et route `/` vers Next.js et
   `/api/*` vers Hono.
 - Drizzle et PostgreSQL disposent d’une fabrique serveur validant
@@ -231,7 +231,7 @@ Ajouter la connectivité de test minimale sans introduire prématurément le mod
  | `CI=true pnpm typecheck` | Réussi | 2026-09-02 |
 | `git diff --check` | Réussi | 2026-09-02 |
 | `pnpm vitest run tests/infrastructure/compose-config.test.ts` | Réussi : 5 tests | 2026-09-03 |
-| `pnpm test` | Réussi : 29 tests dans 11 fichiers | 2026-09-03 |
+| `pnpm test` | Réussi : 31 tests dans 11 fichiers | 2026-09-03 |
 | `pnpm lint` | Réussi sur les 4 workspaces | 2026-09-03 |
 | `pnpm build` | Réussi : API et Next.js 16.2.11 | 2026-09-03 |
 | `pnpm typecheck` | Réussi | 2026-09-03 |
