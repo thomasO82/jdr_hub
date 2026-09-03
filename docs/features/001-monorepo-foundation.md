@@ -229,11 +229,14 @@ Ajouter la connectivité de test minimale sans introduire prématurément le mod
 | `CI=true pnpm build` | Réussi ; builds API et web exécutés via les workspaces | 2026-09-02 |
 | `CI=true pnpm exec vitest run tests/architecture/workspace.test.ts tests/architecture/database-boundary.test.ts --exclude '.superpowers/**'` | Réussi : 5 tests dans 2 fichiers | 2026-09-02 |
  | `CI=true pnpm typecheck` | Réussi | 2026-09-02 |
- | `pnpm audit --audit-level=high` | Réussi : aucune vulnérabilité connue | 2026-09-03 |
 | `git diff --check` | Réussi | 2026-09-02 |
 | `pnpm vitest run tests/infrastructure/compose-config.test.ts` | Réussi : 5 tests | 2026-09-03 |
-| `pnpm test` | Réussi : 27 tests dans 10 fichiers | 2026-09-03 |
+| `pnpm test` | Réussi : 28 tests dans 10 fichiers | 2026-09-03 |
+| `pnpm lint` | Réussi sur les 4 workspaces | 2026-09-03 |
+| `pnpm build` | Réussi : API et Next.js 16.2.11 | 2026-09-03 |
 | `pnpm typecheck` | Réussi | 2026-09-03 |
+| `pnpm audit --audit-level=high` | Réussi : aucune vulnérabilité connue | 2026-09-03 |
+| `curl --fail http://127.0.0.1:18080/` et `/api/health` | Réussi via Caddy, Next.js et Hono | 2026-09-03 |
 | `pnpm build` | Réussi : builds API et Next.js | 2026-09-03 |
 | `docker compose -f docker-compose.yml config --quiet` | Réussi, aucune sortie sensible | 2026-09-03 |
 | `docker compose -f docker-compose.yml build web-next api-hono` | Réussi : 2 images construites | 2026-09-03 |
