@@ -231,7 +231,7 @@ Ajouter la connectivité de test minimale sans introduire prématurément le mod
  | `CI=true pnpm typecheck` | Réussi | 2026-09-02 |
 | `git diff --check` | Réussi | 2026-09-02 |
 | `pnpm vitest run tests/infrastructure/compose-config.test.ts` | Réussi : 5 tests | 2026-09-03 |
-| `pnpm test` | Réussi : 28 tests dans 10 fichiers | 2026-09-03 |
+| `pnpm test` | Réussi : 29 tests dans 11 fichiers | 2026-09-03 |
 | `pnpm lint` | Réussi sur les 4 workspaces | 2026-09-03 |
 | `pnpm build` | Réussi : API et Next.js 16.2.11 | 2026-09-03 |
 | `pnpm typecheck` | Réussi | 2026-09-03 |
