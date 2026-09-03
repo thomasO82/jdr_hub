@@ -1,0 +1,13 @@
+:8080 {
+  request_body {
+    max_size 1MB
+  }
+
+  handle_path /api/* {
+    reverse_proxy api-hono:8787
+  }
+
+  handle {
+    reverse_proxy web-next:3000
+  }
+}

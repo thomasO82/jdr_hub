@@ -10,7 +10,7 @@ Modules Hono prévus : `auth`, `users`, `games`, `tags`, `applications`, `invita
 
 ## Règles de livraison communes
 
-Chaque fonctionnalité ci-dessous doit être développée sur une branche dédiée créée depuis un `main` propre et à jour, avec une Pull Request dédiée vers `main`. Le propriétaire valide et fusionne personnellement chaque PR ; aucune fusion, approbation personnelle, poussée directe sur `main` ou suppression de branche distante n’est automatisée.
+Chaque fonctionnalité ci-dessous doit être développée sur une branche dédiée créée depuis un `develop` propre et à jour, avec une Pull Request dédiée vers `develop`. `develop` est la branche partagée de test et d'intégration ; `main` reçoit uniquement les versions validées lors d'une promotion contrôlée. Le propriétaire valide et fusionne personnellement chaque PR ; aucune fusion, approbation personnelle, poussée directe sur `main` ou suppression de branche distante n’est automatisée.
 
 Cycle obligatoire pour chaque fonctionnalité :
 
@@ -51,7 +51,7 @@ Installer la structure pnpm prévue (`apps/web`, `apps/api`, `packages/shared`, 
 
 ### Dépendances
 
-Aucune fonctionnalité applicative. La branche est créée depuis `main` propre et à jour.
+Aucune fonctionnalité applicative. La branche est créée depuis `develop` propre et à jour ; la Pull Request cible `develop`.
 
 ### Règles métier et techniques
 
