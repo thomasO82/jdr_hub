@@ -166,6 +166,19 @@ Avant chaque fonctionnalité : relire la spécification, consulter `docs/impleme
 
 Ne pas mettre les règles métier dans React, exposer Drizzle au navigateur, dupliquer inutilement les contrats, utiliser `any` sans justification, masquer une erreur TypeScript, ajouter une dépendance sans justification ou modifier des fichiers sans rapport avec la tâche. Utiliser pnpm.
 
+## Autonomie d'exécution
+
+Pour une fonctionnalité explicitement autorisée, Codex exécute de manière
+autonome les étapes normales de développement : exploration autorisée, tests,
+modifications liées au périmètre, builds, contrôles, commits locaux, Docker de
+développement et préparation de Pull Request. Ne pas interrompre inutilement
+le propriétaire pour demander une confirmation intermédiaire.
+
+Demander une validation explicite avant l'ajout ou la mise à jour d'une
+dépendance. Les validations imposées par une règle de sécurité, une opération
+destructive, une migration risquée, un accès interdit ou une coordination
+externe restent obligatoires.
+
 ## 11. Workflow Git obligatoire
 
 Chaque fonctionnalité utilise une branche dédiée créée depuis un `develop` propre et à jour. Les Pull Requests de fonctionnalité ciblent `develop`, puis une promotion séparée et validée peut rejoindre `main`. Il est interdit de développer directement sur `main`.
