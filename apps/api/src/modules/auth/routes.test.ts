@@ -59,6 +59,7 @@ describe('authentication routes', () => {
     expect(await me.json()).toMatchObject({
       data: { username: 'AventureFictive', timezone: 'Europe/Paris' },
       error: null,
+      meta: { requestId: 'test-request-id' },
     })
   })
 

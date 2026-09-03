@@ -63,7 +63,7 @@ export function registerAuthRoutes(app: Hono<AuthRouteEnv>, dependencies: RouteD
     if (!session || !validateSessionCredential(session, token, currentTime)) return error(c, 401)
     await dependencies.repository.touchSession(session.tokenDigest, currentTime)
     const user = await dependencies.repository.findUser(session.userId)
-    return user ? c.json({ data: user, error: null, meta: {} }) : error(c, 401)
+    return user ? c.json({ data: user, error: null, meta: { requestId: c.get('requestId') } }) : error(c, 401)
   })
   app.post('/auth/logout', async (c) => {
     if (c.req.header('origin') !== dependencies.config.appOrigin) return error(c, 403)
