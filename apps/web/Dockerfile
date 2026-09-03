@@ -1,4 +1,4 @@
-FROM node:24.8.0-alpine3.22 AS dependencies
+FROM node:24.8.0-alpine3.22@sha256:3e843c608bb5232f39ecb2b25e41214b958b0795914707374c8acc28487dea17 AS dependencies
 
 ENV PNPM_HOME=/pnpm
 ENV PATH=$PNPM_HOME:$PATH
@@ -19,7 +19,7 @@ RUN pnpm --filter @jdr-hub/web build
 RUN pnpm --filter @jdr-hub/web deploy --prod --legacy /runtime
 RUN cp -R apps/web/.next /runtime/.next
 
-FROM node:24.8.0-alpine3.22 AS runtime
+FROM node:24.8.0-alpine3.22@sha256:3e843c608bb5232f39ecb2b25e41214b958b0795914707374c8acc28487dea17 AS runtime
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 

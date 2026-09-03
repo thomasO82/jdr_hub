@@ -2,6 +2,20 @@ import { describe, expect, it } from 'vitest'
 import { createApiApp } from './app.js'
 
 describe('GET /health', () => {
+  it('rejects requests larger than the API body limit', async () => {
+    const response = await createApiApp().request('/health', {
+      method: 'POST',
+      headers: { 'content-length': '1048577' },
+    })
+
+    expect(response.status).toBe(413)
+    expect(await response.json()).toEqual({
+      data: null,
+      error: { code: 'PAYLOAD_TOO_LARGE', message: 'Request body too large' },
+      meta: { requestId: expect.any(String) },
+    })
+  })
+
   it('returns the stable health envelope and a request id', async () => {
     const response = await createApiApp().request('/health')
     const responseBody = await response.json()

@@ -57,4 +57,23 @@ describe('secure Docker Compose foundation', () => {
     expect(networks).toMatch(/^  database-internal:/m)
     expect(networks).toMatch(/^ {4}internal: true$/m)
   })
+
+  it('hardens every runtime service and pins base images', () => {
+    const compose = composeSource()
+
+    for (const service of ['proxy-caddy', 'web-next', 'api-hono', 'postgres']) {
+      const block = serviceBlock(compose, service)
+      expect(block).toMatch(/^ {4}security_opt:/m)
+      expect(block).toMatch(/no-new-privileges:true/)
+    }
+
+    for (const dockerfile of ['apps/web/Dockerfile', 'apps/api/Dockerfile']) {
+      const source = readFileSync(resolve(root, dockerfile), 'utf8')
+      expect(source).toMatch(/^FROM node:[^\n]+@sha256:[0-9a-f]{64}/m)
+      expect(source).toContain('USER node')
+    }
+
+    expect(compose).toMatch(/image: caddy:[^\n]+@sha256:[0-9a-f]{64}/)
+    expect(compose).toMatch(/image: postgres:[^\n]+@sha256:[0-9a-f]{64}/)
+  })
 })

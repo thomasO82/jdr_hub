@@ -6,11 +6,29 @@ type ApiVariables = {
 
 type ApiApp = Hono<{ Variables: ApiVariables }>
 
+export const MAX_REQUEST_BODY_BYTES = 1_048_576
+
 export function createApiApp(): ApiApp {
   const app = new Hono<{ Variables: ApiVariables }>()
 
   app.use('*', async (c, next) => {
     c.set('requestId', crypto.randomUUID())
+
+    const contentLength = Number(c.req.header('content-length') ?? 0)
+    if (Number.isFinite(contentLength) && contentLength > MAX_REQUEST_BODY_BYTES) {
+      return c.json(
+        {
+          data: null,
+          error: {
+            code: 'PAYLOAD_TOO_LARGE',
+            message: 'Request body too large',
+          },
+          meta: { requestId: c.get('requestId') },
+        },
+        413,
+      )
+    }
+
     await next()
   })
 
