@@ -13,6 +13,8 @@ COPY packages/shared/package.json packages/shared/package.json
 RUN pnpm install --frozen-lockfile
 
 FROM dependencies AS build
+COPY packages/database packages/database
+COPY packages/shared packages/shared
 COPY apps/api apps/api
 RUN pnpm --filter @jdr-hub/api build
 RUN pnpm --filter @jdr-hub/api deploy --prod --legacy /runtime
