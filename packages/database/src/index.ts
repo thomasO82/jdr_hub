@@ -1,4 +1,8 @@
-export {}
+import { drizzle } from 'drizzle-orm/node-postgres'
+import { Pool } from 'pg'
+import * as authSchema from './schema/auth.js'
+
+export { authSchema }
 /** Parse and validate the server-only PostgreSQL connection URL. */
 export function parseDatabaseUrl(rawUrl: string | undefined): URL {
   if (!rawUrl) {
@@ -30,8 +34,6 @@ export function createDatabase(rawUrl: string | undefined) {
 
   return {
     client,
-    db: drizzle(client),
+    db: drizzle(client, { schema: authSchema }),
   }
 }
-import { drizzle } from 'drizzle-orm/node-postgres'
-import { Pool } from 'pg'
