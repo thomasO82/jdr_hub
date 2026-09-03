@@ -22,6 +22,7 @@ export interface AuthRepository {
   createLoginAttempt(attempt: OAuthLoginAttempt): Promise<void>
   createSession(userId: string, credential: NewSessionCredential): Promise<void>
   findSession(tokenDigest: string): Promise<StoredSession | null>
+  findUser(userId: string): Promise<AuthenticatedUser | null>
   revokeSession(tokenDigest: string, now: Date): Promise<void>
   upsertDiscordUser(identity: DiscordIdentity, now: Date): Promise<AuthenticatedUser>
 }
@@ -71,6 +72,9 @@ export function createInMemoryAuthRepository(): AuthRepository & {
     },
     async findSession(tokenDigest) {
       return sessions.get(tokenDigest) ?? null
+    },
+    async findUser(userId) {
+      return [...usersByDiscordId.values()].find((user) => user.id === userId) ?? null
     },
     async revokeSession(tokenDigest, now) {
       const session = sessions.get(tokenDigest)

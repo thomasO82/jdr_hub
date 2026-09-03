@@ -27,7 +27,7 @@ function encodeRandomBytes(randomBytes: RandomBytes): string {
   return Buffer.from(randomBytes()).toString('base64url')
 }
 
-function hashSecret(secret: string): string {
+export function hashOAuthState(secret: string): string {
   return createHash('sha256').update(secret).digest('base64url')
 }
 
@@ -69,7 +69,7 @@ export function createLoginAttempt({
   return {
     state,
     record: {
-      stateDigest: hashSecret(state),
+      stateDigest: hashOAuthState(state),
       codeVerifier,
       returnTo: normalizeInternalReturnPath(returnTo),
       expiresAt: new Date(now.getTime() + OAUTH_ATTEMPT_TTL_MS),
@@ -89,7 +89,7 @@ export function buildDiscordAuthorizationUrl(
   url.searchParams.set('scope', 'identify')
   url.searchParams.set('redirect_uri', config.redirectUri)
   url.searchParams.set('state', attempt.state)
-  url.searchParams.set('code_challenge', hashSecret(attempt.record.codeVerifier))
+  url.searchParams.set('code_challenge', hashOAuthState(attempt.record.codeVerifier))
   url.searchParams.set('code_challenge_method', 'S256')
   return url
 }
@@ -104,5 +104,5 @@ export function verifyLoginAttempt(
     return false
   }
 
-  return hasSameDigest(attempt.stateDigest, hashSecret(returnedState))
+  return hasSameDigest(attempt.stateDigest, hashOAuthState(returnedState))
 }
