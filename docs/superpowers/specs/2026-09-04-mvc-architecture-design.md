@@ -35,7 +35,11 @@ apps/api/src/
     repository.ts
     discord-client.ts
     services/
-      auth-service.ts
+      start-discord-login.ts
+      complete-discord-login.ts
+      authenticate-user.ts
+      refresh-session.ts
+      logout-session.ts
       access-token.ts
       session-service.ts
       oauth.ts
@@ -69,8 +73,9 @@ tests propres à une application ou à un package sont placés dans son dossier
 `handlers.ts` sera la couche contrôleur et conservera le contrat HTTP actuel :
 les chemins, statuts, cookies, réponses génériques et redirections ne
 changent pas. `cookies.ts` centralisera les noms, portées et attributs des
-cookies. `services/auth-service.ts` coordonnera le login Discord, le callback,
-l’authentification par JWT, le renouvellement et la déconnexion.
+cookies. Chaque parcours possède son propre cas d’usage : démarrage de login,
+callback Discord, authentification, renouvellement et déconnexion. Aucun
+service généraliste d’authentification ne regroupe ces parcours.
 
 Les services spécialisés conservent leurs limites : `access-token.ts` signe et
 vérifie seulement les JWT ; `session-service.ts` crée, empreinte et valide les
