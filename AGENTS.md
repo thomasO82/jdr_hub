@@ -358,16 +358,11 @@ Utiliser les outils selon le contexte suivant :
 - plan d'implémentation multi-étapes : `superpowers:writing-plans` après validation de la conception ;
 - fonctionnalité ou correction : `superpowers:test-driven-development` avant le code de production ;
 - bug, test en échec ou comportement inattendu : `superpowers:systematic-debugging` avant de proposer une correction ;
-- utilisation d'une API Next.js, Hono, Drizzle, Zod, Vitest, Playwright, Tailwind CSS, shadcn/ui ou Discord : Context7 pour consulter la documentation actuelle ;
 - développement ou modification significative de l'interface web : `build-web-apps`, en respectant les maquettes et le design system du projet ;
-- authentification, autorisation, session, donnée sensible, endpoint exposé ou changement de sécurité : Codex Security ;
 - avant d'affirmer qu'une tâche est terminée ou réussie : `superpowers:verification-before-completion` avec preuves fraîches ;
 - création, consultation ou mise à jour d'une Pull Request : plugin GitHub, sans jamais fusionner la PR ;
-- avant une Pull Request contenant du code : Codex Security et, s'il est disponible, `differential-review` ;
 - ajout ou mise à jour de dépendances : `supply-chain-risk-auditor` s'il est disponible ;
 - vérification de conformité entre code et spécifications : `spec-to-code-compliance` s'il est disponible.
-
-Context7 doit vérifier la documentation correspondant aux versions réellement installées dans le dépôt. S'il ne couvre pas correctement une bibliothèque, consulter sa documentation officielle. Context7 ne constitue jamais une source de vérité pour les règles métier de JDR Hub.
 
 Ne pas lancer tous les plugins pour chaque tâche. Utiliser uniquement ceux qui sont pertinents afin de limiter le bruit, les permissions, le temps d'exécution et les contradictions.
 
