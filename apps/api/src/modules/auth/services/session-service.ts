@@ -1,16 +1,16 @@
 import {
   createHash,
   randomBytes as createRandomBytes,
+  randomUUID,
   timingSafeEqual,
 } from 'node:crypto'
-
-const SESSION_IDLE_TTL_MS = 7 * 24 * 60 * 60 * 1_000
-const SESSION_ABSOLUTE_TTL_MS = 30 * 24 * 60 * 60 * 1_000
+import { AUTH_LIFETIMES } from '../policy.js'
 
 type RandomBytes = () => Uint8Array
 
 export type StoredSessionCredential = {
   absoluteExpiresAt: Date
+  id: string
   idleExpiresAt: Date
   revokedAt: Date | null
   tokenDigest: string
@@ -20,13 +20,13 @@ export type NewSessionCredential = StoredSessionCredential & {
   token: string
 }
 
-function hashToken(token: string): string {
+export function getSessionTokenDigest(token: string): string {
   return createHash('sha256').update(token).digest('base64url')
 }
 
 function matchesTokenDigest(expectedDigest: string, token: string): boolean {
   const expected = Buffer.from(expectedDigest)
-  const received = Buffer.from(hashToken(token))
+  const received = Buffer.from(getSessionTokenDigest(token))
   return expected.length === received.length && timingSafeEqual(expected, received)
 }
 
@@ -41,17 +41,18 @@ export function createSessionCredential({
   const token = Buffer.from(randomBytes()).toString('base64url')
 
   return {
+    id: randomUUID(),
     token,
-    tokenDigest: hashToken(token),
-    idleExpiresAt: new Date(now.getTime() + SESSION_IDLE_TTL_MS),
-    absoluteExpiresAt: new Date(now.getTime() + SESSION_ABSOLUTE_TTL_MS),
+    tokenDigest: getSessionTokenDigest(token),
+    idleExpiresAt: new Date(now.getTime() + AUTH_LIFETIMES.sessionIdleMs),
+    absoluteExpiresAt: new Date(now.getTime() + AUTH_LIFETIMES.sessionAbsoluteMs),
     revokedAt: null,
   }
 }
 
 /** Slides inactivity expiry while never extending the absolute session cap. */
 export function getNextIdleExpiry(now: Date, absoluteExpiresAt: Date): Date {
-  return new Date(Math.min(now.getTime() + SESSION_IDLE_TTL_MS, absoluteExpiresAt.getTime()))
+  return new Date(Math.min(now.getTime() + AUTH_LIFETIMES.sessionIdleMs, absoluteExpiresAt.getTime()))
 }
 
 /** Confirms that an opaque credential is current, unrevoked and matches its digest. */
@@ -61,9 +62,16 @@ export function validateSessionCredential(
   now: Date,
 ): boolean {
   return (
+    isSessionActive(session, now) &&
+    matchesTokenDigest(session.tokenDigest, token)
+  )
+}
+
+/** Determines whether a server-side session remains usable independently of its browser credential. */
+export function isSessionActive(session: StoredSessionCredential, now: Date): boolean {
+  return (
     !session.revokedAt &&
     session.idleExpiresAt.getTime() > now.getTime() &&
-    session.absoluteExpiresAt.getTime() > now.getTime() &&
-    matchesTokenDigest(session.tokenDigest, token)
+    session.absoluteExpiresAt.getTime() > now.getTime()
   )
 }

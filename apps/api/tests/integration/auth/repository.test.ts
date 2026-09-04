@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
-import { createLoginAttempt } from './oauth.js'
-import { createInMemoryAuthRepository } from './repository.js'
-import { createSessionCredential } from './session-service.js'
+import { createLoginAttempt } from '../../../src/modules/auth/services/oauth.js'
+import { createInMemoryAuthRepository } from '../../helpers/in-memory-auth-repository.js'
+import { createSessionCredential } from '../../../src/modules/auth/services/session-service.js'
 
 const now = new Date('2026-09-03T12:00:00.000Z')
 

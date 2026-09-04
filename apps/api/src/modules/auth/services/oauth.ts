@@ -3,10 +3,10 @@ import {
   randomBytes as createRandomBytes,
   timingSafeEqual,
 } from 'node:crypto'
-import type { AuthConfig } from './config.js'
+import type { AuthConfig } from '../config.js'
+import { AUTH_LIFETIMES } from '../policy.js'
 
 const DISCORD_AUTHORIZE_URL = 'https://discord.com/oauth2/authorize'
-const OAUTH_ATTEMPT_TTL_MS = 10 * 60 * 1_000
 
 type RandomBytes = () => Uint8Array
 
@@ -72,7 +72,7 @@ export function createLoginAttempt({
       stateDigest: hashOAuthState(state),
       codeVerifier,
       returnTo: normalizeInternalReturnPath(returnTo),
-      expiresAt: new Date(now.getTime() + OAUTH_ATTEMPT_TTL_MS),
+      expiresAt: new Date(now.getTime() + AUTH_LIFETIMES.oauthAttemptMs),
       consumedAt: null,
     },
   }

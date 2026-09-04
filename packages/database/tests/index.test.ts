@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { createDatabase, getMigrationsFolder, parseDatabaseUrl } from './index.js'
+import { createDatabase, getMigrationsFolder, parseDatabaseUrl } from '../src/index.js'
 
 describe('database configuration', () => {
   it('rejects a missing connection URL', () => {

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   createSessionCredential,
   validateSessionCredential,
-} from './session-service.js'
+} from '../../../src/modules/auth/services/session-service.js'
 
 const now = new Date('2026-09-03T12:00:00.000Z')
 

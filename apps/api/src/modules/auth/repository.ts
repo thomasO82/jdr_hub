@@ -1,13 +1,12 @@
-import { randomUUID } from 'node:crypto'
 import { and, eq, gt, isNull } from 'drizzle-orm'
 import { authSchema, type createDatabase } from '@jdr-hub/database'
 import type { DiscordIdentity } from './discord-client.js'
-import type { OAuthLoginAttempt } from './oauth.js'
+import type { OAuthLoginAttempt } from './services/oauth.js'
 import type {
   NewSessionCredential,
   StoredSessionCredential,
-} from './session-service.js'
-import { getNextIdleExpiry } from './session-service.js'
+} from './services/session-service.js'
+import { getNextIdleExpiry } from './services/session-service.js'
 
 export type AuthenticatedUser = {
   avatarUrl: string | null
@@ -25,8 +24,11 @@ export interface AuthRepository {
   createLoginAttempt(attempt: OAuthLoginAttempt): Promise<void>
   createSession(userId: string, credential: NewSessionCredential): Promise<void>
   findSession(tokenDigest: string): Promise<StoredSession | null>
+  findSessionById(id: string): Promise<StoredSession | null>
   findUser(userId: string): Promise<AuthenticatedUser | null>
-  revokeSession(tokenDigest: string, now: Date): Promise<void>
+  logoutSession(tokenDigest: string, now: Date): Promise<void>
+  revokeUserSessions(userId: string, now: Date): Promise<void>
+  rotateSession(currentTokenDigest: string, replacement: NewSessionCredential, now: Date): Promise<StoredSession | null>
   touchSession(tokenDigest: string, now: Date): Promise<void>
   upsertDiscordUser(identity: DiscordIdentity, now: Date): Promise<AuthenticatedUser>
 }
@@ -78,6 +80,10 @@ export function createPostgresAuthRepository(database: AuthDatabase): AuthReposi
       const [session] = await database.select().from(sessions).where(eq(sessions.tokenDigest, tokenDigest)).limit(1)
       return session ?? null
     },
+    async findSessionById(id) {
+      const [session] = await database.select().from(sessions).where(eq(sessions.id, id)).limit(1)
+      return session ?? null
+    },
     async findUser(userId) {
       const [user] = await database
         .select({ id: users.id, username: users.username, avatarUrl: users.avatarUrl, timezone: users.timezone })
@@ -86,8 +92,59 @@ export function createPostgresAuthRepository(database: AuthDatabase): AuthReposi
         .limit(1)
       return user ?? null
     },
-    async revokeSession(tokenDigest, now) {
-      await database.update(sessions).set({ revokedAt: now }).where(and(eq(sessions.tokenDigest, tokenDigest), isNull(sessions.revokedAt)))
+    async logoutSession(tokenDigest, now) {
+      await database.transaction(async (transaction) => {
+        const [revoked] = await transaction
+          .update(sessions)
+          .set({ revokedAt: now })
+          .where(and(eq(sessions.tokenDigest, tokenDigest), isNull(sessions.revokedAt)))
+          .returning({ userId: sessions.userId })
+        if (revoked) return
+
+        const [stale] = await transaction
+          .select({ userId: sessions.userId })
+          .from(sessions)
+          .where(eq(sessions.tokenDigest, tokenDigest))
+          .limit(1)
+        if (!stale) return
+
+        // A revoked credential presented again may have been copied: revoke its sibling sessions too.
+        await transaction
+          .update(sessions)
+          .set({ revokedAt: now })
+          .where(and(eq(sessions.userId, stale.userId), isNull(sessions.revokedAt)))
+      })
+    },
+    async revokeUserSessions(userId, now) {
+      await database.update(sessions).set({ revokedAt: now }).where(and(eq(sessions.userId, userId), isNull(sessions.revokedAt)))
+    },
+    async rotateSession(currentTokenDigest, replacement, now) {
+      return database.transaction(async (transaction) => {
+        const [current] = await transaction
+          .update(sessions)
+          .set({ revokedAt: now })
+          .where(and(
+            eq(sessions.tokenDigest, currentTokenDigest),
+            isNull(sessions.revokedAt),
+            gt(sessions.idleExpiresAt, now),
+            gt(sessions.absoluteExpiresAt, now),
+          ))
+          .returning()
+
+        if (!current) return null
+
+        const [rotated] = await transaction
+          .insert(sessions)
+          .values({
+            ...replacement,
+            absoluteExpiresAt: current.absoluteExpiresAt,
+            idleExpiresAt: getNextIdleExpiry(now, current.absoluteExpiresAt),
+            lastSeenAt: now,
+            userId: current.userId,
+          })
+          .returning()
+        return rotated ?? null
+      })
     },
     async touchSession(tokenDigest, now) {
       const [session] = await database
@@ -100,75 +157,6 @@ export function createPostgresAuthRepository(database: AuthDatabase): AuthReposi
         .update(sessions)
         .set({ idleExpiresAt: getNextIdleExpiry(now, session.absoluteExpiresAt), lastSeenAt: now })
         .where(and(eq(sessions.tokenDigest, tokenDigest), isNull(sessions.revokedAt)))
-    },
-  }
-}
-
-/** Minimal deterministic repository used by unit and API tests without a real database. */
-export function createInMemoryAuthRepository(): AuthRepository & {
-  debugStoredValues(): string
-} {
-  const attempts = new Map<string, OAuthLoginAttempt>()
-  const usersByDiscordId = new Map<string, AuthenticatedUser>()
-  const sessions = new Map<string, StoredSession>()
-
-  return {
-    async createLoginAttempt(attempt) {
-      if (attempts.has(attempt.stateDigest)) {
-        throw new Error('OAUTH_ATTEMPT_ALREADY_EXISTS')
-      }
-      attempts.set(attempt.stateDigest, { ...attempt })
-    },
-    async consumeLoginAttempt(stateDigest, now) {
-      const stored = attempts.get(stateDigest)
-      if (!stored || stored.consumedAt || stored.expiresAt.getTime() <= now.getTime()) {
-        return null
-      }
-      attempts.set(stateDigest, { ...stored, consumedAt: now })
-      return stored
-    },
-    async upsertDiscordUser(identity) {
-      const existing = usersByDiscordId.get(identity.discordId)
-      const user: AuthenticatedUser = {
-        id: existing?.id ?? randomUUID(),
-        username: identity.username,
-        avatarUrl: identity.avatarUrl,
-        timezone: existing?.timezone ?? 'Europe/Paris',
-      }
-      usersByDiscordId.set(identity.discordId, user)
-      return user
-    },
-    async createSession(userId, credential) {
-      sessions.set(credential.tokenDigest, {
-        userId,
-        tokenDigest: credential.tokenDigest,
-        idleExpiresAt: credential.idleExpiresAt,
-        absoluteExpiresAt: credential.absoluteExpiresAt,
-        revokedAt: credential.revokedAt,
-      })
-    },
-    async findSession(tokenDigest) {
-      return sessions.get(tokenDigest) ?? null
-    },
-    async findUser(userId) {
-      return [...usersByDiscordId.values()].find((user) => user.id === userId) ?? null
-    },
-    async revokeSession(tokenDigest, now) {
-      const session = sessions.get(tokenDigest)
-      if (session && !session.revokedAt) {
-        sessions.set(tokenDigest, { ...session, revokedAt: now })
-      }
-    },
-    async touchSession(tokenDigest, now) {
-      const session = sessions.get(tokenDigest)
-      if (!session || session.revokedAt || session.absoluteExpiresAt.getTime() <= now.getTime()) return
-      sessions.set(tokenDigest, {
-        ...session,
-        idleExpiresAt: getNextIdleExpiry(now, session.absoluteExpiresAt),
-      })
-    },
-    debugStoredValues() {
-      return JSON.stringify({ attempts: [...attempts.values()], sessions: [...sessions.values()] })
     },
   }
 }

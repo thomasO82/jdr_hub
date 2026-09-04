@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { parsePort } from './config.js'
+import { parsePort } from '../../src/config.js'
 
 describe('API port configuration', () => {
   it('uses the local default when PORT is absent', () => {

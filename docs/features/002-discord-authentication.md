@@ -2,7 +2,7 @@
 
 ## Statut
 
-`IN_PROGRESS`
+`MERGED`
 
 ## Branche
 
@@ -15,9 +15,8 @@
 
 ## Pull Request
 
-Non créée : le push de `feat/discord-auth` est effectué, mais l’intégration
-GitHub de cette session ne possède pas l’autorisation nécessaire pour ouvrir la
-PR vers `develop`.
+[PR #4](https://github.com/thomasO82/jdr_hub/pull/4), fusionnée dans `develop`
+le 2026-09-04.
 
 ## Dépendances
 

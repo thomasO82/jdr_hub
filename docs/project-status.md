@@ -8,7 +8,7 @@ Il ne remplace ni les spécifications, ni les décisions d'architecture, ni les 
 
 ## Dernière mise à jour
 
-2026-09-04
+2026-09-05
 
 ## Signification des statuts
 
@@ -26,13 +26,23 @@ Seuls les statuts suivants sont autorisés :
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | DOC-001 | Mise en place du suivi documentaire | `IN_PROGRESS` | `docs/feature-tracking` | Non créée | Documentation uniquement — à consigner dans la fiche | Contrôles documentaires à renseigner | [README du registre](features/README.md) |
 | F00 | Socle monorepo, Docker et CI sécurisée | `MERGED` | `fix/f00-hardening` | [PR #3](https://github.com/thomasO82/jdr_hub/pull/3) | Vérifications finales vertes avant fusion | Audit hautes vulnérabilités vide, réseau DB interne, non-root, digests et healthchecks | [Fiche F00](features/001-monorepo-foundation.md) |
-| F01 | Discord OAuth2 et sessions sécurisées | `IN_PROGRESS` | `feat/discord-auth` | Non créée : intégration GitHub sans droit de création | 60 tests verts ; lint, typecheck et builds verts | Contrôles OAuth/session réalisés ; audit npm : une vulnérabilité modérée transitive esbuild à traiter séparément | [Fiche F01](features/002-discord-authentication.md) |
+| F01 | Discord OAuth2 et sessions sécurisées | `MERGED` | `feat/discord-auth` | [PR #4](https://github.com/thomasO82/jdr_hub/pull/4) | 60 tests verts ; lint, typecheck et builds verts avant fusion | Contrôles OAuth/session réalisés ; audit pnpm : une vulnérabilité modérée transitive esbuild à traiter séparément | [Fiche F01](features/002-discord-authentication.md) |
+| F12 | Durcissement JWT des sessions | `IN_PROGRESS` | `fix/jwt-session-security` | Création bloquée : intégration GitHub sans permission | 77/77 tests verts ; lint, typecheck et builds verts | JWT d’accès, rotation, révocation serveur et CSRF | [Fiche F12](features/003-jwt-session-security.md) |
 
 ## Blocages
 
-Aucun blocage déclaré.
+- 2026-09-04 — F12 : la branche `fix/jwt-session-security` est poussée,
+  mais l'intégration GitHub a refusé la création de PR vers `develop`
+  (`403 Resource not accessible by integration`). La fonctionnalité reste
+  `IN_PROGRESS` jusqu'à ce qu'une identité ayant la permission de création
+  ouvre la PR.
 
-Tout blocage doit être décrit ici avec son impact, sa date d'apparition, sa dépendance éventuelle et la condition nécessaire à sa résolution. Une fonctionnalité ne doit être marquée `BLOCKED` que si le blocage est explicite et actuel.
+## Mise à jour architecture — 2026-09-05
+
+La refactorisation MVC de l'authentification est réalisée sur la branche F12 :
+routes, handlers, services par cas d'usage, cookies, JWT/sessions, OAuth et
+repository sont séparés ; les tests ont été déplacés hors de `src/`. Aucun
+contrat HTTP, schéma, dépendance ou comportement de sécurité n'a été modifié.
 
 ## Prochaines fonctionnalités
 
