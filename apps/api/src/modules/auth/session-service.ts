@@ -1,6 +1,7 @@
 import {
   createHash,
   randomBytes as createRandomBytes,
+  randomUUID,
   timingSafeEqual,
 } from 'node:crypto'
 
@@ -11,6 +12,7 @@ type RandomBytes = () => Uint8Array
 
 export type StoredSessionCredential = {
   absoluteExpiresAt: Date
+  id: string
   idleExpiresAt: Date
   revokedAt: Date | null
   tokenDigest: string
@@ -20,13 +22,13 @@ export type NewSessionCredential = StoredSessionCredential & {
   token: string
 }
 
-function hashToken(token: string): string {
+export function getSessionTokenDigest(token: string): string {
   return createHash('sha256').update(token).digest('base64url')
 }
 
 function matchesTokenDigest(expectedDigest: string, token: string): boolean {
   const expected = Buffer.from(expectedDigest)
-  const received = Buffer.from(hashToken(token))
+  const received = Buffer.from(getSessionTokenDigest(token))
   return expected.length === received.length && timingSafeEqual(expected, received)
 }
 
@@ -41,8 +43,9 @@ export function createSessionCredential({
   const token = Buffer.from(randomBytes()).toString('base64url')
 
   return {
+    id: randomUUID(),
     token,
-    tokenDigest: hashToken(token),
+    tokenDigest: getSessionTokenDigest(token),
     idleExpiresAt: new Date(now.getTime() + SESSION_IDLE_TTL_MS),
     absoluteExpiresAt: new Date(now.getTime() + SESSION_ABSOLUTE_TTL_MS),
     revokedAt: null,
@@ -61,9 +64,16 @@ export function validateSessionCredential(
   now: Date,
 ): boolean {
   return (
+    isSessionActive(session, now) &&
+    matchesTokenDigest(session.tokenDigest, token)
+  )
+}
+
+/** Determines whether a server-side session remains usable independently of its browser credential. */
+export function isSessionActive(session: StoredSessionCredential, now: Date): boolean {
+  return (
     !session.revokedAt &&
     session.idleExpiresAt.getTime() > now.getTime() &&
-    session.absoluteExpiresAt.getTime() > now.getTime() &&
-    matchesTokenDigest(session.tokenDigest, token)
+    session.absoluteExpiresAt.getTime() > now.getTime()
   )
 }

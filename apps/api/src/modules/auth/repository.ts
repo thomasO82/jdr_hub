@@ -20,13 +20,19 @@ export type StoredSession = StoredSessionCredential & {
   userId: string
 }
 
+export type LogoutSessionResult = 'all' | 'none' | 'session'
+
 export interface AuthRepository {
   consumeLoginAttempt(stateDigest: string, now: Date): Promise<OAuthLoginAttempt | null>
   createLoginAttempt(attempt: OAuthLoginAttempt): Promise<void>
   createSession(userId: string, credential: NewSessionCredential): Promise<void>
   findSession(tokenDigest: string): Promise<StoredSession | null>
+  findSessionById(id: string): Promise<StoredSession | null>
   findUser(userId: string): Promise<AuthenticatedUser | null>
+  logoutSession(tokenDigest: string, now: Date): Promise<LogoutSessionResult>
   revokeSession(tokenDigest: string, now: Date): Promise<void>
+  revokeUserSessions(userId: string, now: Date): Promise<void>
+  rotateSession(currentTokenDigest: string, replacement: NewSessionCredential, now: Date): Promise<StoredSession | null>
   touchSession(tokenDigest: string, now: Date): Promise<void>
   upsertDiscordUser(identity: DiscordIdentity, now: Date): Promise<AuthenticatedUser>
 }
@@ -78,6 +84,10 @@ export function createPostgresAuthRepository(database: AuthDatabase): AuthReposi
       const [session] = await database.select().from(sessions).where(eq(sessions.tokenDigest, tokenDigest)).limit(1)
       return session ?? null
     },
+    async findSessionById(id) {
+      const [session] = await database.select().from(sessions).where(eq(sessions.id, id)).limit(1)
+      return session ?? null
+    },
     async findUser(userId) {
       const [user] = await database
         .select({ id: users.id, username: users.username, avatarUrl: users.avatarUrl, timezone: users.timezone })
@@ -86,8 +96,62 @@ export function createPostgresAuthRepository(database: AuthDatabase): AuthReposi
         .limit(1)
       return user ?? null
     },
+    async logoutSession(tokenDigest, now) {
+      return database.transaction(async (transaction) => {
+        const [revoked] = await transaction
+          .update(sessions)
+          .set({ revokedAt: now })
+          .where(and(eq(sessions.tokenDigest, tokenDigest), isNull(sessions.revokedAt)))
+          .returning({ userId: sessions.userId })
+        if (revoked) return 'session'
+
+        const [stale] = await transaction
+          .select({ userId: sessions.userId })
+          .from(sessions)
+          .where(eq(sessions.tokenDigest, tokenDigest))
+          .limit(1)
+        if (!stale) return 'none'
+
+        await transaction
+          .update(sessions)
+          .set({ revokedAt: now })
+          .where(and(eq(sessions.userId, stale.userId), isNull(sessions.revokedAt)))
+        return 'all'
+      })
+    },
     async revokeSession(tokenDigest, now) {
       await database.update(sessions).set({ revokedAt: now }).where(and(eq(sessions.tokenDigest, tokenDigest), isNull(sessions.revokedAt)))
+    },
+    async revokeUserSessions(userId, now) {
+      await database.update(sessions).set({ revokedAt: now }).where(and(eq(sessions.userId, userId), isNull(sessions.revokedAt)))
+    },
+    async rotateSession(currentTokenDigest, replacement, now) {
+      return database.transaction(async (transaction) => {
+        const [current] = await transaction
+          .update(sessions)
+          .set({ revokedAt: now })
+          .where(and(
+            eq(sessions.tokenDigest, currentTokenDigest),
+            isNull(sessions.revokedAt),
+            gt(sessions.idleExpiresAt, now),
+            gt(sessions.absoluteExpiresAt, now),
+          ))
+          .returning()
+
+        if (!current) return null
+
+        const [rotated] = await transaction
+          .insert(sessions)
+          .values({
+            ...replacement,
+            absoluteExpiresAt: current.absoluteExpiresAt,
+            idleExpiresAt: getNextIdleExpiry(now, current.absoluteExpiresAt),
+            lastSeenAt: now,
+            userId: current.userId,
+          })
+          .returning()
+        return rotated ?? null
+      })
     },
     async touchSession(tokenDigest, now) {
       const [session] = await database
@@ -140,6 +204,7 @@ export function createInMemoryAuthRepository(): AuthRepository & {
     },
     async createSession(userId, credential) {
       sessions.set(credential.tokenDigest, {
+        id: credential.id,
         userId,
         tokenDigest: credential.tokenDigest,
         idleExpiresAt: credential.idleExpiresAt,
@@ -150,14 +215,60 @@ export function createInMemoryAuthRepository(): AuthRepository & {
     async findSession(tokenDigest) {
       return sessions.get(tokenDigest) ?? null
     },
+    async findSessionById(id) {
+      return [...sessions.values()].find((session) => session.id === id) ?? null
+    },
     async findUser(userId) {
       return [...usersByDiscordId.values()].find((user) => user.id === userId) ?? null
+    },
+    async logoutSession(tokenDigest, now) {
+      const session = sessions.get(tokenDigest)
+      if (!session) return 'none'
+      if (!session.revokedAt) {
+        sessions.set(tokenDigest, { ...session, revokedAt: now })
+        return 'session'
+      }
+
+      for (const [digest, candidate] of sessions.entries()) {
+        if (candidate.userId === session.userId && !candidate.revokedAt) {
+          sessions.set(digest, { ...candidate, revokedAt: now })
+        }
+      }
+      return 'all'
     },
     async revokeSession(tokenDigest, now) {
       const session = sessions.get(tokenDigest)
       if (session && !session.revokedAt) {
         sessions.set(tokenDigest, { ...session, revokedAt: now })
       }
+    },
+    async revokeUserSessions(userId, now) {
+      for (const [tokenDigest, session] of sessions.entries()) {
+        if (session.userId === userId && !session.revokedAt) {
+          sessions.set(tokenDigest, { ...session, revokedAt: now })
+        }
+      }
+    },
+    async rotateSession(currentTokenDigest, replacement, now) {
+      const current = sessions.get(currentTokenDigest)
+      if (
+        !current ||
+        current.revokedAt ||
+        current.idleExpiresAt.getTime() <= now.getTime() ||
+        current.absoluteExpiresAt.getTime() <= now.getTime()
+      ) return null
+
+      sessions.set(currentTokenDigest, { ...current, revokedAt: now })
+      const rotated: StoredSession = {
+        absoluteExpiresAt: current.absoluteExpiresAt,
+        id: replacement.id,
+        idleExpiresAt: getNextIdleExpiry(now, current.absoluteExpiresAt),
+        revokedAt: null,
+        tokenDigest: replacement.tokenDigest,
+        userId: current.userId,
+      }
+      sessions.set(rotated.tokenDigest, rotated)
+      return rotated
     },
     async touchSession(tokenDigest, now) {
       const session = sessions.get(tokenDigest)
