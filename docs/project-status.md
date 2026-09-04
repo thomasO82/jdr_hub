@@ -26,7 +26,8 @@ Seuls les statuts suivants sont autorisés :
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | DOC-001 | Mise en place du suivi documentaire | `IN_PROGRESS` | `docs/feature-tracking` | Non créée | Documentation uniquement — à consigner dans la fiche | Contrôles documentaires à renseigner | [README du registre](features/README.md) |
 | F00 | Socle monorepo, Docker et CI sécurisée | `MERGED` | `fix/f00-hardening` | [PR #3](https://github.com/thomasO82/jdr_hub/pull/3) | Vérifications finales vertes avant fusion | Audit hautes vulnérabilités vide, réseau DB interne, non-root, digests et healthchecks | [Fiche F00](features/001-monorepo-foundation.md) |
-| F01 | Discord OAuth2 et sessions sécurisées | `IN_PROGRESS` | `feat/discord-auth` | Non créée : intégration GitHub sans droit de création | 60 tests verts ; lint, typecheck et builds verts | Contrôles OAuth/session réalisés ; audit npm : une vulnérabilité modérée transitive esbuild à traiter séparément | [Fiche F01](features/002-discord-authentication.md) |
+| F01 | Discord OAuth2 et sessions sécurisées | `MERGED` | `feat/discord-auth` | [PR #4](https://github.com/thomasO82/jdr_hub/pull/4) | 60 tests verts ; lint, typecheck et builds verts avant fusion | Contrôles OAuth/session réalisés ; audit pnpm : une vulnérabilité modérée transitive esbuild à traiter séparément | [Fiche F01](features/002-discord-authentication.md) |
+| F12 | Durcissement JWT des sessions | `IN_REVIEW` | `fix/jwt-session-security` | À créer vers `develop` | 76/76 tests verts ; lint, typecheck et builds verts | JWT d’accès, rotation, révocation serveur et CSRF | [Fiche F12](features/003-jwt-session-security.md) |
 
 ## Blocages
 
