@@ -9,6 +9,7 @@ const config = parseAuthConfig({
   DISCORD_CLIENT_ID: '123456789012345678',
   DISCORD_CLIENT_SECRET: 'test-only-client-secret',
   DISCORD_REDIRECT_URI: 'https://jdr-hub.example.test/api/auth/discord/callback',
+  JWT_SIGNING_SECRET: 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   NODE_ENV: 'production',
 })
 
@@ -21,7 +22,7 @@ function createTestApp() {
   const repository = createInMemoryAuthRepository()
   registerAuthRoutes(app, {
     config,
-    now: () => new Date('2026-09-03T12:00:00.000Z'),
+    now: () => new Date(),
     repository,
     fetchDiscordIdentity: async () => ({
       discordId: '123456789012345678',
@@ -30,6 +31,12 @@ function createTestApp() {
     }),
   })
   return { app, repository }
+}
+
+function cookiePair(response: Response, name: string): string {
+  const cookie = response.headers.getSetCookie().find((value) => value.startsWith(`${name}=`))
+  if (!cookie) throw new Error(`Cookie ${name} is missing`)
+  return cookie.split(';', 1)[0]!
 }
 
 describe('authentication routes', () => {
@@ -49,7 +56,8 @@ describe('authentication routes', () => {
     const state = new URL(start.headers.get('location')!).searchParams.get('state')!
     const callback = await app.request(`/auth/discord/callback?code=test-code&state=${state}`)
     const cookie = callback.headers.get('set-cookie')!
-    const me = await app.request('/me', { headers: { cookie } })
+    const accessCookie = cookiePair(callback, 'jdr_hub_access')
+    const me = await app.request('/me', { headers: { cookie: accessCookie } })
 
     expect(callback.status).toBe(302)
     expect(callback.headers.get('location')).toBe('/tableau-de-bord')
@@ -80,14 +88,15 @@ describe('authentication routes', () => {
     const start = await app.request('/auth/discord')
     const state = new URL(start.headers.get('location')!).searchParams.get('state')!
     const callback = await app.request(`/auth/discord/callback?code=test-code&state=${state}`)
-    const cookie = callback.headers.get('set-cookie')!
+    const accessCookie = cookiePair(callback, 'jdr_hub_access')
+    const refreshCookie = cookiePair(callback, 'jdr_hub_refresh')
 
     expect(
-      (await app.request('/auth/logout', { method: 'POST', headers: { cookie, origin: 'https://attacker.example.test' } })).status,
+      (await app.request('/auth/logout', { method: 'POST', headers: { cookie: refreshCookie, origin: 'https://attacker.example.test' } })).status,
     ).toBe(403)
     expect(
-      (await app.request('/auth/logout', { method: 'POST', headers: { cookie, origin: config.appOrigin } })).status,
+      (await app.request('/auth/logout', { method: 'POST', headers: { cookie: refreshCookie, origin: config.appOrigin } })).status,
     ).toBe(204)
-    expect((await app.request('/me', { headers: { cookie } })).status).toBe(401)
+    expect((await app.request('/me', { headers: { cookie: accessCookie } })).status).toBe(401)
   })
 })

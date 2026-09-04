@@ -6,6 +6,7 @@ const validEnvironment = {
   DISCORD_CLIENT_ID: '123456789012345678',
   DISCORD_CLIENT_SECRET: 'test-only-client-secret',
   DISCORD_REDIRECT_URI: 'https://jdr-hub.example.test/api/auth/discord/callback',
+  JWT_SIGNING_SECRET: 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
   NODE_ENV: 'production',
 }
 
