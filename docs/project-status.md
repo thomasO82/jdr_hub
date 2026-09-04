@@ -26,7 +26,7 @@ Seuls les statuts suivants sont autorisés :
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | DOC-001 | Mise en place du suivi documentaire | `IN_PROGRESS` | `docs/feature-tracking` | Non créée | Documentation uniquement — à consigner dans la fiche | Contrôles documentaires à renseigner | [README du registre](features/README.md) |
 | F00 | Socle monorepo, Docker et CI sécurisée | `MERGED` | `fix/f00-hardening` | [PR #3](https://github.com/thomasO82/jdr_hub/pull/3) | Vérifications finales vertes avant fusion | Audit hautes vulnérabilités vide, réseau DB interne, non-root, digests et healthchecks | [Fiche F00](features/001-monorepo-foundation.md) |
-| F01 | Discord OAuth2 et sessions sécurisées | `IN_PROGRESS` | `feat/discord-auth` | À créer | 60 tests verts ; lint, typecheck et builds verts | Contrôles OAuth/session réalisés ; audit npm : une vulnérabilité modérée transitive esbuild à traiter séparément | [Fiche F01](features/002-discord-authentication.md) |
+| F01 | Discord OAuth2 et sessions sécurisées | `IN_REVIEW` | `feat/discord-auth` | À créer | 60 tests verts ; lint, typecheck et builds verts | Contrôles OAuth/session réalisés ; audit npm : une vulnérabilité modérée transitive esbuild à traiter séparément | [Fiche F01](features/002-discord-authentication.md) |
 
 ## Blocages
 

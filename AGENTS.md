@@ -174,6 +174,12 @@ modifications liées au périmètre, builds, contrôles, commits locaux, Docker 
 développement et préparation de Pull Request. Ne pas interrompre inutilement
 le propriétaire pour demander une confirmation intermédiaire.
 
+Dès qu’une fonctionnalité satisfait les vérifications obligatoires, Codex doit
+créer les commits locaux, pousser sa branche dédiée et ouvrir automatiquement
+une Pull Request vers `develop`, sans demander un choix d’intégration. Après
+l’ouverture, il fournit le lien et s’arrête jusqu’à la revue ou la confirmation
+de fusion du propriétaire.
+
 Demander une validation explicite avant l'ajout ou la mise à jour d'une
 dépendance. Les validations imposées par une règle de sécurité, une opération
 destructive, une migration risquée, un accès interdit ou une coordination

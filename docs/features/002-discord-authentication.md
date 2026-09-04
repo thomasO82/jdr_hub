@@ -2,7 +2,7 @@
 
 ## Statut
 
-`IN_PROGRESS`
+`IN_REVIEW`
 
 ## Branche
 
@@ -15,7 +15,7 @@
 
 ## Pull Request
 
-À créer vers `develop` après vérifications finales.
+À créer vers `develop` ; URL à renseigner immédiatement après l’ouverture.
 
 ## Dépendances
 
@@ -144,3 +144,5 @@ CSRF, validation, logs et RGPD de `docs/security/security-requirements.md`.
 ## Commits importants
 
 - `b81c501` — écran de connexion responsive, test initial et documentation.
+- `ad46d3c` — correction de l’accessibilité des viewports courts et de la
+  préférence de mouvement réduit.
