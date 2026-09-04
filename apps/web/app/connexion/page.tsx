@@ -21,7 +21,7 @@ export default function ConnectionPage() {
           <img
             className={styles.logo}
             src="/branding/logo.svg"
-            alt="Logo JDR Hub"
+            alt=""
           />
           <h1 id="connection-title">JDR Hub</h1>
           <p className={styles.tagline}>Digital Dungeon Master</p>

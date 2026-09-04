@@ -74,7 +74,12 @@ La conception reste documentée dans
 - **Refactor :** styles confinés au CSS module et page conservée sans état
   client ni appel navigateur ; aucune refactorisation comportementale n’était
   nécessaire après le vert.
-- **Non-régression :** `pnpm test` : 21 fichiers de test, 57 tests verts.
+- **Revue :** une revue indépendante a relevé un CTA potentiellement rogné sur
+  viewport court. Un test rouge a reproduit `overflow: hidden`, puis le style
+  a été corrigé pour ne masquer que le débordement horizontal. Deux autres
+  tests rouges ont couvert l’alternative textuelle décorative du logo et la
+  préférence de mouvement réduit.
+- **Non-régression :** `pnpm test` : 21 fichiers de test, 60 tests verts.
 
 ## Sécurité
 
@@ -88,9 +93,11 @@ CSRF, validation, logs et RGPD de `docs/security/security-requirements.md`.
   `dangerouslySetInnerHTML` n’est utilisé.
 - La route d’authentification est `noindex`, afin de ne pas créer une page de
   connexion indexée inutilement.
-- Le test composant vérifie l’unique entrée OAuth, l’absence d’accès invité et
-  l’absence de ressource distante. Les en-têtes et protections du flux OAuth
-  restent couverts par les suites API/infrastructure existantes.
+- Le test smoke vérifie l’unique entrée OAuth, l’absence d’accès invité, de
+  composant client et de ressource distante, ainsi que la cible tactile, le
+  focus visible, le défilement vertical et le mouvement réduit. Les en-têtes
+  et protections du flux OAuth restent couverts par les suites
+  API/infrastructure existantes.
 
 ## Documentation et fichiers principaux
 
@@ -124,11 +131,11 @@ CSRF, validation, logs et RGPD de `docs/security/security-requirements.md`.
 
 ## Commandes et résultats observés
 
-- `pnpm exec vitest run tests/smoke/connection-page.test.ts` : 2 tests verts.
+- `pnpm exec vitest run tests/smoke/connection-page.test.ts` : 5 tests verts.
 - `pnpm --filter @jdr-hub/web build` : build vert ; `/connexion` pré-rendue.
 - `pnpm lint` : vert.
 - `pnpm typecheck` : vert.
-- `pnpm test` : 21 fichiers, 57 tests verts.
+- `pnpm test` : 21 fichiers, 60 tests verts.
 - `pnpm audit` : une vulnérabilité modérée transitive `esbuild` est signalée
   dans le chemin de développement de `drizzle-kit`. Aucune dépendance n’a été
   modifiée dans F01 ; une mise à jour exigerait une validation dédiée du
@@ -136,4 +143,4 @@ CSRF, validation, logs et RGPD de `docs/security/security-requirements.md`.
 
 ## Commits importants
 
-À compléter au moment des commits locaux de la finalisation F01.
+- `b81c501` — écran de connexion responsive, test initial et documentation.
