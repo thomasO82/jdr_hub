@@ -4,9 +4,7 @@ import {
   randomUUID,
   timingSafeEqual,
 } from 'node:crypto'
-
-const SESSION_IDLE_TTL_MS = 7 * 24 * 60 * 60 * 1_000
-const SESSION_ABSOLUTE_TTL_MS = 30 * 24 * 60 * 60 * 1_000
+import { AUTH_LIFETIMES } from './policy.js'
 
 type RandomBytes = () => Uint8Array
 
@@ -46,15 +44,15 @@ export function createSessionCredential({
     id: randomUUID(),
     token,
     tokenDigest: getSessionTokenDigest(token),
-    idleExpiresAt: new Date(now.getTime() + SESSION_IDLE_TTL_MS),
-    absoluteExpiresAt: new Date(now.getTime() + SESSION_ABSOLUTE_TTL_MS),
+    idleExpiresAt: new Date(now.getTime() + AUTH_LIFETIMES.sessionIdleMs),
+    absoluteExpiresAt: new Date(now.getTime() + AUTH_LIFETIMES.sessionAbsoluteMs),
     revokedAt: null,
   }
 }
 
 /** Slides inactivity expiry while never extending the absolute session cap. */
 export function getNextIdleExpiry(now: Date, absoluteExpiresAt: Date): Date {
-  return new Date(Math.min(now.getTime() + SESSION_IDLE_TTL_MS, absoluteExpiresAt.getTime()))
+  return new Date(Math.min(now.getTime() + AUTH_LIFETIMES.sessionIdleMs, absoluteExpiresAt.getTime()))
 }
 
 /** Confirms that an opaque credential is current, unrevoked and matches its digest. */

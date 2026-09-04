@@ -2,8 +2,8 @@ import { randomUUID } from 'node:crypto'
 import { sign, verify } from 'hono/jwt'
 import { z } from 'zod'
 import type { AuthConfig } from './config.js'
+import { AUTH_LIFETIMES } from './policy.js'
 
-const ACCESS_TOKEN_TTL_SECONDS = 15 * 60
 const ACCESS_TOKEN_AUDIENCE = 'jdr-hub-api'
 const ACCESS_TOKEN_PURPOSE = 'jdr-hub-access'
 const MAX_ACCESS_TOKEN_LENGTH = 4_096
@@ -40,7 +40,7 @@ export async function createAccessToken({
 
   return sign({
     aud: ACCESS_TOKEN_AUDIENCE,
-    exp: issuedAt + ACCESS_TOKEN_TTL_SECONDS,
+    exp: issuedAt + AUTH_LIFETIMES.accessTokenSeconds,
     iat: issuedAt,
     iss: config.appOrigin,
     jti: randomUUID(),

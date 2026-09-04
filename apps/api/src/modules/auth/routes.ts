@@ -2,6 +2,7 @@ import { getCookie, setCookie } from 'hono/cookie'
 import type { Context, Hono } from 'hono'
 import { z } from 'zod'
 import type { AuthConfig } from './config.js'
+import { AUTH_LIFETIMES } from './policy.js'
 import type { DiscordIdentity } from './discord-client.js'
 import { fetchDiscordIdentity as defaultFetchDiscordIdentity } from './discord-client.js'
 import { buildDiscordAuthorizationUrl, createLoginAttempt, hashOAuthState, verifyLoginAttempt } from './oauth.js'
@@ -17,7 +18,6 @@ import {
 const ACCESS_COOKIE_NAME = 'jdr_hub_access'
 const LEGACY_COOKIE_NAME = 'jdr_hub_session'
 const REFRESH_COOKIE_NAME = 'jdr_hub_refresh'
-const ACCESS_TOKEN_TTL_MS = 15 * 60 * 1_000
 const callbackQuerySchema = z.object({ code: z.string().min(1).max(2_048), state: z.string().min(1).max(512) })
 
 type RouteDependencies = {
@@ -40,7 +40,7 @@ function error(c: Context<AuthRouteEnv>, status: 400 | 401 | 403) {
   )
 }
 
-function setAuthenticationCookiesWithRefreshCredential(
+function setAuthCookies(
   c: Context<AuthRouteEnv>,
   config: AuthConfig,
   accessToken: string,
@@ -49,7 +49,7 @@ function setAuthenticationCookiesWithRefreshCredential(
   now: Date,
 ) {
   setCookie(c, ACCESS_COOKIE_NAME, accessToken, {
-    expires: new Date(now.getTime() + ACCESS_TOKEN_TTL_MS),
+    expires: new Date(now.getTime() + AUTH_LIFETIMES.accessTokenMs),
     httpOnly: true,
     path: '/api',
     sameSite: 'Lax',
@@ -64,7 +64,7 @@ function setAuthenticationCookiesWithRefreshCredential(
   })
 }
 
-function clearAuthenticationCookies(c: Context<AuthRouteEnv>, config: AuthConfig) {
+function clearAuthCookies(c: Context<AuthRouteEnv>, config: AuthConfig) {
   for (const [name, path] of [
     [ACCESS_COOKIE_NAME, '/api'],
     [REFRESH_COOKIE_NAME, '/api/auth'],
@@ -72,6 +72,39 @@ function clearAuthenticationCookies(c: Context<AuthRouteEnv>, config: AuthConfig
   ] as const) {
     setCookie(c, name, '', { httpOnly: true, maxAge: 0, path, sameSite: 'Lax', secure: config.isProduction })
   }
+}
+
+function hasTrustedOrigin(c: Context<AuthRouteEnv>, config: AuthConfig): boolean {
+  return c.req.header('origin') === config.appOrigin
+}
+
+async function createAccessTokenForSession(
+  config: AuthConfig,
+  session: { id: string; userId: string },
+  now: Date,
+): Promise<string> {
+  return createAccessToken({ config, now, sessionId: session.id, userId: session.userId })
+}
+
+async function findAuthenticatedUser(
+  c: Context<AuthRouteEnv>,
+  config: AuthConfig,
+  repository: AuthRepository,
+  now: Date,
+) {
+  const token = getCookie(c, ACCESS_COOKIE_NAME)
+  if (!token) return null
+
+  const accessToken = await verifyAccessToken({ config, token })
+  if (!accessToken) return null
+
+  const session = await repository.findSessionById(accessToken.sessionId)
+  if (!session || session.userId !== accessToken.userId || !isSessionActive(session, now)) {
+    return null
+  }
+
+  await repository.touchSession(session.tokenDigest, now)
+  return repository.findUser(session.userId)
 }
 
 export function registerAuthRoutes(app: Hono<AuthRouteEnv>, dependencies: RouteDependencies): void {
@@ -95,41 +128,32 @@ export function registerAuthRoutes(app: Hono<AuthRouteEnv>, dependencies: RouteD
       const currentTime = now()
       const credential = createSessionCredential({ now: currentTime })
       await dependencies.repository.createSession(user.id, credential)
-      const accessToken = await createAccessToken({
-        config: dependencies.config,
-        now: currentTime,
-        sessionId: credential.id,
-        userId: user.id,
-      })
-      setAuthenticationCookiesWithRefreshCredential(c, dependencies.config, accessToken, credential.token, credential.absoluteExpiresAt, currentTime)
+      const accessToken = await createAccessTokenForSession(
+        dependencies.config,
+        { id: credential.id, userId: user.id },
+        currentTime,
+      )
+      setAuthCookies(c, dependencies.config, accessToken, credential.token, credential.absoluteExpiresAt, currentTime)
       setCookie(c, LEGACY_COOKIE_NAME, '', { httpOnly: true, maxAge: 0, path: '/', sameSite: 'Lax', secure: dependencies.config.isProduction })
       return c.redirect(attempt.returnTo)
     } catch { return error(c, 400) }
   })
   app.get('/me', async (c) => {
-    const token = getCookie(c, ACCESS_COOKIE_NAME)
-    if (!token) return error(c, 401)
-    const currentTime = now()
-    const accessToken = await verifyAccessToken({ config: dependencies.config, token })
-    if (!accessToken) return error(c, 401)
-    const session = await dependencies.repository.findSessionById(accessToken.sessionId)
-    if (!session || session.userId !== accessToken.userId || !isSessionActive(session, currentTime)) return error(c, 401)
-    await dependencies.repository.touchSession(session.tokenDigest, currentTime)
-    const user = await dependencies.repository.findUser(session.userId)
+    const user = await findAuthenticatedUser(c, dependencies.config, dependencies.repository, now())
     return user ? c.json({ data: user, error: null, meta: { requestId: c.get('requestId') } }) : error(c, 401)
   })
   app.post('/auth/logout', async (c) => {
-    if (c.req.header('origin') !== dependencies.config.appOrigin) return error(c, 403)
+    if (!hasTrustedOrigin(c, dependencies.config)) return error(c, 403)
     const token = getCookie(c, REFRESH_COOKIE_NAME)
     if (token) {
       await dependencies.repository.logoutSession(getSessionTokenDigest(token), now())
     }
-    clearAuthenticationCookies(c, dependencies.config)
+    clearAuthCookies(c, dependencies.config)
     return c.body(null, 204)
   })
 
   app.post('/auth/refresh', async (c) => {
-    if (c.req.header('origin') !== dependencies.config.appOrigin) return error(c, 403)
+    if (!hasTrustedOrigin(c, dependencies.config)) return error(c, 403)
     const token = getCookie(c, REFRESH_COOKIE_NAME)
     if (!token) return error(c, 401)
     const currentTime = now()
@@ -139,13 +163,8 @@ export function registerAuthRoutes(app: Hono<AuthRouteEnv>, dependencies: RouteD
     const replacement = createSessionCredential({ now: currentTime })
     const rotated = await dependencies.repository.rotateSession(session.tokenDigest, replacement, currentTime)
     if (!rotated) return error(c, 401)
-    const accessToken = await createAccessToken({
-      config: dependencies.config,
-      now: currentTime,
-      sessionId: rotated.id,
-      userId: rotated.userId,
-    })
-    setAuthenticationCookiesWithRefreshCredential(c, dependencies.config, accessToken, replacement.token, rotated.absoluteExpiresAt, currentTime)
+    const accessToken = await createAccessTokenForSession(dependencies.config, rotated, currentTime)
+    setAuthCookies(c, dependencies.config, accessToken, replacement.token, rotated.absoluteExpiresAt, currentTime)
     return c.body(null, 204)
   })
 }

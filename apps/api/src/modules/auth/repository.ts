@@ -20,8 +20,6 @@ export type StoredSession = StoredSessionCredential & {
   userId: string
 }
 
-export type LogoutSessionResult = 'all' | 'none' | 'session'
-
 export interface AuthRepository {
   consumeLoginAttempt(stateDigest: string, now: Date): Promise<OAuthLoginAttempt | null>
   createLoginAttempt(attempt: OAuthLoginAttempt): Promise<void>
@@ -29,8 +27,7 @@ export interface AuthRepository {
   findSession(tokenDigest: string): Promise<StoredSession | null>
   findSessionById(id: string): Promise<StoredSession | null>
   findUser(userId: string): Promise<AuthenticatedUser | null>
-  logoutSession(tokenDigest: string, now: Date): Promise<LogoutSessionResult>
-  revokeSession(tokenDigest: string, now: Date): Promise<void>
+  logoutSession(tokenDigest: string, now: Date): Promise<void>
   revokeUserSessions(userId: string, now: Date): Promise<void>
   rotateSession(currentTokenDigest: string, replacement: NewSessionCredential, now: Date): Promise<StoredSession | null>
   touchSession(tokenDigest: string, now: Date): Promise<void>
@@ -97,30 +94,27 @@ export function createPostgresAuthRepository(database: AuthDatabase): AuthReposi
       return user ?? null
     },
     async logoutSession(tokenDigest, now) {
-      return database.transaction(async (transaction) => {
+      await database.transaction(async (transaction) => {
         const [revoked] = await transaction
           .update(sessions)
           .set({ revokedAt: now })
           .where(and(eq(sessions.tokenDigest, tokenDigest), isNull(sessions.revokedAt)))
           .returning({ userId: sessions.userId })
-        if (revoked) return 'session'
+        if (revoked) return
 
         const [stale] = await transaction
           .select({ userId: sessions.userId })
           .from(sessions)
           .where(eq(sessions.tokenDigest, tokenDigest))
           .limit(1)
-        if (!stale) return 'none'
+        if (!stale) return
 
+        // A revoked credential presented again may have been copied: revoke its sibling sessions too.
         await transaction
           .update(sessions)
           .set({ revokedAt: now })
           .where(and(eq(sessions.userId, stale.userId), isNull(sessions.revokedAt)))
-        return 'all'
       })
-    },
-    async revokeSession(tokenDigest, now) {
-      await database.update(sessions).set({ revokedAt: now }).where(and(eq(sessions.tokenDigest, tokenDigest), isNull(sessions.revokedAt)))
     },
     async revokeUserSessions(userId, now) {
       await database.update(sessions).set({ revokedAt: now }).where(and(eq(sessions.userId, userId), isNull(sessions.revokedAt)))
@@ -223,23 +217,17 @@ export function createInMemoryAuthRepository(): AuthRepository & {
     },
     async logoutSession(tokenDigest, now) {
       const session = sessions.get(tokenDigest)
-      if (!session) return 'none'
+      if (!session) return
       if (!session.revokedAt) {
         sessions.set(tokenDigest, { ...session, revokedAt: now })
-        return 'session'
+        return
       }
 
+      // Keep the deterministic test repository aligned with replay protection in PostgreSQL.
       for (const [digest, candidate] of sessions.entries()) {
         if (candidate.userId === session.userId && !candidate.revokedAt) {
           sessions.set(digest, { ...candidate, revokedAt: now })
         }
-      }
-      return 'all'
-    },
-    async revokeSession(tokenDigest, now) {
-      const session = sessions.get(tokenDigest)
-      if (session && !session.revokedAt) {
-        sessions.set(tokenDigest, { ...session, revokedAt: now })
       }
     },
     async revokeUserSessions(userId, now) {
