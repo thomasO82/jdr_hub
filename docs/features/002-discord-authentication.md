@@ -2,7 +2,7 @@
 
 ## Statut
 
-`IN_REVIEW`
+`IN_PROGRESS`
 
 ## Branche
 
@@ -15,7 +15,9 @@
 
 ## Pull Request
 
-À créer vers `develop` ; URL à renseigner immédiatement après l’ouverture.
+Non créée : le push de `feat/discord-auth` est effectué, mais l’intégration
+GitHub de cette session ne possède pas l’autorisation nécessaire pour ouvrir la
+PR vers `develop`.
 
 ## Dépendances
 
