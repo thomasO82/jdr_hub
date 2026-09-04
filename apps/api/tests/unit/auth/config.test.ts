@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { parseAuthConfig } from './config.js'
+import { parseAuthConfig } from '../../../src/modules/auth/config.js'
 
 const validEnvironment = {
   APP_ORIGIN: 'https://jdr-hub.example.test',

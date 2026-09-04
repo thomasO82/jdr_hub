@@ -1,8 +1,8 @@
 import { randomUUID } from 'node:crypto'
 import { sign, verify } from 'hono/jwt'
 import { z } from 'zod'
-import type { AuthConfig } from './config.js'
-import { AUTH_LIFETIMES } from './policy.js'
+import type { AuthConfig } from '../config.js'
+import { AUTH_LIFETIMES } from '../policy.js'
 
 const ACCESS_TOKEN_AUDIENCE = 'jdr-hub-api'
 const ACCESS_TOKEN_PURPOSE = 'jdr-hub-access'

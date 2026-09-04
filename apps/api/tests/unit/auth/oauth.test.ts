@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { parseAuthConfig } from './config.js'
+import { parseAuthConfig } from '../../../src/modules/auth/config.js'
 import {
   buildDiscordAuthorizationUrl,
   createLoginAttempt,
   verifyLoginAttempt,
-} from './oauth.js'
+} from '../../../src/modules/auth/services/oauth.js'
 
 const config = parseAuthConfig({
   APP_ORIGIN: 'https://jdr-hub.example.test',

@@ -19,8 +19,11 @@ Avant chaque fonctionnalité, lire les sections concernées, les règles métier
 Les références visuelles sont dans :
 
 - `docs/maquettes/desktop/`
+
 - `docs/maquettes/mobile/`
+
 - `docs/branding/README.md`
+
 - `docs/branding/logo.svg`
 
 Parcourir récursivement les sous-dossiers et consulter les `screen.png`, `code.html`, `DESIGN.md` et autres fichiers Markdown. Les `code.html` de Stitch sont des références visuelles, pas le code définitif. Ne pas les copier aveuglément.
@@ -30,17 +33,25 @@ Parcourir récursivement les sous-dossiers et consulter les `screen.png`, `code.
 Pour les fonctionnalités :
 
 1. `docs/specifications/cahier-des-charges.md`
+
 2. les décisions plus récentes de `docs/decisions/`
+
 3. les règles explicites de ce fichier
+
 4. les maquettes
 
 Pour le design :
 
 1. `docs/branding/logo.svg`
+
 2. `docs/branding/README.md`
+
 3. la landing page desktop
+
 4. la landing page mobile
+
 5. les autres maquettes
+
 6. le cahier des charges
 
 Toute décision récente qui remplace une règle du cahier des charges doit être documentée dans `docs/decisions/`.
@@ -50,14 +61,23 @@ Toute décision récente qui remplace une règle du cahier des charges doit êtr
 Avant la première implémentation :
 
 1. lire le cahier des charges complet ;
+
 2. parcourir toutes les maquettes desktop et mobile ;
+
 3. associer chaque écran desktop à son équivalent mobile ;
+
 4. lire les fichiers Markdown de Stitch ;
+
 5. inspecter les captures et ressources ;
+
 6. identifier les composants communs ;
+
 7. relever les incohérences fonctionnelles et visuelles ;
+
 8. créer `docs/design-audit.md` ;
+
 9. créer `docs/design-system.md` ;
+
 10. créer `docs/implementation-plan.md`.
 
 Ne pas commencer l'implémentation complète avant cet audit.
@@ -93,43 +113,189 @@ shadcn/ui peut servir de base, mais doit être adapté au design JDR Hub. Ne pas
 Utiliser un monorepo pnpm :
 
 ```text
+
 apps/
-  web/          # Next.js
-  api/          # Hono
+
+  web/          # Next.js
+
+  api/          # Hono
+
 packages/
-  shared/       # Contrats Zod, types et enums partagés
-  database/     # Drizzle, relations et migrations
-  ui/           # Composants partagés si pertinent
+
+  shared/       # Contrats Zod, types et enums partagés
+
+  database/     # Drizzle, relations et migrations
+
+  ui/           # Composants partagés si pertinent
+
 docs/
+
 ```
 
 ### Frontend
 
 - Next.js avec App Router
+
 - TypeScript strict
+
 - Tailwind CSS
+
 - shadcn/ui lorsque pertinent
+
 - Lucide Icons
+
 - Server Components par défaut
+
 - Client Components uniquement si une interaction navigateur l'exige
 
 ### Backend
 
 - Hono et TypeScript strict
+
 - API REST
+
 - Zod
+
 - Drizzle ORM
+
 - PostgreSQL
+
 - Discord OAuth2
+
 - sessions sécurisées
 
 Hono reste un monolithe modulaire. Ne pas créer de microservices pour le MVP. Modules recommandés : `auth`, `users`, `games`, `tags`, `applications`, `invitations`, `members`, `sessions`, `availability`, `scheduling`, `attendance`, `notifications`, `gamification`.
 
 Ne jamais importer le package de base de données dans du code frontend exécuté dans le navigateur.
 
+### Architecture du module d'authentification
+
+Le module `auth` doit rester modulaire. Un fichier de routes ne doit pas regrouper à lui seul la déclaration des endpoints, la gestion des cookies, la validation des JWT, la rotation des sessions, l'accès aux données et l'intégration Discord.
+
+Organisation recommandée :
+
+```text
+apps/api/src/modules/auth/
+  routes.ts
+  handlers.ts
+  cookies.ts
+  config.ts
+  policy.ts
+  repository.ts
+  discord-client.ts
+  services/
+    start-discord-login.ts
+    complete-discord-login.ts
+    authenticate-user.ts
+    refresh-session.ts
+    logout-session.ts
+    access-token.ts
+    session-service.ts
+    oauth.ts
+```
+
+Répartition obligatoire des responsabilités :
+
+- `routes.ts` associe les méthodes et chemins HTTP aux handlers et injecte leurs dépendances ;
+
+- `handlers.ts` lit la requête Hono, appelle les services et construit la réponse HTTP ;
+
+- `cookies.ts` centralise les noms, chemins, durées et options des cookies ainsi que leur création et leur suppression ;
+
+- les services de `services/` coordonnent chacun un seul cas d'usage d'authentification, sans créer de service généraliste fourre-tout ;
+
+- `services/access-token.ts` crée et vérifie uniquement les JWT d'accès ;
+
+- `services/session-service.ts` crée et valide les identifiants de renouvellement, calcule leurs empreintes et contrôle les expirations ;
+
+- `services/oauth.ts` crée et vérifie uniquement les tentatives OAuth ;
+
+- `repository.ts` contient uniquement l'accès aux données et ne dépend ni de `Context` ni d'une réponse HTTP Hono ;
+
+- le repository mémoire est réservé aux helpers de test et n'est jamais exporté par la production ;
+
+- `policy.ts` centralise les durées de vie et les règles de sécurité communes afin d'éviter leur duplication.
+
+Les handlers constituent les contrôleurs MVC HTTP. Ils valident uniquement les
+entrées du transport, appellent un cas d'usage et construisent la réponse.
+Toute logique métier, JWT, session, cookie ou accès aux données est interdite
+dans `routes.ts` et ne doit pas être dupliquée dans les handlers.
+
+Les services applicatifs ne dépendent ni de Hono ni de `Context`. Les
+repositories sont la seule frontière de persistance. Le flux de dépendances
+est unidirectionnel : `routes -> handlers -> services -> repositories`.
+
+Les tests ne sont pas placés dans `src/`. Ils vivent dans `apps/api/tests`,
+`apps/web/tests` ou `packages/*/tests`, organisés par niveau (`unit`, `api`,
+`integration`) et par module. Le répertoire racine `tests/` est réservé aux
+contrôles transverses.
+
+Pour Next.js, `app/**/page.tsx` ne contient que la définition de route et la
+composition de la vue. Les vues résident dans `features/`, les accès à l’API
+dans des services frontend, et aucune logique métier ne doit être implémentée
+dans un composant de présentation.
+
+Avant d'ajouter une fonction dans `routes.ts`, déterminer sa responsabilité. Si elle concerne les cookies, les JWT, les sessions, la logique métier ou la base de données, la placer dans le module spécialisé correspondant. Les routes doivent rester courtes et servir principalement de couche d'orchestration HTTP.
+
+Conserver l'injection explicite des dépendances afin de rendre le module testable :
+
+```ts
+
+type RouteDependencies = {
+config: AuthConfig
+repository: AuthRepository
+now?: () => Date
+fetchDiscordIdentity?: typeof fetchDiscordIdentity
+}
+
+```
+
+Les tests peuvent ainsi remplacer l'horloge et les appels Discord sans utiliser de véritables secrets ni dépendre de services externes.
+
+### Variables d'environnement et configuration
+
+Les vraies valeurs de configuration et les secrets proviennent exclusivement de l'environnement d'exécution. Ne jamais écrire un véritable secret Discord, JWT ou PostgreSQL dans le code source, les tests, les images Docker, les logs ou les Pull Requests.
+
+Lire et valider `process.env` une seule fois au démarrage de l'API :
+
+```ts
+
+const config = parseAuthConfig(process.env)
+
+registerAuthRoutes(app, {
+config,
+repository,
+})
+
+```
+
+Injecter ensuite l'objet `AuthConfig` dans les routes et services concernés. Ne pas lire directement `process.env` depuis `routes.ts`, les handlers, les repositories ou les services métier.
+
+Le chemin attendu de la configuration est :
+
+```text
+
+.env
+-> Docker Compose
+-> environnement du conteneur
+-> process.env
+-> parseAuthConfig(process.env)
+-> AuthConfig
+-> routes et services
+
+```
+
+Le fichier `.env` local ne doit jamais être versionné. Maintenir un `.env.example` sans secrets réels qui documente les variables nécessaires.
+
+Les tests unitaires ne doivent pas charger le `.env`. Ils utilisent des domaines réservés comme `example.test`, des UUID de test et des secrets explicitement fictifs. Ces valeurs factices peuvent être écrites directement dans les tests puisqu'elles ne donnent accès à aucun service réel.
+
 ### Docker
 
 Prévoir `web-next`, `api-hono` et `postgres`. L'architecture doit permettre `/` vers Next.js et `/api/*` vers Hono sous le même domaine.
+
+Docker Compose décrit les services et transmet les variables à leurs conteneurs. La syntaxe `${VARIABLE:-valeur}` définit une valeur locale par défaut et `${VARIABLE:?message}` rend une variable obligatoire au démarrage.
+
+Les valeurs locales non sensibles peuvent posséder une valeur par défaut adaptée au développement. Les secrets doivent être fournis par le `.env` local ou par le gestionnaire de secrets de l'environnement de déploiement. Ne pas dupliquer inutilement dans `.env` une valeur locale déjà définie correctement comme valeur par défaut dans Docker Compose.
 
 ## 9. Règles métier essentielles
 
@@ -138,18 +304,27 @@ Une partie est distincte d'une séance.
 ### One-shot
 
 - type `ONE_SHOT` ;
+
 - une à trois séances maximum ;
+
 - dates éventuellement différentes ;
+
 - fin explicite décidée par le MJ ;
+
 - quatrième séance interdite ;
+
 - progression des séances affichée.
 
 ### Campagne
 
 - type `CAMPAIGN` ;
+
 - nombre de séances non limité ;
+
 - rythme généralement hebdomadaire ;
+
 - séances créées progressivement ;
+
 - active jusqu'à sa fermeture par le MJ.
 
 ### Tags
@@ -169,20 +344,31 @@ Ne pas mettre les règles métier dans React, exposer Drizzle au navigateur, dup
 ## Autonomie d'exécution
 
 Pour une fonctionnalité explicitement autorisée, Codex exécute de manière
+
 autonome les étapes normales de développement : exploration autorisée, tests,
+
 modifications liées au périmètre, builds, contrôles, commits locaux, Docker de
+
 développement et préparation de Pull Request. Ne pas interrompre inutilement
+
 le propriétaire pour demander une confirmation intermédiaire.
 
 Dès qu’une fonctionnalité satisfait les vérifications obligatoires, Codex doit
+
 créer les commits locaux, pousser sa branche dédiée et ouvrir automatiquement
+
 une Pull Request vers `develop`, sans demander un choix d’intégration. Après
+
 l’ouverture, il fournit le lien et s’arrête jusqu’à la revue ou la confirmation
+
 de fusion du propriétaire.
 
 Demander une validation explicite avant l'ajout ou la mise à jour d'une
+
 dépendance. Les validations imposées par une règle de sécurité, une opération
+
 destructive, une migration risquée, un accès interdit ou une coordination
+
 externe restent obligatoires.
 
 ## 11. Workflow Git obligatoire
@@ -190,6 +376,7 @@ externe restent obligatoires.
 Chaque fonctionnalité utilise une branche dédiée créée depuis un `develop` propre et à jour. Les Pull Requests de fonctionnalité ciblent `develop`, puis une promotion séparée et validée peut rejoindre `main`. Il est interdit de développer directement sur `main`.
 
 Ne jamais créer ni utiliser de Git worktree pour ce dépôt. Tout travail doit
+
 être effectué dans l'espace de travail courant, sur la branche dédiée active.
 
 Convention : `feat/`, `fix/`, `refactor/`, `docs/`, `test/` ou `chore/` suivi d'une description courte, par exemple `feat/discord-auth` ou `feat/games-and-tags`.
@@ -199,9 +386,13 @@ Une branche correspond à une seule fonctionnalité cohérente. Ne jamais réuti
 Créer des commits petits et explicites, idéalement :
 
 ```text
+
 test: define expected game creation behavior
+
 feat: implement game creation
+
 refactor: simplify game creation service
+
 ```
 
 Ne pas committer `.env`, secrets, `node_modules`, builds, fichiers temporaires ou `Zone.Identifier`.
@@ -237,9 +428,13 @@ Ordre obligatoire : spécification, critères, cas nominal, erreurs, limites, te
 ## 13. Niveaux de tests
 
 - Unitaires : XP, niveaux, limite one-shot, statuts, permissions, disponibilités, créneaux, candidatures, invitations.
+
 - Intégration : Drizzle/PostgreSQL, contraintes, transactions, relations, sessions, authentification, notifications, idempotence.
+
 - API : validation, authentification, autorisation, statuts HTTP, réponses, erreurs et effets en base.
+
 - Composants : formulaires, filtres, tags, votes, disponibilités, navigation et états UI.
+
 - E2E : Discord, création de partie, recherche, candidature, invitation, vote, planning, absence, séance et XP.
 
 Les tests E2E ne remplacent pas les autres niveaux.
@@ -291,21 +486,37 @@ Avant de terminer une fonctionnalité, vérifier la checklist de `docs/security/
 ## 18. Principes de sécurité minimaux
 
 - OAuth2 Discord avec `state`, URI de redirection stricte, scopes minimaux et protection contre les redirections ouvertes.
+
 - Sessions serveur avec cookies `HttpOnly`, `Secure`, `SameSite`, rotation, expiration et révocation.
+
 - Protection CSRF des routes qui modifient l'état.
+
 - Refus par défaut et autorisation par ressource pour prévenir IDOR et élévations de privilèges.
+
 - Validation Zod stricte avec tailles maximales et rejet des propriétés sensibles/inconnues.
+
 - Requêtes Drizzle paramétrées ; SQL brut révisé et jamais concaténé avec une entrée utilisateur.
+
 - Échappement XSS, sanitisation du contenu riche et absence de `dangerouslySetInnerHTML` non maîtrisé.
+
 - CSP, HSTS, `nosniff`, `frame-ancestors`, `Referrer-Policy` et `Permissions-Policy`.
+
 - Rate limiting adapté par route et prévention du spam.
+
 - Transactions et idempotence pour places, votes, séances, notifications et XP.
+
 - Secrets absents du code, du Git, des images Docker, des logs et des PR.
+
 - PostgreSQL non public avec compte applicatif à privilèges minimaux.
+
 - Conteneurs non-root, images épinglées, healthchecks, ports et capacités minimaux.
+
 - Logs structurés et corrélés sans données sensibles.
+
 - Analyse des dépendances, secrets, code et images en CI.
+
 - Sauvegardes protégées avec restauration testée.
+
 - Minimisation, confidentialité, export et suppression des données personnelles conformément au RGPD.
 
 ## 19. SEO
@@ -355,13 +566,21 @@ Avant d'invoquer un plugin ou une skill, vérifier qu'il est disponible dans la 
 Utiliser les outils selon le contexte suivant :
 
 - nouvelle fonctionnalité, modification de comportement ou décision de conception : `superpowers:brainstorming` avant toute implémentation ;
+
 - plan d'implémentation multi-étapes : `superpowers:writing-plans` après validation de la conception ;
+
 - fonctionnalité ou correction : `superpowers:test-driven-development` avant le code de production ;
+
 - bug, test en échec ou comportement inattendu : `superpowers:systematic-debugging` avant de proposer une correction ;
+
 - développement ou modification significative de l'interface web : `build-web-apps`, en respectant les maquettes et le design system du projet ;
+
 - avant d'affirmer qu'une tâche est terminée ou réussie : `superpowers:verification-before-completion` avec preuves fraîches ;
+
 - création, consultation ou mise à jour d'une Pull Request : plugin GitHub, sans jamais fusionner la PR ;
+
 - ajout ou mise à jour de dépendances : `supply-chain-risk-auditor` s'il est disponible ;
+
 - vérification de conformité entre code et spécifications : `spec-to-code-compliance` s'il est disponible.
 
 Ne pas lancer tous les plugins pour chaque tâche. Utiliser uniquement ceux qui sont pertinents afin de limiter le bruit, les permissions, le temps d'exécution et les contradictions.
@@ -373,8 +592,11 @@ Un plugin, une skill, un serveur MCP, un hook, un sous-agent ou un script hérit
 Avant toute exploration du dépôt, lire `docs/security/ai-access-policy.md` sans tenter d'ouvrir au préalable un fichier potentiellement secret. Cette politique distingue :
 
 - les fichiers dont la lecture et la modification sont interdites ;
+
 - les références lisibles mais non modifiables sans autorisation ;
+
 - les tests et migrations protégés ;
+
 - les fichiers de travail ordinaires.
 
 Cette politique s'applique aux commandes shell, recherches récursives, plugins, skills, serveurs MCP, hooks, sous-agents, scripts et outils externes. Lors d'un inventaire ou d'une recherche, exclure explicitement les chemins interdits. Ne jamais afficher, résumer, copier, indexer, transmettre ou journaliser leur contenu.
@@ -386,55 +608,85 @@ Si un fichier interdit est rencontré, ne signaler que son chemin et la raison d
 ## 28. Suivi et traçabilité des fonctionnalités
 
 - Toute fonctionnalité possède une fiche dans `docs/features/`.
+
 - `docs/project-status.md` donne l'état global du projet.
+
 - La fiche doit être créée ou mise à jour avant la Pull Request.
+
 - Une fonctionnalité ne peut pas être déclarée terminée sans cette fiche.
+
 - La fiche décrit uniquement ce qui a réellement été implémenté.
+
 - Les limites, erreurs restantes et travaux reportés doivent être indiqués.
+
 - Les commandes et résultats des tests doivent être consignés.
+
 - La preuve du cycle TDD Red, Green, Refactor doit être renseignée.
+
 - Les contrôles de sécurité doivent être renseignés.
+
 - Le statut doit être `IN_REVIEW` au moment de l'ouverture de la Pull Request.
+
 - Codex ne doit jamais indiquer `MERGED` avant confirmation du propriétaire.
+
 - Une fiche fusionnée ne doit pas être réécrite silencieusement.
+
 - Une évolution importante doit créer une nouvelle fiche ou une section datée.
+
 - Les décisions architecturales restent enregistrées dans `docs/decisions/`.
+
 - Les secrets, données personnelles et valeurs sensibles ne doivent jamais apparaître dans ces documents.
+
 - `docs/security/ai-access-policy.md` s'applique à tous ces fichiers.
 
 ## 28. Suivi et traçabilité des fonctionnalités
 
 Chaque fonctionnalité doit être documentée afin de conserver une trace précise
+
 de l’état du projet, du contexte initial, du travail réalisé et des éléments
+
 restants.
 
 Les documents de suivi sont :
 
 - `docs/project-status.md` pour la vision globale du projet ;
+
 - `docs/features/` pour les fiches détaillées des fonctionnalités ;
+
 - `docs/decisions/` pour les décisions métier et architecturales importantes.
 
 ### Tableau de suivi global
 
 Avant de commencer une fonctionnalité, mettre à jour
+
 `docs/project-status.md` avec :
 
 - l’identifiant de la fonctionnalité ;
+
 - son nom ;
+
 - son statut ;
+
 - le nom de sa branche ;
+
 - sa fiche détaillée ;
+
 - ses dépendances éventuelles.
 
 Les seuls statuts autorisés sont :
 
 - `PLANNED` : fonctionnalité prévue mais non commencée ;
+
 - `IN_PROGRESS` : développement en cours ;
+
 - `BLOCKED` : développement bloqué ;
+
 - `IN_REVIEW` : implémentation terminée et Pull Request en attente ;
+
 - `MERGED` : Pull Request fusionnée par le propriétaire.
 
 Codex ne doit jamais indiquer `MERGED` avant confirmation explicite du
+
 propriétaire ou vérification de l’état réel de la Pull Request sur GitHub.
 
 GitHub reste la source de vérité pour l’état réel des Pull Requests.
@@ -448,51 +700,83 @@ Chaque fonctionnalité possède une fiche :
 Exemples :
 
 - `docs/features/001-project-foundation.md`
+
 - `docs/features/002-discord-authentication.md`
+
 - `docs/features/003-game-creation.md`
+
 - `docs/features/004-game-tags.md`
 
 La numérotation est croissante et ne doit pas être réutilisée.
 
 La fiche doit être créée au début de la fonctionnalité avec le statut
+
 `IN_PROGRESS`, puis complétée pendant le développement.
 
 Elle doit contenir :
 
 - identifiant et nom ;
+
 - statut ;
+
 - branche ;
+
 - Pull Request ;
+
 - dates ;
+
 - dépendances ;
+
 - contexte ;
+
 - besoin utilisateur ;
+
 - périmètre prévu ;
+
 - fonctionnalités réellement réalisées ;
+
 - parcours utilisateur ;
+
 - règles métier implémentées ;
+
 - architecture et choix techniques ;
+
 - modèle de données et migrations ;
+
 - routes API ;
+
 - pages et composants ;
+
 - tests ajoutés ;
+
 - preuve du cycle TDD Red, Green, Refactor ;
+
 - contrôles de sécurité ;
+
 - documentation technique consultée ;
+
 - fichiers principaux ;
+
 - limites connues ;
+
 - travaux reportés ;
+
 - procédure de vérification manuelle ;
+
 - commits importants ;
+
 - décisions associées.
 
 La fiche doit clairement distinguer :
 
 - ce qui était prévu ;
+
 - ce qui a réellement été réalisé ;
+
 - ce qui reste à faire.
 
 Ne jamais présenter comme réalisée une fonctionnalité absente, incomplète,
+
 désactivée ou non vérifiée.
 
 ### Mise à jour avant Pull Request
@@ -500,16 +784,25 @@ désactivée ou non vérifiée.
 Avant la création de chaque Pull Request :
 
 1. compléter la fiche de fonctionnalité ;
+
 2. consigner les commandes de vérification réellement exécutées ;
+
 3. indiquer les résultats des tests ;
+
 4. consigner la preuve TDD ;
+
 5. consigner les contrôles de sécurité ;
+
 6. documenter les limites et travaux reportés ;
+
 7. passer le statut à `IN_REVIEW` ;
+
 8. mettre à jour `docs/project-status.md` ;
+
 9. inclure la fiche dans la Pull Request.
 
 Une fonctionnalité n’est pas terminée tant que sa fiche et le tableau global
+
 ne sont pas à jour.
 
 ### Après fusion
@@ -517,25 +810,33 @@ ne sont pas à jour.
 Codex ne fusionne jamais la Pull Request.
 
 Après confirmation de la fusion par le propriétaire, passer le statut de la
+
 fonctionnalité à `MERGED` au début de la prochaine branche documentaire ou
+
 fonctionnelle.
 
 Si aucune nouvelle fonctionnalité n’est prévue, effectuer cette synchronisation
+
 dans une Pull Request documentaire dédiée.
 
 ### Protection de l’historique
 
 Une fiche correspondant à une fonctionnalité fusionnée constitue un historique
+
 du projet. Elle ne doit pas être supprimée, réécrite ou corrigée silencieusement.
 
 Une évolution importante doit :
 
 - créer une nouvelle fiche ; ou
+
 - ajouter une section datée explicitement reliée à une nouvelle Pull Request.
 
 Une erreur documentaire peut être corrigée avec une justification claire dans
+
 le diff et la Pull Request.
 
 Les fiches ne doivent jamais contenir de secret, jeton, mot de passe, donnée
+
 personnelle réelle ou contenu interdit par
+
 `docs/security/ai-access-policy.md`.

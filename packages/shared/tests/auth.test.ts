@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { parseCurrentUser } from './auth.js'
+import { parseCurrentUser } from '../src/auth.js'
 
 describe('current-user contract', () => {
   it('returns only the safe local profile fields', () => {

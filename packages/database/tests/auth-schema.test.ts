@@ -1,6 +1,6 @@
 import { getTableColumns, getTableName } from 'drizzle-orm'
 import { describe, expect, it } from 'vitest'
-import { oauthLoginAttempts, sessions, users } from './schema/auth.js'
+import { oauthLoginAttempts, sessions, users } from '../src/schema/auth.js'
 
 describe('authentication database schema', () => {
   it('keeps Discord identities unique and requires a timezone', () => {

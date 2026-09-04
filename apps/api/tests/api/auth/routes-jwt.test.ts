@@ -1,10 +1,10 @@
 import { Hono } from 'hono'
 import { describe, expect, it } from 'vitest'
-import { parseAuthConfig } from './config.js'
-import { createInMemoryAuthRepository } from './repository.js'
-import { registerAuthRoutes, type AuthRouteEnv } from './routes.js'
-import { getSessionTokenDigest } from './session-service.js'
-import { createAccessToken } from './access-token.js'
+import { parseAuthConfig } from '../../../src/modules/auth/config.js'
+import { createInMemoryAuthRepository } from '../../helpers/in-memory-auth-repository.js'
+import { registerAuthRoutes, type AuthRouteEnv } from '../../../src/modules/auth/routes.js'
+import { getSessionTokenDigest } from '../../../src/modules/auth/services/session-service.js'
+import { createAccessToken } from '../../../src/modules/auth/services/access-token.js'
 
 const config = parseAuthConfig({
   APP_ORIGIN: 'https://jdr-hub.example.test',

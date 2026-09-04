@@ -56,6 +56,9 @@ l’authentification par mot de passe et le stockage de token Discord.
   Il supprime dans tous les cas les cookies d'accès, refresh et legacy.
 - Compose transmet les clés JWT seulement à `api-hono`; elles ne sont pas
   exposées au frontend.
+- Le script de démarrage local de l'API charge le `.env` racine avec le
+  mécanisme natif de Node.js ; Docker Compose continue à injecter ses variables
+  sans embarquer ce fichier dans l'image.
 
 ## Parcours utilisateur
 
@@ -70,8 +73,8 @@ restant par révocation serveur.
 
 - Aucun schéma ni migration n'a été ajouté : `sessions.id` est le `sid` et
   `token_digest` reste le seul stockage du secret de refresh.
-- `access-token.ts` isole l'émission et la validation JWT de la gestion des
-  cookies et de la persistance.
+- `services/access-token.ts` isole l'émission et la validation JWT de la gestion
+  des cookies et de la persistance.
 - Le repository ajoute la recherche par ID, la rotation transactionnelle et
   la révocation de toutes les sessions d'un utilisateur.
 - Routes concernées : `GET /me`, `POST /auth/refresh`, `POST /auth/logout`,
@@ -92,9 +95,10 @@ restant par révocation serveur.
   la demande du propriétaire.
 - Tests ajoutés : `config-jwt.test.ts`, `access-token.test.ts`,
   `session-jwt.test.ts`, `repository-jwt.test.ts`, `routes-jwt.test.ts` et
-  `jwt-compose-config.test.ts`.
+  `jwt-compose-config.test.ts`, ainsi que le test du chargement local du
+  `.env`.
 - Vérifications finales observées : `pnpm lint`, `pnpm typecheck`,
-  `pnpm test` (76/76) et `pnpm build` réussissent.
+  `pnpm test` (77/77) et `pnpm build` réussissent.
 
 ## Sécurité
 
@@ -125,6 +129,23 @@ restant par révocation serveur.
 - `apps/api/src/modules/auth/config.ts`
 - `docker-compose.yml` et `.env.example`
 
+## Évolution architecturale — 2026-09-05
+
+La refactorisation MVC demandée a été réalisée sans modifier les contrats :
+
+- les routes Hono déclarent uniquement les endpoints ;
+- les handlers portent le transport HTTP ;
+- chaque parcours d'authentification est coordonné par un service dédié dans
+  `apps/api/src/modules/auth/services/` ;
+- cookies, JWT, sessions et OAuth sont isolés dans leurs modules spécialisés ;
+- le repository de production est PostgreSQL et le repository mémoire vit dans
+  `apps/api/tests/helpers/` ;
+- les tests sont séparés de `src/` par niveau sous `apps/api/tests`, avec les
+  tests frontend et packages dans leurs répertoires dédiés.
+
+Les vues Next.js ont également été déplacées dans `apps/web/features/`; les
+fichiers `app/**/page.tsx` restent des points d'entrée de route et de métadonnées.
+
 ## Vérification manuelle proposée
 
 1. Définir une clé base64url de 32 octets dans l'environnement de l'API.
@@ -138,8 +159,6 @@ restant par révocation serveur.
 
 - Les règles d’autorisation par ressource seront ajoutées dans les modules
   métier concernés ; elles ne seront jamais inférées d’un JWT.
-- Une refactorisation globale de lisibilité est reportée dans une tâche
-  séparée, comme demandé par le propriétaire.
 - La rotation transactionnelle PostgreSQL est couverte par les tests du
   repository en mémoire ; un harnais d'intégration PostgreSQL concurrent dédié
   reste à créer ultérieurement.

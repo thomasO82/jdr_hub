@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { createApiApp } from './app.js'
+import { createApiApp } from '../../src/app.js'
 
 describe('GET /health', () => {
   it('rejects requests larger than the API body limit', async () => {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import { createInMemoryAuthRepository } from './repository.js'
-import { createSessionCredential } from './session-service.js'
+import { createInMemoryAuthRepository } from '../../helpers/in-memory-auth-repository.js'
+import { createSessionCredential } from '../../../src/modules/auth/services/session-service.js'
 
 const createdAt = new Date('2026-09-03T12:00:00.000Z')
 const rotatedAt = new Date('2026-09-04T12:00:00.000Z')

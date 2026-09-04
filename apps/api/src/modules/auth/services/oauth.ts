@@ -3,8 +3,8 @@ import {
   randomBytes as createRandomBytes,
   timingSafeEqual,
 } from 'node:crypto'
-import type { AuthConfig } from './config.js'
-import { AUTH_LIFETIMES } from './policy.js'
+import type { AuthConfig } from '../config.js'
+import { AUTH_LIFETIMES } from '../policy.js'
 
 const DISCORD_AUTHORIZE_URL = 'https://discord.com/oauth2/authorize'
 

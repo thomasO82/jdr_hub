@@ -4,7 +4,7 @@ import {
   randomUUID,
   timingSafeEqual,
 } from 'node:crypto'
-import { AUTH_LIFETIMES } from './policy.js'
+import { AUTH_LIFETIMES } from '../policy.js'
 
 type RandomBytes = () => Uint8Array
 

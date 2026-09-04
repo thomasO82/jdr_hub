@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { createSessionCredential } from './session-service.js'
+import { createSessionCredential } from '../../../src/modules/auth/services/session-service.js'
 
 describe('refresh session credentials', () => {
   it('creates a non-secret UUID session identifier for access-token binding', () => {

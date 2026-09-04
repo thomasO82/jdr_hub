@@ -1,7 +1,7 @@
 import { sign } from 'hono/jwt'
 import { describe, expect, it } from 'vitest'
-import { parseAuthConfig } from './config.js'
-import { createAccessToken, verifyAccessToken } from './access-token.js'
+import { parseAuthConfig } from '../../../src/modules/auth/config.js'
+import { createAccessToken, verifyAccessToken } from '../../../src/modules/auth/services/access-token.js'
 
 const config = parseAuthConfig({
   APP_ORIGIN: 'https://jdr-hub.example.test',
