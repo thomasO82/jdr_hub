@@ -2,7 +2,7 @@
 
 ## Statut
 
-`IN_REVIEW`
+`IN_PROGRESS`
 
 ## Branche
 
@@ -10,7 +10,9 @@
 
 ## Pull Request
 
-À créer vers `develop` après le push de la branche.
+Non créée : la branche a été poussée, mais l'intégration GitHub de cette
+session a reçu `403 Resource not accessible by integration` lors de la
+création vers `develop`.
 
 ## Dates
 
