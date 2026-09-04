@@ -8,7 +8,7 @@ Il ne remplace ni les spécifications, ni les décisions d'architecture, ni les 
 
 ## Dernière mise à jour
 
-2026-09-03
+2026-09-04
 
 ## Signification des statuts
 
@@ -25,7 +25,8 @@ Seuls les statuts suivants sont autorisés :
 | Identifiant | Fonctionnalité | Statut | Branche | Pull Request | Tests | Sécurité | Fiche détaillée |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | DOC-001 | Mise en place du suivi documentaire | `IN_PROGRESS` | `docs/feature-tracking` | Non créée | Documentation uniquement — à consigner dans la fiche | Contrôles documentaires à renseigner | [README du registre](features/README.md) |
-| F00 | Socle monorepo, Docker et CI sécurisée | `IN_PROGRESS` | `fix/f00-hardening` | Sans PR à ce stade | Tests ciblés verts ; vérification finale en cours | Audit hautes vulnérabilités vide, réseau DB interne, non-root, digests et healthchecks | [Fiche F00](features/001-monorepo-foundation.md) |
+| F00 | Socle monorepo, Docker et CI sécurisée | `MERGED` | `fix/f00-hardening` | [PR #3](https://github.com/thomasO82/jdr_hub/pull/3) | Vérifications finales vertes avant fusion | Audit hautes vulnérabilités vide, réseau DB interne, non-root, digests et healthchecks | [Fiche F00](features/001-monorepo-foundation.md) |
+| F01 | Discord OAuth2 et sessions sécurisées | `IN_PROGRESS` | `feat/discord-auth` | Non créée : intégration GitHub sans droit de création | 60 tests verts ; lint, typecheck et builds verts | Contrôles OAuth/session réalisés ; audit npm : une vulnérabilité modérée transitive esbuild à traiter séparément | [Fiche F01](features/002-discord-authentication.md) |
 
 ## Blocages
 

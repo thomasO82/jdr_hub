@@ -1,4 +1,10 @@
-export {}
+import { fileURLToPath } from 'node:url'
+import { drizzle } from 'drizzle-orm/node-postgres'
+import { migrate } from 'drizzle-orm/node-postgres/migrator'
+import { Pool } from 'pg'
+import * as authSchema from './schema/auth.js'
+
+export { authSchema }
 /** Parse and validate the server-only PostgreSQL connection URL. */
 export function parseDatabaseUrl(rawUrl: string | undefined): URL {
   if (!rawUrl) {
@@ -30,8 +36,16 @@ export function createDatabase(rawUrl: string | undefined) {
 
   return {
     client,
-    db: drizzle(client),
+    db: drizzle(client, { schema: authSchema }),
   }
 }
-import { drizzle } from 'drizzle-orm/node-postgres'
-import { Pool } from 'pg'
+
+/** Resolve migrations relative to this package so container startup is independent of cwd. */
+export function getMigrationsFolder(): string {
+  return fileURLToPath(new URL('../migrations', import.meta.url))
+}
+
+/** Apply the package migrations before the API begins handling requests. */
+export async function migrateDatabase(database: ReturnType<typeof createDatabase>): Promise<void> {
+  await migrate(database.db, { migrationsFolder: getMigrationsFolder() })
+}

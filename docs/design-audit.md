@@ -154,6 +154,7 @@ Les noms de répertoires existants sont parfois générés avec des caractères 
 - Utiliser « Planning » comme libellé français commun à la place de l’alternance `Schedule`/`Calendar`.
 - Rendre le footer uniquement sur les pages publiques et utiliser la navigation applicative sur les pages authentifiées.
 - Ne pas reprendre les images distantes, les textes de démonstration, les icônes Material Symbols ou les liens `href="#"` comme production.
+- Pour D03/M03 (connexion Discord), conserver la composition sombre et centrée du desktop à tous les breakpoints. La variante mobile avec illustration distante, titre tronqué et carte vitrée est écartée : le mobile utilise le logo officiel, une hiérarchie identique au desktop et un unique CTA Discord tactile. Décision validée par le propriétaire le 2026-09-04.
 
 ## Points nécessitant validation humaine
 

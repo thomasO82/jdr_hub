@@ -12,11 +12,15 @@
     "lint": "tsc -p tsconfig.json --noEmit",
     "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "build": "tsc -p tsconfig.json",
+    "build": "pnpm --filter @jdr-hub/shared build && pnpm --filter @jdr-hub/database build && tsc -p tsconfig.json",
     "start": "node dist/index.js"
   },
   "dependencies": {
     "@hono/node-server": "^2.1.1",
-    "hono": "^4.13.5"
+    "@jdr-hub/database": "workspace:*",
+    "@jdr-hub/shared": "workspace:*",
+    "drizzle-orm": "0.45.2",
+    "hono": "^4.13.5",
+    "zod": "^4.5.4"
   }
 }
