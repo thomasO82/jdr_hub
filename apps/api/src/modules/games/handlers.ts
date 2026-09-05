@@ -52,7 +52,7 @@ export function createGameHandlers(dependencies: Dependencies) {
       return game ? c.json({ data: game, error: null, meta: { requestId: c.get('requestId') } }) : fail(c, 404)
     },
     publicList: async (c: Context<GameEnv>) => {
-      const parsed = publicGamesQuerySchema.safeParse(c.req.query())
+      const parsed = publicGamesQuerySchema.safeParse({ ...c.req.query(), tagSlugs: c.req.queries().tagSlugs ?? c.req.query('tagSlugs') })
       if (!parsed.success) return fail(c, 400)
       return c.json({ data: await listPublicGames({ query: parsed.data, repository: dependencies.repository }), error: null, meta: { requestId: c.get('requestId') } })
     },

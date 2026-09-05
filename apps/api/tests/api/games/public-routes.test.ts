@@ -20,6 +20,7 @@ function createApp() {
       { id: 'game-1', ownerId: 'owner', slug: 'crypte', title: 'La Crypte', system: 'D&D', description: '<script>alert(1)</script>', type: 'ONE_SHOT', status: 'OPEN', visibility: 'PUBLIC', maxPlayers: 4, tags: ['horror', 'online'] },
       { id: 'game-2', ownerId: 'owner', slug: 'privee', title: 'Privée', system: 'D&D', description: 'Privée', type: 'CAMPAIGN', status: 'OPEN', visibility: 'PRIVATE', maxPlayers: 4, tags: [] },
       { id: 'game-3', ownerId: 'owner', slug: 'fermee', title: 'Fermée', system: 'D&D', description: 'Fermée', type: 'CAMPAIGN', status: 'CLOSED', visibility: 'PUBLIC', maxPlayers: 4, tags: [] },
+      { id: 'game-4', ownerId: 'owner', slug: 'horreur-seule', title: 'Horreur seule', system: 'D&D', description: 'Horreur', type: 'ONE_SHOT', status: 'OPEN', visibility: 'PUBLIC', maxPlayers: 4, tags: ['horror'] },
     ]),
   })
   return app
@@ -45,10 +46,15 @@ describe('public games API routes', () => {
     const response = await createApp().request('/public/slugs')
     expect(response.status).toBe(200)
     expect((await response.json()).data).toEqual({
-      games: ['crypte'],
+      games: ['crypte', 'horreur-seule'],
       gms: ['owner'],
       tags: ['horror', 'online'],
       systems: ['d-d'],
     })
+  })
+
+  it('combines repeated tag filters with AND semantics', async () => {
+    const response = await createApp().request('/public/games?tagSlugs=horror&tagSlugs=online')
+    expect((await response.json()).data.items.map((game: { slug: string }) => game.slug)).toEqual(['crypte'])
   })
 })
