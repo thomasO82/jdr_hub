@@ -15,4 +15,9 @@ describe('web security headers', () => {
     expect(config).toContain('Referrer-Policy')
     expect(config).toContain('frame-ancestors \'none\'')
   })
+
+  it('allows only the Discord CDN used for authenticated avatars', () => {
+    const config = readFileSync(resolve(root, 'apps/web/next.config.mjs'), 'utf8')
+    expect(config).toContain("img-src 'self' data: https://cdn.discordapp.com")
+  })
 })
