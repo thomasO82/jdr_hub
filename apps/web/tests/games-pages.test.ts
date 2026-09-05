@@ -7,6 +7,7 @@ describe('games pages', () => {
   it('keeps route files as thin App Router entries', () => {
     expect(read('../app/parties/page.tsx')).toContain("from '../../features/games/games-list-view'")
     expect(read('../app/parties/nouvelle/page.tsx')).toContain("from '../../../features/games/new-game-view'")
+    expect(read('../app/parties/[slug]/page.tsx')).toContain("from '../../../features/games/game-detail-view'")
   })
 
   it('exposes the essential discovery and creation controls', () => {
@@ -17,5 +18,13 @@ describe('games pages', () => {
     expect(create).toContain('Créer une partie')
     expect(create).toContain('ONE_SHOT')
     expect(create).toContain('CAMPAIGN')
+  })
+
+  it('follows the detail mockup hierarchy', () => {
+    const detail = read('../features/games/game-detail-view.tsx')
+    expect(detail).toContain('La Crypte Maudite')
+    expect(detail).toContain('Synopsis')
+    expect(detail).toContain("Rejoindre l'aventure")
+    expect(detail).toContain('Détails de la partie')
   })
 })

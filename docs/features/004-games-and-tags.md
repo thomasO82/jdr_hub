@@ -41,7 +41,10 @@ dans `packages/shared`. Les migrations sont non destructives.
   tags en logique `AND`, validation des tags actifs et archivage propriétaire.
 - Services, handlers et routes Hono `GET/POST /games`, `GET/PATCH/DELETE
   /games/:id` et `GET /tags`.
-- Tests unitaires et API : 50 tests API verts ; suite monorepo : 88 tests verts.
+- Pages Next.js `/parties`, `/parties/nouvelle` et `/parties/[slug]` avec une
+  hiérarchie visuelle alignée sur les maquettes D02, D04 et D05 : recherche,
+  création, hero de partie, synopsis, tags, candidature et détails.
+- Tests unitaires et API : suite monorepo : 91 tests verts.
 
 ## Tests et sécurité
 
@@ -52,5 +55,7 @@ restent à compléter avant l’ouverture de la PR.
 
 ## Limites
 
-La recherche publique, les pages SEO, les candidatures, les membres et les
-séances seront traitées dans des fonctionnalités dédiées.
+La liste et la page détail utilisent encore des données de présentation ; le
+branchement SSR sur `GET /games` et `GET /games/:id`, les pages SEO complètes,
+les candidatures, les membres et les séances seront traités dans des
+fonctionnalités dédiées.
