@@ -10,7 +10,9 @@ F05
 `feat/availability-and-player-search`
 
 ## Pull Request
-Non créée.
+Création tentée automatiquement après le push ; l’intégration GitHub a refusé
+l’opération (`403 Resource not accessible by integration`). Le propriétaire doit
+ouvrir la PR manuellement depuis la branche poussée.
 
 ## Dates
 - Début : 2026-09-05
@@ -85,7 +87,8 @@ le module auth existant. Aucun secret réel n’a été ajouté.
 - les exceptions ne sont pas encore soustraites du calcul de compatibilité (la
   compatibilité actuelle porte sur la semaine type) ;
 - séances, votes, invitations et notifications restent hors F05 ;
-- la PR doit être poussée et ouverte vers `develop` après la vérification finale.
+- la PR est poussée mais doit être ouverte manuellement vers `develop` à cause
+  du blocage d’intégration GitHub.
 
 ## Dépendances et documentation consultée
 

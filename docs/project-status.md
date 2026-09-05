@@ -49,6 +49,10 @@ Seuls les statuts suivants sont autorisés :
   (`403 Resource not accessible by integration`). La fonctionnalité reste
   `IN_PROGRESS` jusqu'à ce qu'une identité ayant la permission de création
   ouvre la PR.
+- 2026-09-05 — F05 : la branche `feat/availability-and-player-search` est
+  poussée et vérifiée, mais l'intégration GitHub a refusé la création de PR
+  vers `develop` (`403 Resource not accessible by integration`). La
+  fonctionnalité reste `IN_PROGRESS` jusqu'à l'ouverture manuelle de la PR.
 
 ## Mise à jour architecture — 2026-09-05
 
