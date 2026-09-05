@@ -48,6 +48,9 @@ dans `packages/shared`. Les migrations sont non destructives.
   détails.
 - Client serveur Next.js branché sur les réponses publiques de l’API pour le
   catalogue filtré et la fiche par slug, avec états vide et erreur explicites.
+- Interface migrée vers Tailwind CSS v4 uniquement : tokens globaux Arcane,
+  shell partagé, connexion Discord, catalogue, détail et création sans CSS
+  Module ni style inline.
 - Migration de données idempotente avec un référentiel initial de tags actifs
   pour les filtres et la création de partie.
 - Tests unitaires, API, structure visuelle, typographie et formulaire : suite

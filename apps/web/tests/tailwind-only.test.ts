@@ -19,6 +19,17 @@ function findCssModules(directory: string): string[] {
   return found
 }
 
+function findFiles(directory: string, extension: string): string[] {
+  const found: string[] = []
+  for (const entry of readdirSync(directory, { withFileTypes: true })) {
+    if (entry.name === '.next' || entry.name === 'node_modules') continue
+    const path = join(directory, entry.name)
+    if (entry.isDirectory()) found.push(...findFiles(path, extension))
+    else if (entry.name.endsWith(extension)) found.push(path)
+  }
+  return found
+}
+
 describe('Tailwind-only frontend architecture', () => {
   it('uses one global Tailwind entrypoint and no CSS modules', () => {
     expect(existsSync(join(webRoot, 'app/globals.css'))).toBe(true)
@@ -33,5 +44,11 @@ describe('Tailwind-only frontend architecture', () => {
     expect(read('app/globals.css')).toContain('--font-body:')
     expect(read('app/globals.css')).toContain('--font-label:')
     expect(read('postcss.config.mjs')).toContain("'@tailwindcss/postcss'")
+  })
+
+  it('keeps all component styling in Tailwind classes', () => {
+    expect(findFiles(webRoot, '.css')).toEqual([join(webRoot, 'app/globals.css')])
+    const sourceFiles = [...findFiles(join(webRoot, 'app'), '.tsx'), ...findFiles(join(webRoot, 'features'), '.tsx')]
+    expect(sourceFiles.some((path) => readFileSync(path, 'utf8').includes('style={{'))).toBe(false)
   })
 })
