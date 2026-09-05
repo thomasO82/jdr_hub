@@ -2,8 +2,8 @@ import Link from 'next/link'
 import styles from './games-view.module.css'
 
 const examples = [
-  { title: 'La Crypte Maudite', system: 'D&D 5e · One-shot', gm: 'AventureFictive', tags: ['horror', 'débutant'] },
-  { title: 'Les Chroniques d’Avalon', system: 'Pathfinder · Campagne', gm: 'Morgane', tags: ['fantasy', 'roleplay'] },
+  { slug: 'la-crypte-maudite', title: 'La Crypte Maudite', system: 'D&D 5e · One-shot', gm: 'AventureFictive', tags: ['horror', 'débutant'] },
+  { slug: 'chroniques-avalon', title: 'Les Chroniques d’Avalon', system: 'Pathfinder · Campagne', gm: 'Morgane', tags: ['fantasy', 'roleplay'] },
 ]
 
 export function GamesListView() {
@@ -31,7 +31,17 @@ export function GamesListView() {
           <p className={styles.filterNote}>Tous les tags doivent correspondre à la partie.</p>
         </form>
         <div className={styles.grid}>
-          {examples.map((game) => <article className={styles.card} key={game.title}><h2>{game.title}</h2><p className={styles.meta}>{game.system} · MJ : {game.gm}</p><ul className={styles.tags}>{game.tags.map((tag) => <li className={styles.tag} key={tag}>{tag}</li>)}</ul></article>)}
+          {examples.map((game) => (
+            <article className={styles.card} key={game.slug}>
+              <Link className={styles.cardLink} href={`/parties/${game.slug}`}>
+                <h2>{game.title}</h2>
+                <p className={styles.meta}>{game.system} · MJ : {game.gm}</p>
+                <ul className={styles.tags}>
+                  {game.tags.map((tag) => <li className={styles.tag} key={tag}>{tag}</li>)}
+                </ul>
+              </Link>
+            </article>
+          ))}
         </div>
       </section>
     </main>

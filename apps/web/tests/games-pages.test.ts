@@ -15,6 +15,7 @@ describe('games pages', () => {
     const create = read('../features/games/new-game-view.tsx')
     expect(list).toContain('Rechercher une partie')
     expect(list).toContain('Tous les tags doivent correspondre')
+    expect(list).toContain('/parties/${game.slug}')
     expect(create).toContain('Créer une partie')
     expect(create).toContain('ONE_SHOT')
     expect(create).toContain('CAMPAIGN')
