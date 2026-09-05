@@ -12,4 +12,10 @@ describe('players API client', () => {
     expect(requests[0]?.url).toBe('http://api.test/players?q=L%C3%A9o%20%26%20co&system=D%26D%205e&dayOfWeek=2&startMinute=1080&endMinute=1320&page=1&pageSize=20')
     expect(requests[0]?.init?.credentials).toBe('include')
   })
+
+  it('keeps the response status so the UI can distinguish an expired session', async () => {
+    const api = createPlayersApi({ baseUrl: 'http://api.test', fetcher: async () => new Response('{}', { status: 401 }) })
+    expect(await api.search()).toBeNull()
+    expect(api.lastStatus()).toBe(401)
+  })
 })

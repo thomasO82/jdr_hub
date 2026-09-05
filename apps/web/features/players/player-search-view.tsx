@@ -9,6 +9,7 @@ import { PlayerCard } from './player-card'
 const defaultQuery: PlayerQuery = { page: 1, pageSize: 20 }
 
 export function PlayerSearchView({ initialQuery = defaultQuery }: { initialQuery?: Partial<PlayerQuery> }) {
+  const [api] = useState(() => createPlayersApi())
   const [query, setQuery] = useState<Partial<PlayerQuery>>({ ...defaultQuery, ...initialQuery })
   const [page, setPage] = useState<PlayersPage | null>(null)
   const [loading, setLoading] = useState(true)
@@ -17,7 +18,7 @@ export function PlayerSearchView({ initialQuery = defaultQuery }: { initialQuery
 
   useEffect(() => {
     setLoading(true); setError(false)
-    void createPlayersApi().search(query).then((result) => { if (!result) setError(true); setPage(result); setLoading(false) })
+    void api.search(query).then((result) => { if (!result) setError(true); setPage(result); setLoading(false) })
   }, [query])
 
   function update(key: keyof PlayerQuery, value: string) {
@@ -41,7 +42,8 @@ export function PlayerSearchView({ initialQuery = defaultQuery }: { initialQuery
             <section aria-live="polite">
               {!filtersOpen && <button className="mb-4 rounded-lg border border-outline-variant bg-surface px-4 py-2 text-sm font-semibold text-primary lg:hidden" type="button" onClick={() => setFiltersOpen(true)}>Afficher les filtres</button>}
               {loading && <p className="rounded-xl border border-dashed border-outline-variant bg-surface p-10 text-center text-sm text-on-surface-variant" role="status">Recherche des joueurs…</p>}
-              {!loading && error && <p className="rounded-xl border border-error/30 bg-error-container p-10 text-center text-sm text-on-error-container" role="alert">La recherche est indisponible. Réessayez dans un instant.</p>}
+              {!loading && error && api.lastStatus() !== 401 && <p className="rounded-xl border border-error/30 bg-error-container p-10 text-center text-sm text-on-error-container" role="alert">La recherche est indisponible. Réessayez dans un instant.</p>}
+              {!loading && error && api.lastStatus() === 401 && <p className="rounded-xl border border-error/30 bg-error-container p-10 text-center text-sm text-on-error-container" role="alert">Votre session a expiré. Reconnectez-vous pour rechercher des joueurs.</p>}
               {!loading && !error && page && page.items.length === 0 && <p className="rounded-xl border border-dashed border-outline-variant bg-surface p-10 text-center text-sm text-on-surface-variant">Aucun joueur ne correspond à vos filtres.</p>}
               {!loading && !error && page && page.items.length > 0 && <><div className="grid gap-4 md:grid-cols-2">{page.items.map((player: PlayerSummary) => <PlayerCard key={player.id} player={player} />)}</div><div className="mt-6 flex items-center justify-between"><button className="rounded-lg border border-outline-variant bg-surface px-4 py-2 text-sm font-semibold disabled:opacity-40" type="button" disabled={query.page === 1} onClick={() => setQuery((current) => ({ ...current, page: Math.max(1, Number(current.page ?? 1) - 1) }))}>Précédent</button><span className="text-sm text-on-surface-variant">Page {page.page}</span><button className="rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-on-primary disabled:opacity-40" type="button" disabled={page.items.length < page.pageSize} onClick={() => setQuery((current) => ({ ...current, page: Number(current.page ?? 1) + 1 }))}>Suivant</button></div></>}
             </section>
