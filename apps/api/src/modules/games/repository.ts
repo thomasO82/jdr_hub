@@ -1,4 +1,4 @@
-import { and, desc, eq, ilike, inArray } from 'drizzle-orm'
+import { and, desc, eq, ilike, inArray, sql } from 'drizzle-orm'
 import { gameSchema, type createDatabase } from '@jdr-hub/database'
 import type { CreateGameInput, GameQuery, UpdateGameInput } from '@jdr-hub/shared'
 
@@ -64,6 +64,16 @@ export function createPostgresGamesRepository(database: Database): GamesReposito
     async list(query) {
       const conditions = [eq(games.visibility, 'PUBLIC'), eq(games.status, 'OPEN')]
       if (query.q) conditions.push(ilike(games.title, `%${query.q}%`))
+      if (query.gmId) conditions.push(eq(games.ownerId, query.gmId))
+      if (query.tagSlugs.length > 0) {
+        const matching = await database.select({ gameId: gameTags.gameId }).from(gameTags)
+          .innerJoin(tags, eq(gameTags.tagId, tags.id))
+          .where(and(eq(tags.isActive, true), inArray(tags.slug, query.tagSlugs)))
+          .groupBy(gameTags.gameId)
+          .having(sql`count(distinct ${tags.slug}) = ${query.tagSlugs.length}`)
+        if (matching.length === 0) return { page: query.page, pageSize: query.pageSize, items: [] }
+        conditions.push(inArray(games.id, matching.map((row) => row.gameId)))
+      }
       const rows = await database.select().from(games).where(and(...conditions)).orderBy(desc(games.createdAt)).limit(query.pageSize).offset((query.page - 1) * query.pageSize)
       const items = await Promise.all(rows.map(async (game) => ({ ...game, type: game.type as GameRecord['type'], status: game.status as GameRecord['status'], visibility: game.visibility as GameRecord['visibility'], tags: await readTags(game.id) })))
       return { page: query.page, pageSize: query.pageSize, items }
