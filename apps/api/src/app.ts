@@ -4,6 +4,8 @@ import type { AuthConfig } from './modules/auth/config.js'
 import type { AuthRepository } from './modules/auth/repository.js'
 import { registerGamesRoutes } from './modules/games/routes.js'
 import type { GamesDependencies } from './modules/games/routes.js'
+import { registerApplicationRoutes } from './modules/applications/routes.js'
+import type { ApplicationsDependencies } from './modules/applications/handlers.js'
 
 type ApiVariables = {
   requestId: string
@@ -22,7 +24,7 @@ const SECURITY_HEADERS = {
   'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
 } as const
 
-export function createApiApp(options?: { auth: { config: AuthConfig; repository: AuthRepository }; games?: GamesDependencies }): ApiApp {
+export function createApiApp(options?: { auth: { config: AuthConfig; repository: AuthRepository }; games?: GamesDependencies; applications?: ApplicationsDependencies }): ApiApp {
   const app = new Hono<{ Variables: ApiVariables }>()
 
   app.use('*', async (c, next) => {
@@ -78,6 +80,9 @@ export function createApiApp(options?: { auth: { config: AuthConfig; repository:
   }
   if (options?.games) {
     registerGamesRoutes(app, options.games)
+  }
+  if (options?.applications) {
+    registerApplicationRoutes(app, options.applications)
   }
 
   app.notFound((c) =>

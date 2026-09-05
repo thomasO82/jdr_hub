@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import type { PublicGame } from '@jdr-hub/shared'
 import { AppShell } from '../layout/app-shell'
+import { ApplicationForm } from '../applications/application-form'
 
 export function GameDetailView({ game }: { game: PublicGame }) {
   return (
@@ -26,7 +27,7 @@ export function GameDetailView({ game }: { game: PublicGame }) {
               <ul className="m-0 flex list-none flex-wrap gap-2 p-0">{game.tags.map((tag) => <li className="rounded-full bg-primary-fixed px-2 py-1 font-body text-xs font-semibold text-on-primary-fixed" key={tag.slug}>#{tag.name}</li>)}</ul>
             </article>
             <aside className="grid content-start gap-6 lg:col-span-1">
-              <section className="rounded-2xl border border-primary-fixed-dim bg-primary-fixed/50 p-7 text-center"><h2 className="m-0 font-display text-2xl font-semibold">Rejoindre l'aventure</h2><p className="mt-3 font-body leading-relaxed text-on-surface-variant">Les candidatures sont ouvertes.</p><button className="mt-3 min-h-11 w-full rounded-lg border-0 bg-primary px-4 font-body font-semibold text-on-primary transition-colors hover:bg-primary-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary" type="button">Postuler pour rejoindre</button></section>
+              <section className="rounded-2xl border border-primary-fixed-dim bg-primary-fixed/50 p-7 text-center"><h2 className="m-0 font-display text-2xl font-semibold">Rejoindre l'aventure</h2><p className="mt-3 font-body leading-relaxed text-on-surface-variant">Les candidatures sont ouvertes.</p><span className="sr-only">Postuler pour rejoindre</span><ApplicationForm gameId={game.slug} /></section>
               <section className="rounded-2xl border border-surface-container-highest bg-surface p-5 shadow-sm"><h2 className="m-0 font-display text-xl font-semibold">Détails de la partie</h2><dl className="mt-5 grid gap-4">{[['Système', game.system], ['Joueurs', `${game.maxPlayers} places maximum`], ['Type', game.type === 'CAMPAIGN' ? 'Campagne' : 'One-shot'], ['Statut', game.status === 'ACTIVE' ? 'En cours' : 'Inscriptions ouvertes']].map(([label, value]) => <div key={label}><dt className="font-label text-xs font-bold uppercase tracking-wider text-on-surface-variant">{label}</dt><dd className="m-0 mt-1 font-body">{value}</dd></div>)}</dl></section>
             </aside>
           </div>

@@ -31,10 +31,19 @@ Seuls les statuts suivants sont autorisés :
 | F02 | Parties, tags et cycle de vie | `MERGED` | `feat/games-and-tags` | [PR #7](https://github.com/thomasO82/jdr_hub/pull/7) | 89 tests monorepo verts au moment de la fusion | Contrôles d’autorisation, validation stricte et invariants métier | [Fiche F02](features/004-games-and-tags.md) |
 | REF-001 | Migration frontend Tailwind-only | `IN_PROGRESS` | `refactor/tailwind-only-frontend` | Non créée | 106 tests monorepo verts ; lint, typecheck et build verts | Aucun changement de contrat ; contrôle architectural CSS et focus accessibles | [Fiche REF-001](features/005-tailwind-only-frontend.md) |
 | F03 | Catalogue public, détail et SEO | `IN_PROGRESS` | `feat/public-games-and-seo` | Non créée | 120 tests monorepo verts ; lint, typecheck et build verts | Projection sans identifiants, visibilité publique, validation stricte, filtres AND et slugs sitemap | [Fiche F03](features/006-public-games-and-seo.md) |
+| F04 | Candidatures et roster | `IN_PROGRESS` | `feat/applications` | Création bloquée : intégration GitHub sans permission | 135 tests monorepo verts ; lint, typecheck, build et Docker web verts | Autorisation par ressource, anti-doublon, transaction de capacité, origine et validation stricte | [Fiche F04](features/007-applications.md) |
+| DEV-001 | Données de développement | `IN_PROGRESS` | `feat/development-seeds` | Non créée | 59 fichiers, 141 tests verts ; lint, typecheck et build verts | Données fictives uniquement, pas de suppression ni de secret | [Fiche DEV-001](features/008-development-seeds.md) |
+| DEV-002 | Commandes de développement | `IN_PROGRESS` | `chore/developer-commands` | Non créée | 60 fichiers, 142 tests verts ; lint et typecheck verts | Alias Docker Compose sans modification de sécurité | [Fiche DEV-002](features/009-developer-commands.md) |
+| DEV-003 | Drizzle Studio local | `IN_PROGRESS` | `chore/drizzle-studio` | Non créée | 61 fichiers, 146 tests verts ; lint, typecheck, build et image Studio vérifiés | Port local uniquement, réseau PostgreSQL privé, conteneur non-root | [Fiche DEV-003](features/010-drizzle-studio.md) |
 
 ## Blocages
 
 - 2026-09-04 — F12 : la branche `fix/jwt-session-security` est poussée,
+  mais l'intégration GitHub a refusé la création de PR vers `develop`
+  (`403 Resource not accessible by integration`). La fonctionnalité reste
+  `IN_PROGRESS` jusqu'à ce qu'une identité ayant la permission de création
+  ouvre la PR.
+- 2026-09-05 — F04 : la branche `feat/applications` est poussée et vérifiée,
   mais l'intégration GitHub a refusé la création de PR vers `develop`
   (`403 Resource not accessible by integration`). La fonctionnalité reste
   `IN_PROGRESS` jusqu'à ce qu'une identité ayant la permission de création

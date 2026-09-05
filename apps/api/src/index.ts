@@ -5,6 +5,7 @@ import { parsePort } from './config.js'
 import { parseAuthConfig } from './modules/auth/config.js'
 import { createPostgresAuthRepository } from './modules/auth/repository.js'
 import { createPostgresGamesRepository } from './modules/games/repository.js'
+import { createPostgresApplicationRepository } from './modules/applications/repository.js'
 
 async function startApi(): Promise<void> {
   const port = parsePort(process.env.PORT)
@@ -17,6 +18,7 @@ async function startApi(): Promise<void> {
     fetch: createApiApp({
       auth: { config: authConfig, repository: authRepository },
       games: { authConfig, authRepository, repository: createPostgresGamesRepository(database.db) },
+      applications: { authConfig, authRepository, repository: createPostgresApplicationRepository(database.db) },
     }).fetch,
     port,
   })

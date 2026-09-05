@@ -1,4 +1,4 @@
-import { index, integer, pgTable, primaryKey, timestamp, uuid, varchar, text, boolean } from 'drizzle-orm/pg-core'
+import { index, integer, pgTable, primaryKey, timestamp, unique, uuid, varchar, text, boolean } from 'drizzle-orm/pg-core'
 import { users } from './auth.js'
 
 export const games = pgTable('games', {
@@ -36,4 +36,31 @@ export const gameTags = pgTable('game_tags', {
   index('game_tags_tag_id_index').on(table.tagId),
 ])
 
-export const gameSchema = { games, tags, gameTags }
+export const applications = pgTable('applications', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  gameId: uuid('game_id').notNull().references(() => games.id, { onDelete: 'cascade' }),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  message: varchar('message', { length: 1_000 }),
+  status: varchar('status', { length: 16 }).notNull().default('PENDING'),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  unique('applications_game_user_unique').on(table.gameId, table.userId),
+  index('applications_game_id_index').on(table.gameId),
+  index('applications_user_id_index').on(table.userId),
+  index('applications_status_index').on(table.status),
+])
+
+export const gameMembers = pgTable('game_members', {
+  gameId: uuid('game_id').notNull().references(() => games.id, { onDelete: 'cascade' }),
+  userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  role: varchar('role', { length: 16 }).notNull().default('PLAYER'),
+  status: varchar('status', { length: 16 }).notNull().default('ACTIVE'),
+  joinedAt: timestamp('joined_at', { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  primaryKey({ columns: [table.gameId, table.userId] }),
+  index('game_members_user_id_index').on(table.userId),
+  index('game_members_game_status_index').on(table.gameId, table.status),
+])
+
+export const gameSchema = { games, tags, gameTags, applications, gameMembers }
