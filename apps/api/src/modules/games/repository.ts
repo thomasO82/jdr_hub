@@ -29,6 +29,7 @@ type Database = ReturnType<typeof createDatabase>['db']
 
 export function createPostgresGamesRepository(database: Database): GamesRepository {
   const { games, gameTags, tags } = gameSchema
+  const readTags = async (gameId: string) => (await database.select({ slug: tags.slug }).from(gameTags).innerJoin(tags, eq(gameTags.tagId, tags.id)).where(eq(gameTags.gameId, gameId))).map((tag) => tag.slug)
   return {
     async create(input) {
       const { tags: tagSlugs, ...gameInput } = input
@@ -43,13 +44,18 @@ export function createPostgresGamesRepository(database: Database): GamesReposito
     async findById(id) {
       const [game] = await database.select().from(games).where(eq(games.id, id)).limit(1)
       if (!game) return null
-      const tagRows = await database.select({ slug: tags.slug }).from(gameTags).innerJoin(tags, eq(gameTags.tagId, tags.id)).where(eq(gameTags.gameId, id))
-      return { ...game, type: game.type as GameRecord['type'], status: game.status as GameRecord['status'], visibility: game.visibility as GameRecord['visibility'], tags: tagRows.map((tag) => tag.slug) }
+      return { ...game, type: game.type as GameRecord['type'], status: game.status as GameRecord['status'], visibility: game.visibility as GameRecord['visibility'], tags: await readTags(id) }
     },
     async update(id, ownerId, input) {
       const { tags: _tags, ...gameInput } = input
       const [game] = await database.update(games).set({ ...gameInput, updatedAt: new Date() }).where(and(eq(games.id, id), eq(games.ownerId, ownerId))).returning()
-      return game ? { ...game, type: game.type as GameRecord['type'], status: game.status as GameRecord['status'], visibility: game.visibility as GameRecord['visibility'], tags: [] } : null
+      if (!game) return null
+      if (input.tags) {
+        await database.delete(gameTags).where(eq(gameTags.gameId, id))
+        const tagRows = await database.select({ id: tags.id }).from(tags).where(and(eq(tags.isActive, true), inArray(tags.slug, input.tags)))
+        if (tagRows.length > 0) await database.insert(gameTags).values(tagRows.map((tag) => ({ gameId: id, tagId: tag.id })))
+      }
+      return { ...game, type: game.type as GameRecord['type'], status: game.status as GameRecord['status'], visibility: game.visibility as GameRecord['visibility'], tags: await readTags(id) }
     },
     async archive(id, ownerId) {
       const result = await database.update(games).set({ status: 'CLOSED', updatedAt: new Date() }).where(and(eq(games.id, id), eq(games.ownerId, ownerId))).returning({ id: games.id })
@@ -59,7 +65,8 @@ export function createPostgresGamesRepository(database: Database): GamesReposito
       const conditions = [eq(games.visibility, 'PUBLIC'), eq(games.status, 'OPEN')]
       if (query.q) conditions.push(ilike(games.title, `%${query.q}%`))
       const rows = await database.select().from(games).where(and(...conditions)).orderBy(desc(games.createdAt)).limit(query.pageSize).offset((query.page - 1) * query.pageSize)
-      return { page: query.page, pageSize: query.pageSize, items: rows.map((game) => ({ ...game, type: game.type as GameRecord['type'], status: game.status as GameRecord['status'], visibility: game.visibility as GameRecord['visibility'], tags: [] })) }
+      const items = await Promise.all(rows.map(async (game) => ({ ...game, type: game.type as GameRecord['type'], status: game.status as GameRecord['status'], visibility: game.visibility as GameRecord['visibility'], tags: await readTags(game.id) })))
+      return { page: query.page, pageSize: query.pageSize, items }
     },
     async listActiveTags() {
       return database.select({ name: tags.name, slug: tags.slug }).from(tags).where(eq(tags.isActive, true)).orderBy(tags.name)
