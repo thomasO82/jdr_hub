@@ -108,6 +108,22 @@ Créer des composants réutilisables : boutons, champs, sélecteurs, filtres, ta
 
 shadcn/ui peut servir de base, mais doit être adapté au design JDR Hub. Ne pas remplacer les maquettes par une interface shadcn générique.
 
+### Typographie obligatoire
+
+La typographie de référence est commune à toutes les pages applicatives :
+
+- `Hanken Grotesk` pour les titres, le nom de la marque et les éléments de
+  hiérarchie (`h1`, `h2`, `h3`) ;
+- `Inter` pour le texte courant, les champs, les boutons et la navigation ;
+- `Geist` pour les labels, catégories, métadonnées et données compactes.
+
+Les fontes doivent être chargées au niveau du layout global et non remplacées
+par une pile de polices système seule. Si elles sont chargées depuis un CDN,
+les domaines doivent être déclarés explicitement dans la CSP ; une solution
+auto-hébergée est préférable lorsque les contraintes de build le permettent.
+Toute nouvelle page ou composant doit reprendre ces rôles et conserver les
+tailles, poids et interlignes documentés dans `docs/design-system.md`.
+
 ## 8. Architecture technique
 
 Utiliser un monorepo pnpm :
