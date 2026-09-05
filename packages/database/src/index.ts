@@ -37,7 +37,7 @@ export function createDatabase(rawUrl: string | undefined) {
 
   return {
     client,
-    db: drizzle(client, { schema: authSchema }),
+    db: drizzle(client, { schema: { ...authSchema, ...gameSchema } }),
   }
 }
 
