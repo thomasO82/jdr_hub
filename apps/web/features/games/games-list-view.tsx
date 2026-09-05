@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { createGamesApi, type GamesPage } from './games-api'
+import { FiltersToggle } from './filters-toggle'
 import styles from './games-view.module.css'
 
 type SearchParams = Record<string, string | string[] | undefined>
@@ -57,14 +58,16 @@ export async function GamesListView({ searchParams = {} }: { searchParams?: Sear
             <span className="sr-only">Rechercher une partie</span>
             <input className={styles.input} name="q" placeholder="Rechercher une partie" defaultValue={typeof searchParams.q === 'string' ? searchParams.q : ''} />
           </label>
-          <label>
-            <span className="sr-only">Filtrer par tags</span>
-            <select className={styles.select} name="tagSlugs" multiple defaultValue={selectedTagValues}>
-              {tags?.map((tag) => <option value={tag.slug} key={tag.slug}>{tag.name}</option>)}
-            </select>
-          </label>
-          <button className={styles.primary} type="submit">Rechercher</button>
-          <p className={styles.filterNote}>Tous les tags doivent correspondre à la partie.</p>
+          <FiltersToggle>
+            <label>
+              <span className="sr-only">Filtrer par tags</span>
+              <select className={styles.select} name="tagSlugs" multiple defaultValue={selectedTagValues}>
+                {tags?.map((tag) => <option value={tag.slug} key={tag.slug}>{tag.name}</option>)}
+              </select>
+            </label>
+            <button className={styles.primary} type="submit">Rechercher</button>
+            <p className={styles.filterNote}>Tous les tags doivent correspondre à la partie.</p>
+          </FiltersToggle>
         </form>
         <div className={styles.grid}>
           {result?.items.map((game) => <GameCard game={game} key={game.id} />)}

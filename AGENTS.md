@@ -341,6 +341,16 @@ Avant chaque fonctionnalité : relire la spécification, consulter `docs/impleme
 
 Ne pas mettre les règles métier dans React, exposer Drizzle au navigateur, dupliquer inutilement les contrats, utiliser `any` sans justification, masquer une erreur TypeScript, ajouter une dépendance sans justification ou modifier des fichiers sans rapport avec la tâche. Utiliser pnpm.
 
+### Messages d'erreur utilisateur
+
+Toute erreur visible dans l'interface doit être traduite en français clair et
+indiquer, lorsque c'est possible, l'action à effectuer. Le frontend ne doit
+jamais afficher directement une exception, une stack trace, le texte brut d'une
+réponse API ou un détail interne. Les composants utilisent le traducteur partagé
+des erreurs et conservent uniquement le `requestId` pour le diagnostic interne.
+Les messages ne doivent révéler ni secret, ni donnée personnelle, ni existence
+d'une ressource privée.
+
 ## Autonomie d'exécution
 
 Pour une fonctionnalité explicitement autorisée, Codex exécute de manière
