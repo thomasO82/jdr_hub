@@ -194,3 +194,11 @@
 - [ ] Migration is additive, reviewed and applied successfully to a test PostgreSQL database.
 - [ ] Desktop/mobile pages match the approved maquettes and use only Tailwind for styling.
 - [ ] Documentation and project status are complete before the PR.
+
+## État d’exécution — 2026-09-05
+
+- Tâches 1, 2, 3, 4, 6 et 7 réalisées sur `feat/availability-and-player-search`.
+- Tâche 5 (scénario PostgreSQL dédié) reste à exécuter avec une base de test isolée.
+- Les tests de schéma, services, API et composants sont verts ; aucun test
+  existant n’a été supprimé ou affaibli.
+- La vérification finale et l’ouverture de la Pull Request restent à faire.

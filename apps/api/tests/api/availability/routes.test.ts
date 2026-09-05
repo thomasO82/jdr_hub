@@ -58,4 +58,16 @@ describe('availability API routes', () => {
     expect((await result.json()).data.items[0]).not.toHaveProperty('rules')
     expect(availabilityRepository.replacements).toHaveLength(0)
   })
+
+  it('limits repeated availability writes for the authenticated user', async () => {
+    const { app, cookie } = await createTestApp()
+    const headers = { cookie, origin: config.appOrigin, 'content-type': 'application/json' }
+    const payload = { timezone: 'Europe/Paris', rules: [], exceptions: [], preferences: { availabilityPublic: false, invitationNotifications: true, experienceLevel: null }, preferredSystems: [] }
+    const statuses: number[] = []
+    for (let attempt = 0; attempt < 21; attempt += 1) {
+      statuses.push((await app.request('/availability', { method: 'PUT', headers, body: JSON.stringify(payload) })).status)
+    }
+    expect(statuses.slice(0, 20).every((status) => status === 200)).toBe(true)
+    expect(statuses[20]).toBe(429)
+  })
 })

@@ -18,12 +18,24 @@ export type AvailabilityDependencies = {
 
 export type AvailabilityRouteEnv = { Variables: { requestId: string } }
 
-function error(c: Context<AvailabilityRouteEnv>, status: 400 | 401 | 403) {
+function error(c: Context<AvailabilityRouteEnv>, status: 400 | 401 | 403 | 429) {
   return c.json({ data: null, error: { code: 'AVAILABILITY_ERROR', message: 'Availability request failed' }, meta: { requestId: c.get('requestId') } }, status)
 }
 
 export function createAvailabilityHandlers(dependencies: AvailabilityDependencies) {
   const now = dependencies.now ?? (() => new Date())
+  const limits = new Map<string, { startedAt: number; count: number }>()
+  function allowed(userId: string, limit: number): boolean {
+    const currentTime = Date.now()
+    const current = limits.get(userId)
+    if (!current || currentTime - current.startedAt >= 60_000) {
+      limits.set(userId, { startedAt: currentTime, count: 1 })
+      return true
+    }
+    if (current.count >= limit) return false
+    current.count += 1
+    return true
+  }
   async function currentUser(c: Context<AvailabilityRouteEnv>) {
     const token = readAccessToken(c)
     return token ? authenticateUser({ config: dependencies.authConfig, repository: dependencies.authRepository, token, now: now() }) : null
@@ -47,6 +59,7 @@ export function createAvailabilityHandlers(dependencies: AvailabilityDependencie
       const user = await currentUser(c)
       if (!user) return error(c, 401)
       if (!trustedOrigin(c)) return error(c, 403)
+      if (!allowed(user.id, 20)) return error(c, 429)
       const parsed = availabilityPayloadSchema.safeParse(await c.req.json().catch(() => null))
       if (!parsed.success) return error(c, 400)
       try {
