@@ -1,231 +1,94 @@
 # F05 — Disponibilités et recherche de joueurs
 
 ## Identifiant
-
 F05
 
 ## Statut
-
 `IN_PROGRESS`
 
 ## Branche
-
 `feat/availability-and-player-search`
 
-## Lien ou numéro de Pull Request
-
+## Pull Request
 Non créée.
 
 ## Dates
-
 - Début : 2026-09-05
 - Fin : Non terminée
 
-## Dépendances
-
-### Prévues
-
-- F01 — authentification et sessions ;
-- F02 — parties, systèmes et tags ;
-- socle Next.js, Hono, PostgreSQL et Drizzle.
-
-### Réalisées ou constatées
-
-- Les sessions et repositories auth existants sont disponibles.
-- Les contrats et routes des parties existants sont disponibles.
-
-### Restantes
-
-- Aucune dépendance bloquante identifiée.
-
-## Contexte et besoin
-
-### Prévu
-
-Permettre à un utilisateur de déclarer ses créneaux récurrents et ses
-exceptions, puis permettre à un MJ authentifié de rechercher des joueurs par
-nom, système préféré et compatibilité agrégée.
-
-### Réalisé
-
-La conception détaillée est proposée dans
-`docs/superpowers/specs/2026-09-05-availability-and-player-search-design.md`.
-
-### Restant à faire
-
-L’implémentation API, la migration, les pages web et les tests restent à
-réaliser.
-
-## Périmètre prévu
-
-- règles hebdomadaires jour/minute ;
-- exceptions d’indisponibilité datées ;
-- préférences de visibilité et de notification ;
-- recherche de joueurs avec projection sans horaires précis ;
-- pages `/disponibilites` et `/joueurs` responsive selon les maquettes.
-
-## Fonctionnalités effectivement réalisées
-
-- Aucune fonctionnalité métier livrée à ce stade ; seule la conception est
-  documentée.
-
-## Parcours utilisateur
-
-### Prévu
-
-L’utilisateur ouvre ses disponibilités, modifie la grille et les préférences,
-enregistre, puis un MJ ouvre la recherche de joueurs et applique ses filtres.
-
-### Réalisé
-
-Non implémenté.
-
-### Restant à faire
-
-Le parcours complet et ses états d’erreur doivent être construits et vérifiés.
-
-## Règles métier
-
-### Prévues
-
-- minutes hebdomadaires interprétées dans le fuseau IANA du profil ;
-- plages bornées, positives et sans chevauchement ;
-- exceptions ponctuelles qui ignorent la semaine type ;
-- horaires précis privés par défaut ;
-- compatibilité renvoyée uniquement sous forme agrégée et selon la visibilité.
-
-### Implémentées
-
-- Aucune.
-
-### Non couvertes ou reportées
-
-- conversion vers les séances et votes, réservée à F06.
-
-## Architecture et choix techniques
-
-### Prévu
-
-Module Hono `availability` séparé en routes, handlers, services et repository,
-contrats Zod dans `packages/shared`, repository Drizzle côté API uniquement et
-composants Tailwind réutilisant `AppShell`.
-
-### Réalisé
-
-- Spécification d’architecture écrite et relue ; implémentation en attente de
-  validation du propriétaire.
-
-### Restant à faire
-
-- créer le module API, les contrats, la migration et les composants web ;
-- intégrer la protection CSRF et le rate limiting prévus.
-
-## Modèle de données et migrations
-
-### Prévu
-
-Créer `availability_rules`, `availability_exceptions`, `user_preferences` et
-`user_preferred_systems` avec index utilisateur et contraintes de clés
-étrangères. La migration sera additive et non destructive.
-
-### Réalisé
-
-Aucune migration.
-
-### Restant à faire
-
-Implémenter les tables, contraintes, transaction de remplacement et tests
-d’intégration PostgreSQL.
-
-## Routes API
-
-### Prévues
-
-- `GET /availability` ;
-- `PUT /availability` ;
-- `GET /players`.
-
-### Implémentées
-
-Aucune.
-
-### Restantes
-
-Toutes les routes prévues.
-
-## Interface et composants
-
-### Prévus
-
-- grille desktop et navigation par jour mobile pour les disponibilités ;
-- exceptions, préférences, états loading/empty/error ;
-- recherche de joueurs, filtres, cartes et pagination ;
-- navigation `AppShell` avec les liens `/disponibilites` et `/joueurs`.
-
-### Réalisés
-
-Aucun.
-
-### Restants
-
-Tous les écrans et composants prévus.
-
-## Tests
-
-### Prévus
-
-- unitaires : intervalles, fuseaux, DST, chevauchements et compatibilité ;
-- API : authentification, CSRF, validation, projection et erreurs ;
-- intégration : remplacement transactionnel et contraintes ;
-- composants : grille, toggles, filtres, états et responsive.
-
-### Réalisés
-
-Aucun test F05 ; les tests existants restent inchangés.
-
-### Restants
-
-Écrire les tests en premier selon la spécification de conception.
-
-## Preuve TDD Red, Green, Refactor
-
-### Red
-
-Pas encore commencé ; les tests seront écrits avant toute implémentation.
-
-### Green
-
-Non commencé.
-
-### Refactor
-
-Non commencé.
+## Contexte et périmètre
+
+F05 permet à un utilisateur de renseigner ses créneaux récurrents, son fuseau,
+ses exceptions et ses préférences, puis à un utilisateur authentifié de
+rechercher des joueurs par pseudo, système et compatibilité agrégée. Les
+horaires précis restent privés : `/players` ne renvoie jamais les règles ou
+exceptions d’un autre utilisateur.
+
+## Réalisé
+
+- contrats Zod partagés avec bornes et rejet des propriétés inconnues ;
+- validation des fuseaux IANA et chevauchements sans mutation des entrées ;
+- tables Drizzle `availability_rules`, `availability_exceptions`,
+  `user_preferences` et `user_preferred_systems` ;
+- migration additive `0004_availability-and-player-preferences.sql` ;
+- repository Drizzle transactionnel, indépendant de Hono ;
+- services séparés `get-availability`, `replace-availability` et
+  `search-players` ;
+- routes `GET /availability`, `PUT /availability` (origine stricte) et
+  `GET /players` ;
+- pages Tailwind `/disponibilites` et `/joueurs`, états chargement/vide/erreur,
+  responsive et navigation AppShell ;
+- projections joueurs limitées au profil public et à une compatibilité booléenne.
+
+## Architecture et données
+
+La validation d’environnement reste au démarrage API. Les handlers lisent la
+requête, authentifient la session, valident le transport et appellent les
+services ; les services ne dépendent pas de Hono. Le remplacement s’effectue
+dans une transaction et met à jour le fuseau du profil utilisateur.
+
+## Routes et parcours
+
+- `GET /availability` lit uniquement le snapshot de l’utilisateur courant ;
+- `PUT /availability` remplace le snapshot après authentification, contrôle
+  d’origine et validation stricte ;
+- `GET /players` exige une session, accepte des filtres bornés et renvoie des
+  cartes sans disponibilité détaillée ;
+- `/disponibilites` permet de modifier grille, fuseau et préférences ;
+- `/joueurs` propose recherche, système, jour et pagination.
+
+## Tests et preuve TDD
+
+Tests écrits avant chaque implémentation puis exécutés en rouge : contrats et
+politique, services, routes API, client web, pages et structure Tailwind.
+Après implémentation, les suites ciblées puis la suite monorepo sont vertes.
+
+- tests F05 ciblés : 23 assertions ;
+- suite monorepo : 72 fichiers, 172 tests passés ;
+- type-check et lint monorepo passés ;
+- build API et Next.js passé (Turbopack relancé avec permissions de processus).
+
+Les tests PostgreSQL dédiés restent à ajouter/exécuter avec une base de test
+isolée ; les tests de schéma et le repository mémoire couvrent déjà les contrats
+et invariants sans dépendre d’un `.env`.
 
 ## Sécurité
 
-### Contrôles prévus
+Session obligatoire pour les trois routes, origine exacte pour la mutation,
+validation Zod stricte, pagination bornée, projection sans créneaux détaillés et
+aucun `userId` fourni par le navigateur. Les cookies et JWT restent gérés par
+le module auth existant. Aucun secret réel n’a été ajouté.
 
-- session obligatoire pour les endpoints privés ;
-- origine stricte/CSRF sur `PUT /availability` ;
-- aucun `userId` client pour la ressource courante ;
-- réponses agrégées sans horaires ou exceptions d’autrui ;
-- validation Zod, pagination bornée et rate limiting ;
-- logs sans données de disponibilité précises.
+## Limites et travaux reportés
 
-### Vérifications réalisées
+- les exceptions ne sont pas encore soustraites du calcul de compatibilité (la
+  compatibilité actuelle porte sur la semaine type) ;
+- séances, votes, invitations et notifications restent hors F05 ;
+- la PR doit être poussée et ouverte vers `develop` après la vérification finale.
 
-Aucune.
+## Dépendances et documentation consultée
 
-## Documentation consultée
-
-- `docs/specifications/cahier-des-charges.md` ;
-- `docs/implementation-plan.md` ;
-- `docs/security/security-requirements.md` ;
-- maquettes desktop/mobile de recherche de joueurs et disponibilités ;
-- `docs/superpowers/specs/2026-09-05-availability-and-player-search-design.md`.
-
-## Limites connues et travaux reportés
-
-- La conception doit encore être approuvée avant le plan d’implémentation.
-- Les séances, votes et notifications restent hors F05.
-- La Pull Request n’est pas créée.
+F01, F02, le socle Next.js/Hono/PostgreSQL/Drizzle/Tailwind,
+`docs/specifications/cahier-des-charges.md`, `docs/security/security-requirements.md`,
+`docs/security/ai-access-policy.md`, les maquettes desktop/mobile, la fiche de
+conception et le plan F05.
