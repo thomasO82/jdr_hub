@@ -10,7 +10,8 @@ F06
 `feat/sessions-scheduling`
 
 ## Pull Request
-Non créée.
+Non créée automatiquement : `gh` n'est pas installé dans l'environnement.
+Ouverture manuelle : https://github.com/thomasO82/jdr_hub/pull/new/feat/sessions-scheduling
 
 ## Dates
 
@@ -93,3 +94,9 @@ secret ou horaire privé d'un autre utilisateur n'est exposé.
   l'agenda mobile ; les vues semaine/jour de la maquette restent décoratives ;
 - l'ouverture de la PR interviendra après les vérifications et reste sous
   réserve des permissions GitHub.
+
+## Blocage de livraison
+
+La branche est poussée et vérifiée, mais la PR doit être ouverte manuellement
+avec le lien ci-dessus. Le statut reste `IN_PROGRESS` jusqu'à l'ouverture
+effective de la PR.
