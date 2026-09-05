@@ -11,6 +11,7 @@
     "dev:up": "docker compose -f docker-compose.yml up -d --wait",
     "dev:rebuild": "docker compose -f docker-compose.yml up -d --build --wait",
     "db:seed": "docker compose -f docker-compose.yml run --rm api-hono node node_modules/@jdr-hub/database/dist/seed-cli.js",
+    "db:studio": "docker compose --profile tools up --build db-studio",
     "dev:down": "docker compose -f docker-compose.yml down",
     "audit": "pnpm audit"
   },

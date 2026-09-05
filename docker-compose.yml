@@ -56,6 +56,28 @@ services:
     security_opt:
       - no-new-privileges:true
 
+  db-studio:
+    build:
+      context: .
+      dockerfile: docker/db-studio/Dockerfile
+    profiles:
+      - tools
+    init: true
+    ports:
+      - "127.0.0.1:4983:4983"
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-jdr_hub_app}:${POSTGRES_PASSWORD:-local-development-only}@postgres:5432/${POSTGRES_DB:-jdr_hub_dev}
+    networks:
+      - application
+      - database-internal
+    depends_on:
+      postgres:
+        condition: service_healthy
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+
   api-hono:
     build:
       context: .

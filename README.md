@@ -38,7 +38,19 @@ docker compose -f docker-compose.yml run --rm api-hono node node_modules/@jdr-hu
 ```
 
 Les raccourcis du workspace sont `pnpm dev:up`, `pnpm dev:rebuild`,
-`pnpm db:seed` et `pnpm dev:down`.
+`pnpm db:seed`, `pnpm db:studio` et `pnpm dev:down`.
+
+Pour inspecter la base de développement avec Drizzle Studio, démarrez la
+stack PostgreSQL puis lancez :
+
+```bash
+pnpm db:studio
+```
+
+Ouvrez ensuite <https://local.drizzle.studio>. Studio est publié uniquement
+sur `127.0.0.1:4983` et utilise le réseau Docker privé ; PostgreSQL ne reçoit
+toujours aucun port public. La commande reste attachée au terminal : `Ctrl-C`
+arrête Studio, puis `pnpm dev:down` arrête les conteneurs de développement.
 
 Le proxy Caddy publie uniquement `127.0.0.1:18080`. PostgreSQL reste privé
 sur le réseau Docker interne et utilise le volume local `postgres-data`.
