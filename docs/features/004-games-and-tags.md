@@ -46,7 +46,9 @@ dans `packages/shared`. Les migrations sont non destructives.
   création, hero de partie, synopsis, tags, candidature et détails.
 - Client serveur Next.js branché sur les réponses publiques de l’API pour le
   catalogue filtré et la fiche par slug, avec états vide et erreur explicites.
-- Tests unitaires et API : suite monorepo : 97 tests verts.
+- Migration de données idempotente avec un référentiel initial de tags actifs
+  pour les filtres et la création de partie.
+- Tests unitaires et API : suite monorepo : 98 tests verts.
 
 ## Tests et sécurité
 
