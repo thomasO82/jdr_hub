@@ -59,8 +59,10 @@ export function createGameHandlers(dependencies: Dependencies) {
       if (!parsed.success) return fail(c, 400)
       const id = requiredId(c)
       if (!id) return fail(c, 400)
-      const game = await updateGame({ id, ownerId: user.id, game: parsed.data, repository: dependencies.repository })
-      return game ? c.json({ data: game, error: null, meta: { requestId: c.get('requestId') } }) : fail(c, 403)
+      try {
+        const game = await updateGame({ id, ownerId: user.id, game: parsed.data, repository: dependencies.repository })
+        return game ? c.json({ data: game, error: null, meta: { requestId: c.get('requestId') } }) : fail(c, 403)
+      } catch { return fail(c, 409) }
     },
     archive: async (c: Context<GameEnv>) => {
       const user = await currentUser(c, dependencies)

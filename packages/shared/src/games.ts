@@ -23,6 +23,7 @@ export const updateGameSchema = z.object({
   type: gameTypeSchema.optional(),
   maxPlayers: z.number().int().min(1).max(12).optional(),
   visibility: gameVisibilitySchema.optional(),
+  status: gameStatusSchema.optional(),
   tags: z.array(tagSlugSchema).max(20).refine((values) => new Set(values).size === values.length, 'Tags must be unique').optional(),
 }).strict()
 

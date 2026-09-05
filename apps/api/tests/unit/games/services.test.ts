@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { createGame } from '../../../src/modules/games/services/create-game.js'
+import { updateGame } from '../../../src/modules/games/services/update-game.js'
 import type { GamesRepository } from '../../../src/modules/games/repository.js'
 
 describe('game services', () => {
@@ -12,5 +13,13 @@ describe('game services', () => {
     } })
     expect(calls).toEqual([expect.objectContaining({ ownerId: 'owner-1', slug: 'la-crypte-maudite' })])
     expect(calls[0]).not.toHaveProperty('status')
+  })
+
+  it('rejects an invalid lifecycle transition', async () => {
+    const repository = {
+      findById: async () => ({ id: 'g', ownerId: 'owner-1', status: 'COMPLETED', type: 'CAMPAIGN', visibility: 'PUBLIC', title: 'x', slug: 'x', system: 'x', description: 'x', maxPlayers: 1, tags: [] }),
+      update: async () => null,
+    } as unknown as GamesRepository
+    await expect(updateGame({ id: 'g', ownerId: 'owner-1', game: { status: 'OPEN' }, repository })).rejects.toThrow('GAME_STATUS_TRANSITION_INVALID')
   })
 })
