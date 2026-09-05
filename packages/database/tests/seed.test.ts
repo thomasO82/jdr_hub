@@ -50,4 +50,11 @@ describe('development seed data', () => {
     expect(() => assertSeedEnvironment('development')).not.toThrow()
     expect(() => assertSeedEnvironment(undefined)).not.toThrow()
   })
+
+  it('uses a dedicated executable entrypoint', () => {
+    const source = readFileSync(resolve(root, 'src/seed-cli.ts'), 'utf8')
+
+    expect(source).toContain("import { main } from './seed.js'")
+    expect(source).toContain('await main()')
+  })
 })

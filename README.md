@@ -34,7 +34,7 @@ Avec Docker Compose, la même opération peut être lancée dans le conteneur AP
 pour utiliser automatiquement le réseau et la configuration Compose :
 
 ```bash
-docker compose -f docker-compose.yml run --rm api-hono node node_modules/@jdr-hub/database/dist/seed.js
+docker compose -f docker-compose.yml run --rm api-hono node node_modules/@jdr-hub/database/dist/seed-cli.js
 ```
 
 Le proxy Caddy publie uniquement `127.0.0.1:18080`. PostgreSQL reste privé

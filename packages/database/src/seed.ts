@@ -101,7 +101,7 @@ export async function seedDatabase(db: Database): Promise<void> {
   })
 }
 
-async function main(): Promise<void> {
+export async function main(): Promise<void> {
   assertSeedEnvironment(process.env.NODE_ENV)
   const database = createDatabase(process.env.DATABASE_URL)
 
@@ -112,8 +112,4 @@ async function main(): Promise<void> {
   } finally {
     await database.client.end()
   }
-}
-
-if (import.meta.url === `file://${process.argv[1]}`) {
-  await main()
 }
