@@ -1,5 +1,5 @@
 import { and, desc, eq, ilike, inArray, sql } from 'drizzle-orm'
-import { gameSchema, type createDatabase } from '@jdr-hub/database'
+import { authSchema, gameSchema, type createDatabase } from '@jdr-hub/database'
 import type { CreateGameInput, GameQuery, UpdateGameInput } from '@jdr-hub/shared'
 
 export type GameRecord = {
@@ -29,6 +29,7 @@ type Database = ReturnType<typeof createDatabase>['db']
 
 export function createPostgresGamesRepository(database: Database): GamesRepository {
   const { games, gameTags, tags } = gameSchema
+  const { users } = authSchema
   const readTags = async (gameId: string) => (await database.select({ slug: tags.slug }).from(gameTags).innerJoin(tags, eq(gameTags.tagId, tags.id)).where(eq(gameTags.gameId, gameId))).map((tag) => tag.slug)
   return {
     async create(input) {
@@ -68,6 +69,11 @@ export function createPostgresGamesRepository(database: Database): GamesReposito
       const conditions = [eq(games.visibility, 'PUBLIC'), eq(games.status, 'OPEN')]
       if (query.q) conditions.push(ilike(games.title, `%${query.q}%`))
       if (query.gmId) conditions.push(eq(games.ownerId, query.gmId))
+      if (query.gmName) {
+        const matchingOwners = await database.select({ id: users.id }).from(users).where(ilike(users.username, `%${query.gmName}%`))
+        if (matchingOwners.length === 0) return { page: query.page, pageSize: query.pageSize, items: [] }
+        conditions.push(inArray(games.ownerId, matchingOwners.map((owner) => owner.id)))
+      }
       if (query.tagSlugs.length > 0) {
         const matching = await database.select({ gameId: gameTags.gameId }).from(gameTags)
           .innerJoin(tags, eq(gameTags.tagId, tags.id))

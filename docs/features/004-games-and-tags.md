@@ -41,7 +41,7 @@ dans `packages/shared`. Les migrations sont non destructives.
   tags en logique `AND`, validation des tags actifs et archivage propriétaire.
 - Services, handlers et routes Hono `GET/POST /games`, `GET/PATCH/DELETE
   /games/:id` et `GET /tags`.
-- Tests unitaires et API : 49 tests API verts ; suite monorepo : 87 tests verts.
+- Tests unitaires et API : 50 tests API verts ; suite monorepo : 88 tests verts.
 
 ## Tests et sécurité
 
