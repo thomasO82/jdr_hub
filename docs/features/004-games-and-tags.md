@@ -50,8 +50,8 @@ dans `packages/shared`. Les migrations sont non destructives.
   catalogue filtré et la fiche par slug, avec états vide et erreur explicites.
 - Migration de données idempotente avec un référentiel initial de tags actifs
   pour les filtres et la création de partie.
-- Tests unitaires, API, structure visuelle et typographie : suite monorepo :
-  102 tests verts.
+- Tests unitaires, API, structure visuelle, typographie et formulaire : suite
+  monorepo : 103 tests verts.
 
 ## Tests et sécurité
 
