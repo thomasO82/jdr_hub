@@ -2,7 +2,7 @@
 
 ## Statut
 
-`IN_REVIEW`
+`IN_PROGRESS`
 
 ## Branche
 
