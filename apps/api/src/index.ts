@@ -4,16 +4,19 @@ import { createApiApp } from './app.js'
 import { parsePort } from './config.js'
 import { parseAuthConfig } from './modules/auth/config.js'
 import { createPostgresAuthRepository } from './modules/auth/repository.js'
+import { createPostgresGamesRepository } from './modules/games/repository.js'
 
 async function startApi(): Promise<void> {
   const port = parsePort(process.env.PORT)
   const database = createDatabase(process.env.DATABASE_URL)
   const authConfig = parseAuthConfig(process.env)
+  const authRepository = createPostgresAuthRepository(database.db)
   await migrateDatabase(database)
 
   serve({
     fetch: createApiApp({
-      auth: { config: authConfig, repository: createPostgresAuthRepository(database.db) },
+      auth: { config: authConfig, repository: authRepository },
+      games: { authConfig, authRepository, repository: createPostgresGamesRepository(database.db) },
     }).fetch,
     port,
   })
