@@ -31,6 +31,7 @@ Seuls les statuts suivants sont autorisés :
 | F02 | Parties, tags et cycle de vie | `MERGED` | `feat/games-and-tags` | [PR #7](https://github.com/thomasO82/jdr_hub/pull/7) | 89 tests monorepo verts au moment de la fusion | Contrôles d’autorisation, validation stricte et invariants métier | [Fiche F02](features/004-games-and-tags.md) |
 | REF-001 | Migration frontend Tailwind-only | `IN_PROGRESS` | `refactor/tailwind-only-frontend` | Non créée | 106 tests monorepo verts ; lint, typecheck et build verts | Aucun changement de contrat ; contrôle architectural CSS et focus accessibles | [Fiche REF-001](features/005-tailwind-only-frontend.md) |
 | F03 | Catalogue public, détail et SEO | `IN_PROGRESS` | `feat/public-games-and-seo` | Non créée | 120 tests monorepo verts ; lint, typecheck et build verts | Projection sans identifiants, visibilité publique, validation stricte, filtres AND et slugs sitemap | [Fiche F03](features/006-public-games-and-seo.md) |
+| F04 | Candidatures et roster | `IN_PROGRESS` | `feat/applications` | Non créée | Tests à écrire | Autorisation par ressource, anti-doublon, transaction de capacité et CSRF | [Fiche F04](features/007-applications.md) |
 
 ## Blocages
 
