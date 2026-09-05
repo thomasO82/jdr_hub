@@ -13,11 +13,11 @@ export function ConnectionView() {
           Rejoignez la communauté de rôlistes. Organisez vos parties, trouvez
           des joueurs et vivez vos aventures.
         </p>
-        <a className="mt-8 inline-flex min-h-13 w-full items-center justify-center gap-2 rounded-lg bg-[#5865f2] px-5 py-3.5 font-body text-[0.9375rem] font-bold leading-none text-white shadow-lg shadow-indigo-900/25 transition-colors hover:bg-[#4752c4] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary-fixed active:translate-y-px motion-reduce:transition-none" href="/api/auth/discord">
+        <a className="mt-8 inline-flex min-h-13 w-full items-center justify-center gap-2 rounded-lg bg-discord px-5 py-3.5 font-body text-sm font-bold leading-none text-white shadow-lg shadow-indigo-900/25 transition-colors hover:bg-discord-hover focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary-fixed active:translate-y-px motion-reduce:transition-none" href="/api/auth/discord">
           <MessageCircle aria-hidden="true" size={22} strokeWidth={2.25} />
           Continuer avec Discord
         </a>
-        <p className="mt-4 flex items-center justify-center gap-2 font-body text-[0.8125rem] leading-normal text-violet-200">
+        <p className="mt-4 flex items-center justify-center gap-2 font-body text-xs leading-normal text-violet-200">
           <ShieldCheck aria-hidden="true" size={17} strokeWidth={2} />
           Connexion sécurisée via Discord
         </p>

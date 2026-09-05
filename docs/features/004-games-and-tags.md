@@ -54,7 +54,7 @@ dans `packages/shared`. Les migrations sont non destructives.
 - Migration de données idempotente avec un référentiel initial de tags actifs
   pour les filtres et la création de partie.
 - Tests unitaires, API, structure visuelle, typographie, formulaire et
-  architecture Tailwind : suite monorepo : 105 tests verts.
+  architecture Tailwind : suite monorepo : 106 tests verts.
 
 ## Tests et sécurité
 
