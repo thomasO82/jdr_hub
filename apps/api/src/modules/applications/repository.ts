@@ -1,4 +1,4 @@
-import { and, count, desc, eq, sql } from 'drizzle-orm'
+import { and, count, desc, eq, or } from 'drizzle-orm'
 import { authSchema, gameSchema, type createDatabase } from '@jdr-hub/database'
 import type { Application, ApplicationStatus } from '@jdr-hub/shared'
 
@@ -42,7 +42,7 @@ export function createPostgresApplicationRepository(database: Database): Applica
 
   return {
     async findEligibleGame(gameId) {
-      const [game] = await database.select({ id: games.id, ownerId: games.ownerId, visibility: games.visibility, status: games.status, maxPlayers: games.maxPlayers }).from(games).where(eq(games.id, gameId)).limit(1)
+      const [game] = await database.select({ id: games.id, ownerId: games.ownerId, visibility: games.visibility, status: games.status, maxPlayers: games.maxPlayers }).from(games).where(or(eq(games.id, gameId), eq(games.slug, gameId))).limit(1)
       return game ?? null
     },
     async findByGameAndUser(gameId, userId) {
