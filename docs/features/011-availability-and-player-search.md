@@ -63,7 +63,7 @@ Tests écrits avant chaque implémentation puis exécutés en rouge : contrats e
 politique, services, routes API, client web, pages et structure Tailwind.
 Après implémentation, les suites ciblées puis la suite monorepo sont vertes.
 
-- tests F05 ciblés : 23 assertions ;
+- tests F05 ciblés : 24 assertions ;
 - suite monorepo : 72 fichiers, 172 tests passés ;
 - type-check et lint monorepo passés ;
 - build API et Next.js passé (Turbopack relancé avec permissions de processus).
@@ -75,7 +75,8 @@ et invariants sans dépendre d’un `.env`.
 ## Sécurité
 
 Session obligatoire pour les trois routes, origine exacte pour la mutation,
-validation Zod stricte, pagination bornée, projection sans créneaux détaillés et
+validation Zod stricte, pagination bornée, limite de 20 écritures par utilisateur
+et par minute, projection sans créneaux détaillés et
 aucun `userId` fourni par le navigateur. Les cookies et JWT restent gérés par
 le module auth existant. Aucun secret réel n’a été ajouté.
 
