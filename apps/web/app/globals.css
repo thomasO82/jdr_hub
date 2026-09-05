@@ -22,6 +22,11 @@
   --color-connection-start: #26005a;
   --color-connection-mid: #180033;
   --color-connection-end: #030006;
+  --color-cover-night: #101b2f;
+  --color-cover-violet: #5b2a73;
+  --color-cover-warm: #29121e;
+  --color-cover-amber: #523024;
+  --color-cover-red: #79293c;
 
   --radius-sm: 0.25rem;
   --radius-md: 0.5rem;

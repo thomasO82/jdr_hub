@@ -19,6 +19,8 @@ describe('games pages', () => {
     expect(create).toContain('Créer une partie')
     expect(create).toContain('ONE_SHOT')
     expect(create).toContain('CAMPAIGN')
+    expect(list).not.toContain('games-view.module.css')
+    expect(create).not.toContain('games-view.module.css')
   })
 
   it('follows the detail mockup hierarchy', () => {
@@ -27,6 +29,7 @@ describe('games pages', () => {
     expect(detail).toContain('Synopsis')
     expect(detail).toContain("Rejoindre l'aventure")
     expect(detail).toContain('Détails de la partie')
+    expect(detail).not.toContain('games-view.module.css')
   })
 
   it('loads catalogue and details through the API client', () => {

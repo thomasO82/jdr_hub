@@ -14,11 +14,15 @@ describe('JDR Hub typography', () => {
   })
 
   it('assigns headings, body text and labels to the documented font roles', () => {
-    const shell = read('../features/layout/app-shell.module.css')
-    const games = read('../features/games/games-view.module.css')
+    const globalStyles = read('../app/globals.css')
+    const shell = read('../features/layout/app-shell.tsx')
+    const games = read('../features/games/games-list-view.tsx')
 
-    expect(`${shell}\n${games}`).toContain('font-family: Hanken Grotesk')
-    expect(`${shell}\n${games}`).toContain('font-family: Inter')
-    expect(`${shell}\n${games}`).toContain('font-family: Geist')
+    expect(globalStyles).toContain('--font-display:')
+    expect(globalStyles).toContain('--font-body:')
+    expect(globalStyles).toContain('--font-label:')
+    expect(`${shell}\n${games}`).toContain('font-display')
+    expect(`${shell}\n${games}`).toContain('font-body')
+    expect(`${shell}\n${games}`).toContain('font-label')
   })
 })
