@@ -23,9 +23,14 @@ describe('games pages', () => {
 
   it('follows the detail mockup hierarchy', () => {
     const detail = read('../features/games/game-detail-view.tsx')
-    expect(detail).toContain('La Crypte Maudite')
+    expect(detail).toContain('{game.title}')
     expect(detail).toContain('Synopsis')
     expect(detail).toContain("Rejoindre l'aventure")
     expect(detail).toContain('Détails de la partie')
+  })
+
+  it('loads catalogue and details through the API client', () => {
+    expect(read('../features/games/games-list-view.tsx')).toContain('createGamesApi')
+    expect(read('../app/parties/[slug]/page.tsx')).toContain('createGamesApi')
   })
 })

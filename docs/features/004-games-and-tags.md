@@ -40,11 +40,13 @@ dans `packages/shared`. Les migrations sont non destructives.
 - Repository PostgreSQL avec visibilité publique, recherche par titre, MJ et
   tags en logique `AND`, validation des tags actifs et archivage propriétaire.
 - Services, handlers et routes Hono `GET/POST /games`, `GET/PATCH/DELETE
-  /games/:id` et `GET /tags`.
+  /games/:id`, `GET /public/games/:slug` et `GET /tags`.
 - Pages Next.js `/parties`, `/parties/nouvelle` et `/parties/[slug]` avec une
   hiérarchie visuelle alignée sur les maquettes D02, D04 et D05 : recherche,
   création, hero de partie, synopsis, tags, candidature et détails.
-- Tests unitaires et API : suite monorepo : 91 tests verts.
+- Client serveur Next.js branché sur les réponses publiques de l’API pour le
+  catalogue filtré et la fiche par slug, avec états vide et erreur explicites.
+- Tests unitaires et API : suite monorepo : 96 tests verts.
 
 ## Tests et sécurité
 

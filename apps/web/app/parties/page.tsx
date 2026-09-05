@@ -6,6 +6,10 @@ export const metadata: Metadata = {
   description: 'Trouvez une partie de jeu de rôle et rejoignez une nouvelle aventure.',
 }
 
-export default function GamesPage() {
-  return <GamesListView />
+export default async function GamesPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>
+}) {
+  return <GamesListView searchParams={await searchParams} />
 }

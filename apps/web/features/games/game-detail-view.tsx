@@ -1,7 +1,8 @@
 import Link from 'next/link'
+import type { PublicGame } from './games-api'
 import styles from './games-view.module.css'
 
-export function GameDetailView() {
+export function GameDetailView({ game }: { game: PublicGame }) {
   return (
     <main className={styles.page}>
       <section className={styles.detailShell} aria-labelledby="game-detail-title">
@@ -9,43 +10,32 @@ export function GameDetailView() {
         <header className={styles.hero}>
           <div className={styles.heroContent}>
             <div className={styles.heroTags}>
-              <span className={styles.heroTag}>Campagne</span>
-              <span className={styles.heroTagMuted}>D&amp;D 5e</span>
+              <span className={styles.heroTag}>{game.type === 'CAMPAIGN' ? 'Campagne' : 'One-shot'}</span>
+              <span className={styles.heroTagMuted}>{game.system}</span>
             </div>
-            <h1 id="game-detail-title">La Crypte Maudite</h1>
-            <p>Une aventure sombre et mystérieuse menée par MaîtreHibou.</p>
+            <h1 id="game-detail-title">{game.title}</h1>
+            <p>Une aventure proposée par le maître du jeu.</p>
           </div>
           <div className={styles.gmBadge}>
             <span className={styles.avatar}>M</span>
             <span>
               <small>Maître du jeu</small>
-              <strong>MaîtreHibou</strong>
+              <strong>Organisateur de la partie</strong>
             </span>
           </div>
         </header>
         <div className={styles.detailGrid}>
           <article className={`${styles.card} ${styles.synopsis}`}>
             <h2>▱ Synopsis</h2>
-            <p>
-              Depuis des siècles, la Crypte d’Oakhaven repose en silence sous les
-              collines d’émeraude, scellée par une magie dont on a oublié le nom.
-              Mais récemment, le sceau a commencé à se fissurer.
-            </p>
-            <p>
-              Vous êtes un groupe d’aventuriers hétéroclites, engagés pour
-              enquêter sur ces phénomènes avant que la corruption n’atteigne le
-              village.
-            </p>
+            <p>{game.description}</p>
             <ul className={styles.tags}>
-              <li className={styles.tag}>#DarkFantasy</li>
-              <li className={styles.tag}>#Exploration</li>
-              <li className={styles.tag}>#HorreurPsychologique</li>
+              {game.tags.map((tag) => <li className={styles.tag} key={tag}>#{tag}</li>)}
             </ul>
           </article>
           <aside className={styles.detailAside}>
             <section className={styles.joinCard}>
               <h2>Rejoindre l'aventure</h2>
-              <p>3 places restantes. Candidatures ouvertes.</p>
+              <p>Les candidatures sont ouvertes.</p>
               <button className={styles.primary} type="button">
                 Postuler pour rejoindre
               </button>
@@ -55,19 +45,19 @@ export function GameDetailView() {
               <dl className={styles.details}>
                 <div>
                   <dt>Système</dt>
-                  <dd>Dungeons &amp; Dragons 5E</dd>
+                  <dd>{game.system}</dd>
                 </div>
                 <div>
                   <dt>Joueurs</dt>
-                  <dd>2 / 5 <span>(3 requis)</span></dd>
+                  <dd>{game.maxPlayers} places maximum</dd>
                 </div>
                 <div>
-                  <dt>Mode</dt>
-                  <dd>En ligne</dd>
+                  <dt>Type</dt>
+                  <dd>{game.type === 'CAMPAIGN' ? 'Campagne' : 'One-shot'}</dd>
                 </div>
                 <div>
-                  <dt>Outils</dt>
-                  <dd>Discord</dd>
+                  <dt>Statut</dt>
+                  <dd>{game.status === 'ACTIVE' ? 'En cours' : 'Inscriptions ouvertes'}</dd>
                 </div>
               </dl>
             </section>
