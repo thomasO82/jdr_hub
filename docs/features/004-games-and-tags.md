@@ -53,8 +53,8 @@ dans `packages/shared`. Les migrations sont non destructives.
   Module ni style inline.
 - Migration de données idempotente avec un référentiel initial de tags actifs
   pour les filtres et la création de partie.
-- Tests unitaires, API, structure visuelle, typographie et formulaire : suite
-  monorepo : 103 tests verts.
+- Tests unitaires, API, structure visuelle, typographie, formulaire et
+  architecture Tailwind : suite monorepo : 105 tests verts.
 
 ## Tests et sécurité
 
