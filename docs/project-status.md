@@ -33,6 +33,7 @@ Seuls les statuts suivants sont autorisés :
 | F03 | Catalogue public, détail et SEO | `IN_PROGRESS` | `feat/public-games-and-seo` | Non créée | 120 tests monorepo verts ; lint, typecheck et build verts | Projection sans identifiants, visibilité publique, validation stricte, filtres AND et slugs sitemap | [Fiche F03](features/006-public-games-and-seo.md) |
 | F04 | Candidatures et roster | `IN_PROGRESS` | `feat/applications` | Création bloquée : intégration GitHub sans permission | 135 tests monorepo verts ; lint, typecheck, build et Docker web verts | Autorisation par ressource, anti-doublon, transaction de capacité, origine et validation stricte | [Fiche F04](features/007-applications.md) |
 | DEV-001 | Données de développement | `IN_PROGRESS` | `feat/development-seeds` | Non créée | 59 fichiers, 141 tests verts ; lint, typecheck et build verts | Données fictives uniquement, pas de suppression ni de secret | [Fiche DEV-001](features/008-development-seeds.md) |
+| DEV-002 | Commandes de développement | `IN_PROGRESS` | `chore/developer-commands` | Non créée | 60 fichiers, 142 tests verts ; lint et typecheck verts | Alias Docker Compose sans modification de sécurité | [Fiche DEV-002](features/009-developer-commands.md) |
 
 ## Blocages
 

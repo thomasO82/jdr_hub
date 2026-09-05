@@ -13,10 +13,10 @@ pnpm typecheck
 pnpm test
 pnpm build
 pnpm audit --audit-level=high
-docker compose -f docker-compose.yml up -d --build --wait
+pnpm dev:rebuild
 curl --fail http://127.0.0.1:18080/
 curl --fail http://127.0.0.1:18080/api/health
-docker compose -f docker-compose.yml down
+pnpm dev:down
 ```
 
 Pour charger les données fictives de développement après le démarrage de
@@ -36,6 +36,9 @@ pour utiliser automatiquement le réseau et la configuration Compose :
 ```bash
 docker compose -f docker-compose.yml run --rm api-hono node node_modules/@jdr-hub/database/dist/seed-cli.js
 ```
+
+Les raccourcis du workspace sont `pnpm dev:up`, `pnpm dev:rebuild`,
+`pnpm db:seed` et `pnpm dev:down`.
 
 Le proxy Caddy publie uniquement `127.0.0.1:18080`. PostgreSQL reste privé
 sur le réseau Docker interne et utilise le volume local `postgres-data`.

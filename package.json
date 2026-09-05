@@ -8,7 +8,10 @@
     "typecheck": "pnpm --filter @jdr-hub/api --filter @jdr-hub/web --filter @jdr-hub/shared --filter @jdr-hub/database -r run typecheck",
     "test": "vitest run",
     "build": "pnpm --filter @jdr-hub/api build && pnpm --filter @jdr-hub/web build",
-    "db:seed": "pnpm --filter @jdr-hub/database db:seed",
+    "dev:up": "docker compose -f docker-compose.yml up -d --wait",
+    "dev:rebuild": "docker compose -f docker-compose.yml up -d --build --wait",
+    "db:seed": "docker compose -f docker-compose.yml run --rm api-hono node node_modules/@jdr-hub/database/dist/seed-cli.js",
+    "dev:down": "docker compose -f docker-compose.yml down",
     "audit": "pnpm audit"
   },
   "devDependencies": {
