@@ -11,9 +11,10 @@ type PageProps = {
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const game = await createPublicGamesApi().detail((await params).slug)
+  const slug = (await params).slug
+  const game = await createPublicGamesApi().detail(slug)
   return game
-    ? { title: `${game.title} | JDR Hub`, description: game.description.slice(0, 160) }
+    ? { title: `${game.title} | JDR Hub`, description: game.description.slice(0, 160), alternates: { canonical: `/parties/${slug}` }, openGraph: { title: game.title, description: game.description.slice(0, 160), type: 'article' } }
     : { title: 'Partie introuvable | JDR Hub' }
 }
 

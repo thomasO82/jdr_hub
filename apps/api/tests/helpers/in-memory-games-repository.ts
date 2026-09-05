@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto'
-import type { CreateGameInput, GameQuery, PublicCollection, PublicGame, PublicGamesQuery, UpdateGameInput } from '@jdr-hub/shared'
-import type { GameRecord, GamesRepository, PublicGamesRepository, PublicSlugs } from '../../src/modules/games/repository.js'
+import type { CreateGameInput, GameQuery, PublicCollection, PublicGame, PublicGamesQuery, PublicSlugs, UpdateGameInput } from '@jdr-hub/shared'
+import type { GameRecord, GamesRepository, PublicGamesRepository } from '../../src/modules/games/repository.js'
+import { slugifyPublicLabel } from '../../src/modules/games/policy.js'
 
 type InMemoryRepository = GamesRepository & PublicGamesRepository
 
@@ -14,7 +15,7 @@ function publicGame(game: GameRecord): PublicGame {
     status: game.status as PublicGame['status'],
     maxPlayers: game.maxPlayers,
     tags: game.tags.map((slug) => ({ name: slug, slug })),
-    gameMaster: { name: game.ownerId, slug: game.ownerId },
+    gameMaster: { name: game.ownerId, slug: slugifyPublicLabel(game.ownerId) },
   }
 }
 
@@ -45,9 +46,9 @@ export function createInMemoryGamesRepository(seed: GameRecord[] = []): InMemory
     async findPublicCollection(kind, slug) {
       const eligible = [...games.values()].filter((game) => game.visibility === 'PUBLIC' && ['OPEN', 'ACTIVE'].includes(game.status))
       let matching: GameRecord[]
-      if (kind === 'gm') matching = eligible.filter((game) => game.ownerId === slug)
+      if (kind === 'gm') matching = eligible.filter((game) => slugifyPublicLabel(game.ownerId) === slug)
       else if (kind === 'tag') matching = eligible.filter((game) => game.tags.includes(slug))
-      else matching = eligible.filter((game) => game.system.toLowerCase().replaceAll(' ', '-') === slug)
+      else matching = eligible.filter((game) => slugifyPublicLabel(game.system) === slug)
       if (matching.length === 0) return null
       const name = kind === 'gm' ? matching[0]?.ownerId ?? slug : kind === 'tag' ? slug : matching[0]?.system ?? slug
       const collection: PublicCollection = { slug, name, games: matching.map(publicGame) }
@@ -57,9 +58,9 @@ export function createInMemoryGamesRepository(seed: GameRecord[] = []): InMemory
       const eligible = [...games.values()].filter((game) => game.visibility === 'PUBLIC' && ['OPEN', 'ACTIVE'].includes(game.status))
       return {
         games: eligible.map((game) => game.slug),
-        gms: [...new Set(eligible.map((game) => game.ownerId))],
+        gms: [...new Set(eligible.map((game) => slugifyPublicLabel(game.ownerId)))],
         tags: [...new Set(eligible.flatMap((game) => game.tags))],
-        systems: [...new Set(eligible.map((game) => game.system.toLowerCase().replaceAll(' ', '-')))],
+        systems: [...new Set(eligible.map((game) => slugifyPublicLabel(game.system)))],
       }
     },
     async update(id, ownerId, input: UpdateGameInput) {

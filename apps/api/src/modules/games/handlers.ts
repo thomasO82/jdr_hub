@@ -63,6 +63,7 @@ export function createGameHandlers(dependencies: Dependencies) {
       const collection = await getPublicCollection({ kind, slug, repository: dependencies.repository })
       return collection ? c.json({ data: collection, error: null, meta: { requestId: c.get('requestId') } }) : fail(c, 404)
     },
+    publicSlugs: async (c: Context<GameEnv>) => c.json({ data: await dependencies.repository.listPublicSlugs(), error: null, meta: { requestId: c.get('requestId') } }),
     create: async (c: Context<GameEnv>) => {
       const user = await currentUser(c, dependencies)
       if (!user) return fail(c, 401)

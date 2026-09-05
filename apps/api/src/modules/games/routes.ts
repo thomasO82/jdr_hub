@@ -13,6 +13,7 @@ export function registerGamesRoutes(app: Hono<GamesRouteEnv>, dependencies: Game
   app.get('/tags', handlers.tags)
   app.get('/public/games/:slug', handlers.publicGet)
   app.get('/public/games', handlers.publicList)
+  app.get('/public/slugs', handlers.publicSlugs)
   app.get('/public/gms/:slug', handlers.publicCollection)
   app.get('/public/tags/:slug', handlers.publicCollection)
   app.get('/public/systems/:slug', handlers.publicCollection)

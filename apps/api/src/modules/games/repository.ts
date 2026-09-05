@@ -1,6 +1,6 @@
 import { and, desc, eq, ilike, inArray, sql } from 'drizzle-orm'
 import { authSchema, gameSchema, type createDatabase } from '@jdr-hub/database'
-import type { CreateGameInput, GameQuery, PublicCollection, PublicGame, PublicGamesPage, PublicGamesQuery, UpdateGameInput } from '@jdr-hub/shared'
+import type { CreateGameInput, GameQuery, PublicCollection, PublicGame, PublicGamesPage, PublicGamesQuery, PublicSlugs, UpdateGameInput } from '@jdr-hub/shared'
 import { slugifyPublicLabel } from './policy.js'
 
 export type GameRecord = {
@@ -15,13 +15,6 @@ export type GameRecord = {
   visibility: CreateGameInput['visibility']
   maxPlayers: number
   tags: string[]
-}
-
-export type PublicSlugs = {
-  games: string[]
-  gms: string[]
-  tags: string[]
-  systems: string[]
 }
 
 export interface PublicGamesRepository {
@@ -141,11 +134,12 @@ export function createPostgresGamesRepository(database: Database): GamesReposito
       if (kind === 'tag') {
         const [tag] = await database.select({ name: tags.name, slug: tags.slug }).from(tags).where(and(eq(tags.slug, slug), eq(tags.isActive, true))).limit(1)
         if (!tag) return null
+        const [tagId] = await database.select({ id: tags.id }).from(tags).where(eq(tags.slug, slug)).limit(1)
         const rows = await database.select({
           id: games.id, slug: games.slug, title: games.title, system: games.system,
           description: games.description, type: games.type, status: games.status,
           maxPlayers: games.maxPlayers, ownerName: users.username,
-        }).from(games).innerJoin(users, eq(games.ownerId, users.id)).innerJoin(gameTags, eq(gameTags.gameId, games.id)).where(and(eligible, eq(gameTags.tagId, (await database.select({ id: tags.id }).from(tags).where(eq(tags.slug, slug)).limit(1))[0]?.id ?? '')))
+        }).from(games).innerJoin(users, eq(games.ownerId, users.id)).innerJoin(gameTags, eq(gameTags.gameId, games.id)).where(and(eligible, eq(gameTags.tagId, tagId?.id ?? '')))
         return { slug: tag.slug, name: tag.name, games: await Promise.all(rows.map(toPublicGame)) }
       }
       const systems = await database.select({ system: games.system }).from(games).where(eligible).groupBy(games.system)
@@ -162,7 +156,7 @@ export function createPostgresGamesRepository(database: Database): GamesReposito
       const [gameRows, ownerRows, tagRows, systemRows] = await Promise.all([
         database.select({ slug: games.slug }).from(games).where(and(eq(games.visibility, 'PUBLIC'), inArray(games.status, ['OPEN', 'ACTIVE']))),
         database.select({ name: users.username }).from(users).where(sql`exists (select 1 from games where games.owner_id = ${users.id} and games.visibility = 'PUBLIC' and games.status in ('OPEN', 'ACTIVE'))`),
-        database.select({ slug: tags.slug }).from(tags).where(eq(tags.isActive, true)),
+        database.select({ slug: tags.slug }).from(gameTags).innerJoin(games, eq(gameTags.gameId, games.id)).innerJoin(tags, eq(gameTags.tagId, tags.id)).where(and(eq(tags.isActive, true), eq(games.visibility, 'PUBLIC'), inArray(games.status, ['OPEN', 'ACTIVE']))).groupBy(tags.slug),
         database.select({ system: games.system }).from(games).where(and(eq(games.visibility, 'PUBLIC'), inArray(games.status, ['OPEN', 'ACTIVE']))).groupBy(games.system),
       ])
       return {

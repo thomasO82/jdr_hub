@@ -40,4 +40,15 @@ describe('public games API routes', () => {
     expect((await app.request('/public/games/privee')).status).toBe(404)
     expect((await app.request('/public/games/fermee')).status).toBe(404)
   })
+
+  it('exposes only public slugs for sitemap generation', async () => {
+    const response = await createApp().request('/public/slugs')
+    expect(response.status).toBe(200)
+    expect((await response.json()).data).toEqual({
+      games: ['crypte'],
+      gms: ['owner'],
+      tags: ['horror', 'online'],
+      systems: ['d-d'],
+    })
+  })
 })
