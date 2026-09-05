@@ -4,19 +4,19 @@
 F05
 
 ## Statut
-`IN_PROGRESS`
+`MERGED`
 
 ## Branche
 `feat/availability-and-player-search`
 
 ## Pull Request
-Création tentée automatiquement après le push ; l’intégration GitHub a refusé
-l’opération (`403 Resource not accessible by integration`). Le propriétaire doit
-ouvrir la PR manuellement depuis la branche poussée.
+Création automatique initialement refusée par l’intégration GitHub (`403`).
+Fusion ensuite confirmée par le propriétaire dans `develop` ; le numéro de PR
+n'a pas été vérifié dans cette session.
 
 ## Dates
 - Début : 2026-09-05
-- Fin : Non terminée
+- Fin : 2026-09-06 (fusion confirmée)
 
 ## Contexte et périmètre
 
@@ -87,8 +87,7 @@ le module auth existant. Aucun secret réel n’a été ajouté.
 - les exceptions ne sont pas encore soustraites du calcul de compatibilité (la
   compatibilité actuelle porte sur la semaine type) ;
 - séances, votes, invitations et notifications restent hors F05 ;
-- la PR est poussée mais doit être ouverte manuellement vers `develop` à cause
-  du blocage d’intégration GitHub.
+- les tests PostgreSQL dédiés restent un travail de suivi séparé.
 
 ## Dépendances et documentation consultée
 
@@ -96,3 +95,8 @@ F01, F02, le socle Next.js/Hono/PostgreSQL/Drizzle/Tailwind,
 `docs/specifications/cahier-des-charges.md`, `docs/security/security-requirements.md`,
 `docs/security/ai-access-policy.md`, les maquettes desktop/mobile, la fiche de
 conception et le plan F05.
+
+## Synchronisation post-fusion — 2026-09-06
+
+Le propriétaire a confirmé la fusion de cette fonctionnalité dans `develop`.
+Le numéro de Pull Request n'a pas été vérifié dans cette session.
