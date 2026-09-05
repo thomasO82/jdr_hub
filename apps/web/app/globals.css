@@ -19,6 +19,9 @@
   --color-outline: #7b7487;
   --color-outline-variant: #ccc3d8;
   --color-error: #ba1a1a;
+  --color-connection-start: #26005a;
+  --color-connection-mid: #180033;
+  --color-connection-end: #030006;
 
   --radius-sm: 0.25rem;
   --radius-md: 0.5rem;
