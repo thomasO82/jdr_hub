@@ -40,3 +40,10 @@ export type PublicCollection = {
   name: string
   games: PublicGame[]
 }
+
+export type PublicSlugs = {
+  games: string[]
+  gms: string[]
+  tags: string[]
+  systems: string[]
+}

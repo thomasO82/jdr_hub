@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import type { PublicGame } from './games-api'
+import type { PublicGame } from '@jdr-hub/shared'
 import { AppShell } from '../layout/app-shell'
 
 export function GameDetailView({ game }: { game: PublicGame }) {
@@ -16,14 +16,14 @@ export function GameDetailView({ game }: { game: PublicGame }) {
             </div>
             <div className="flex items-center gap-2.5 rounded-full border border-white/35 bg-black/25 px-3.5 py-2.5 max-md:w-full max-md:justify-center">
               <span className="grid h-9 w-9 place-items-center rounded-full bg-primary-fixed font-body font-bold text-primary">M</span>
-              <span><small className="block font-label text-xs uppercase text-violet-200">Maître du jeu</small><strong className="block font-body text-sm">Organisateur de la partie</strong></span>
+              <span><small className="block font-label text-xs uppercase text-violet-200">Maître du jeu</small><strong className="block font-body text-sm">{game.gameMaster.name}</strong></span>
             </div>
           </header>
           <div className="mt-6 grid gap-6 lg:grid-cols-3">
             <article className="rounded-2xl border border-surface-container-highest bg-surface p-8 shadow-sm max-md:p-6 lg:col-span-2">
               <h2 className="m-0 font-display text-2xl font-semibold">▱ Synopsis</h2>
               <p className="mt-5 font-body text-lg leading-relaxed text-on-surface-variant">{game.description}</p>
-              <ul className="m-0 flex list-none flex-wrap gap-2 p-0">{game.tags.map((tag) => <li className="rounded-full bg-primary-fixed px-2 py-1 font-body text-xs font-semibold text-on-primary-fixed" key={tag}>#{tag}</li>)}</ul>
+              <ul className="m-0 flex list-none flex-wrap gap-2 p-0">{game.tags.map((tag) => <li className="rounded-full bg-primary-fixed px-2 py-1 font-body text-xs font-semibold text-on-primary-fixed" key={tag.slug}>#{tag.name}</li>)}</ul>
             </article>
             <aside className="grid content-start gap-6 lg:col-span-1">
               <section className="rounded-2xl border border-primary-fixed-dim bg-primary-fixed/50 p-7 text-center"><h2 className="m-0 font-display text-2xl font-semibold">Rejoindre l'aventure</h2><p className="mt-3 font-body leading-relaxed text-on-surface-variant">Les candidatures sont ouvertes.</p><button className="mt-3 min-h-11 w-full rounded-lg border-0 bg-primary px-4 font-body font-semibold text-on-primary transition-colors hover:bg-primary-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary" type="button">Postuler pour rejoindre</button></section>
