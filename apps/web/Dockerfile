@@ -14,7 +14,9 @@ RUN pnpm install --frozen-lockfile
 
 FROM dependencies AS build
 COPY tsconfig.base.json ./
+COPY packages/shared packages/shared
 COPY apps/web apps/web
+RUN pnpm --filter @jdr-hub/shared build
 RUN pnpm --filter @jdr-hub/web build
 RUN pnpm --filter @jdr-hub/web deploy --prod --legacy /runtime
 RUN cp -R apps/web/.next /runtime/.next

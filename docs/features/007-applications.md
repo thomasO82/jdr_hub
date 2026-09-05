@@ -47,6 +47,8 @@ Voir `docs/superpowers/specs/2026-09-05-applications-design.md`.
 - Formulaire sur le détail public, page candidat `/candidatures` et page MJ
   `/gestion/parties/[id]/candidatures`, en Tailwind et responsive.
 - Matrice d'autorisation créée dans `docs/security/authorization-matrix.md`.
+- Dockerfile `web-next` complété pour copier et compiler `@jdr-hub/shared`
+  avant le build Next.js.
 
 ## Parcours utilisateur
 
@@ -66,7 +68,7 @@ Voir `docs/superpowers/specs/2026-09-05-applications-design.md`.
   implémentés au minimum pour faire passer chaque scénario.
 - **Refactor :** résolution UUID/slug, contrôle d'origine, projections et
   responsabilités ont été séparés sans affaiblir les assertions.
-- Suite finale : 56 fichiers, 134 tests verts.
+- Suite finale : 57 fichiers, 135 tests verts.
 
 ## Sécurité
 
@@ -81,10 +83,12 @@ Voir `docs/superpowers/specs/2026-09-05-applications-design.md`.
 
 ## Vérification
 
-- `pnpm test` — 56 fichiers, 134 tests verts.
+- `pnpm test` — 57 fichiers, 135 tests verts.
 - `pnpm lint` — vert.
 - `pnpm typecheck` — vert.
 - `pnpm build` — API et Next.js verts.
+- `docker compose -f docker-compose.yml build --progress=plain web-next` — image
+  `web-next` construite avec succès.
 - `git diff --check` — vert.
 
 ## Limites et travaux reportés
