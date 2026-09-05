@@ -27,7 +27,7 @@
 - Modify: `packages/shared/src/index.ts`
 - Modify: `packages/database/src/schema/games.ts`
 - Modify: `packages/database/src/index.ts`
-- Create: `packages/database/migrations/0003_applications_and_members.sql`
+- Create: `packages/database/migrations/0003_applications-and-members.sql`
 - Test: `packages/shared/tests/applications.test.ts`
 - Test: `packages/database/tests/applications-schema.test.ts`
 
