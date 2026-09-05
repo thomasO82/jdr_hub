@@ -7,6 +7,7 @@ import { createPostgresAuthRepository } from './modules/auth/repository.js'
 import { createPostgresGamesRepository } from './modules/games/repository.js'
 import { createPostgresApplicationRepository } from './modules/applications/repository.js'
 import { createPostgresAvailabilityRepository } from './modules/availability/repository.js'
+import { createPostgresSchedulingRepository } from './modules/scheduling/repository.js'
 
 async function startApi(): Promise<void> {
   const port = parsePort(process.env.PORT)
@@ -21,6 +22,7 @@ async function startApi(): Promise<void> {
       games: { authConfig, authRepository, repository: createPostgresGamesRepository(database.db) },
       applications: { authConfig, authRepository, repository: createPostgresApplicationRepository(database.db) },
       availability: { authConfig, authRepository, repository: createPostgresAvailabilityRepository(database.db) },
+      scheduling: { authConfig, authRepository, repository: createPostgresSchedulingRepository(database.db) },
     }).fetch,
     port,
   })

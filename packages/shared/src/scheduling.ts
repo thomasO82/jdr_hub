@@ -24,6 +24,12 @@ export const fixedSessionInputSchema = sessionWindowSchema.extend({
   notes: z.string().trim().max(2_000).nullable().default(null),
 }).strict()
 
+export const voteCommandSchema = z.object({ vote: voteValueSchema }).strict()
+export const sessionCommandSchema = z.union([
+  fixedSessionInputSchema,
+  z.object({ proposalId: z.uuid() }).strict(),
+])
+
 export const planningQuerySchema = z.object({
   from: dateTimeSchema.optional(),
   to: dateTimeSchema.optional(),
@@ -46,5 +52,6 @@ export type VoteValue = z.infer<typeof voteValueSchema>
 export type SessionWindow = z.infer<typeof sessionWindowSchema>
 export type ProposalInput = z.infer<typeof proposalInputSchema>
 export type FixedSessionInput = z.infer<typeof fixedSessionInputSchema>
+export type VoteCommand = z.infer<typeof voteCommandSchema>
+export type SessionCommand = z.infer<typeof sessionCommandSchema>
 export type PlanningQuery = z.infer<typeof planningQuerySchema>
-
