@@ -29,7 +29,7 @@ export function AppShell({ children, active = 'Games' }: { children: ReactNode; 
           <img className="h-11 w-11" src="/branding/logo.svg" alt="JDR Hub" />
           <span>
             <strong className="block font-display text-xl leading-tight tracking-tight text-primary">JDR Hub</strong>
-            <small className="mt-0.5 block font-label text-[0.6rem] uppercase tracking-wider text-on-surface-variant">Digital Dungeon Master</small>
+            <small className="mt-0.5 block font-label text-xs uppercase tracking-wider text-on-surface-variant">Digital Dungeon Master</small>
           </span>
         </Link>
         <nav className="mt-11 grid gap-2">

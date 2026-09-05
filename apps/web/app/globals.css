@@ -10,6 +10,7 @@
   --color-primary-fixed: #eaddff;
   --color-primary-fixed-dim: #d2bbff;
   --color-on-primary: #ffffff;
+  --color-on-primary-fixed: #25005a;
   --color-background: #f7f9fb;
   --color-surface: #ffffff;
   --color-surface-container: #eceef0;
@@ -27,6 +28,8 @@
   --color-cover-warm: #29121e;
   --color-cover-amber: #523024;
   --color-cover-red: #79293c;
+  --color-discord: #5865f2;
+  --color-discord-hover: #4752c4;
 
   --radius-sm: 0.25rem;
   --radius-md: 0.5rem;
