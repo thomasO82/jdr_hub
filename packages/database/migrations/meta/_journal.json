@@ -29,6 +29,13 @@
       "when": 1788617072119,
       "tag": "0003_applications-and-members",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1788642063727,
+      "tag": "0004_availability-and-player-preferences",
+      "breakpoints": true
     }
   ]
 }
