@@ -29,8 +29,20 @@ mobile des maquettes. Les absences et notifications restent F07.
 
 ## Réalisé
 
-La conception et le plan d'implémentation sont écrits. Aucun code métier F06
-n'est encore déclaré réalisé.
+- contrats partagés stricts pour fenêtres UTC, propositions, votes, séances et
+  périodes de planning ;
+- migration additive `0005_scheduling.sql` et tables Drizzle
+  `time_proposals`, `time_votes`, `game_sessions` ;
+- repository séparé des handlers, avec transaction de sélection, unicité des
+  votes et lecture des séances du propriétaire ou des membres actifs ;
+- services distincts pour propositions, lecture, vote, séance fixe, sélection
+  idempotente et planning ;
+- routes `POST/GET /games/:id/proposals`, `POST /proposals/:id/votes`,
+  `POST /games/:id/sessions` et `GET /planning` ;
+- page `/planning` avec calendrier mensuel desktop, agenda mobile, prochaines
+  séances, légende et états loading/error/empty ;
+- écran `/parties/[id]/vote` avec matrice desktop, cartes mobiles, compteurs,
+  progression et choix accessibles au clavier.
 
 ## Dépendances
 
@@ -44,11 +56,40 @@ F02, F04 et F05 doivent être disponibles dans `develop`.
 `docs/implementation-plan.md`, les maquettes planning/vote desktop et mobile,
 `docs/superpowers/specs/2026-09-06-sessions-scheduling-design.md`.
 
+## Preuve TDD
+
+Les tests de contrats et de politique ont d'abord échoué car les modules
+n'existaient pas (Red), puis sont passés après l'implémentation minimale
+(Green). Les services, routes et composants ont suivi le même cycle ; une
+régression one-shot (sélection d'une quatrième séance) a ensuite été ajoutée
+et vérifiée. Aucun test existant n'a été modifié ou affaibli.
+
+## Tests et vérifications
+
+- tests F06 ciblés : 26 tests ;
+- suite monorepo : 84 fichiers, 202 tests passés ;
+- lint et typecheck des quatre packages passés ;
+- build Next.js passé avec Turbopack après autorisation de création de
+  processus ;
+- test repository d'idempotence et de double vote ajouté sous
+  `apps/api/tests/integration/scheduling` ; il utilise le helper mémoire
+  existant car aucun harness PostgreSQL d'intégration n'est encore fourni.
+
+## Sécurité
+
+Les mutations exigent une session, l'origine applicative et un contrôle de
+propriétaire ou de membre actif. Les entrées sont validées par Zod avec dates,
+durées, listes et périodes bornées. Les votes sont uniques par proposition et
+utilisateur ; la sélection est transactionnelle et idempotente. Les services
+ne lisent pas `process.env`, les repositories ne dépendent pas de Hono et aucun
+secret ou horaire privé d'un autre utilisateur n'est exposé.
+
 ## Limites et travaux reportés
 
 - les tests d'intégration PostgreSQL et la migration seront exécutés avec une
   base de test isolée ;
 - les notifications Discord, présences et absences ne font pas partie de F06 ;
+- le planning ne propose pour l'instant que la vue mensuelle desktop et
+  l'agenda mobile ; les vues semaine/jour de la maquette restent décoratives ;
 - l'ouverture de la PR interviendra après les vérifications et reste sous
   réserve des permissions GitHub.
-

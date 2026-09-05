@@ -67,7 +67,7 @@ export function createInMemorySchedulingRepository(input: { games: InMemoryGame[
       return created
     },
     async listPlanning({ userId, from, to }): Promise<PlanningPage> {
-      const gameIds = members.filter((member) => member.userId === userId).map((member) => member.gameId)
+      const gameIds = [...members.filter((member) => member.userId === userId).map((member) => member.gameId), ...games.filter((candidate) => candidate.ownerId === userId).map((candidate) => candidate.id)]
       return { items: sessions.filter((item) => gameIds.includes(item.gameId) && item.status !== 'CANCELLED' && (!from || item.endsAt >= from) && (!to || item.startsAt <= to)), from, to }
     },
     setGameStatus(gameId, status) { const candidate = game(gameId); if (candidate) candidate.status = status },

@@ -40,8 +40,9 @@ Exclus :
   `COMPLETED`.
 - Une proposition appartient à une partie et possède un statut `OPEN`,
   `CLOSED` ou `SELECTED`.
-- Un membre actif ne possède qu'un vote par proposition. Un vote remplace son
-  vote précédent avant la clôture ; toute écriture après clôture est refusée.
+- Un membre actif ne possède qu'un vote par proposition. Une seconde écriture
+  est refusée avant comme après la clôture ; toute écriture après clôture est
+  refusée.
 - Le MJ propriétaire est le seul à créer une séance, créer des propositions,
   clôturer un sondage et sélectionner un créneau.
 - Les membres actifs peuvent voter et consulter les propositions ; les autres
@@ -101,4 +102,3 @@ le contrôle MJ, l'origine, les dates trop longues, le double vote, le vote apr�
 clôture, la concurrence clôture/sélection, l'idempotence et les conversions
 UTC/fuseau avec changement d'heure. Les requêtes sont paramétrées et les logs
 ne contiennent ni token ni donnée personnelle inutile.
-

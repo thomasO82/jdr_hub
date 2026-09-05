@@ -1,4 +1,4 @@
-import { and, asc, eq, gte, inArray, lte } from 'drizzle-orm'
+import { and, asc, eq, gte, inArray, lte, or } from 'drizzle-orm'
 import { authSchema, gameSchema, schedulingSchema, type createDatabase } from '@jdr-hub/database'
 import type { GameStatus, GameType, ProposalStatus, SessionStatus, SessionWindow, VoteValue } from '@jdr-hub/shared'
 
@@ -132,10 +132,7 @@ export function createPostgresSchedulingRepository(database: Database): Scheduli
       })
     },
     async listPlanning({ userId, from, to }) {
-      const conditions = [eq(gameMembers.userId, userId), eq(gameMembers.status, 'ACTIVE'), inArray(gameSessions.status, ['SCHEDULED', 'COMPLETED'])]
-      if (from) conditions.push(gte(gameSessions.endsAt, from))
-      if (to) conditions.push(lte(gameSessions.startsAt, to))
-      const rows = await database.select({ id: gameSessions.id, gameId: gameSessions.gameId, proposalId: gameSessions.proposalId, gameTitle: games.title, startsAt: gameSessions.startsAt, endsAt: gameSessions.endsAt, status: gameSessions.status, notes: gameSessions.notes }).from(gameSessions).innerJoin(games, eq(gameSessions.gameId, games.id)).innerJoin(gameMembers, eq(gameMembers.gameId, gameSessions.gameId)).where(and(...conditions)).orderBy(asc(gameSessions.startsAt))
+      const rows = await database.select({ id: gameSessions.id, gameId: gameSessions.gameId, proposalId: gameSessions.proposalId, gameTitle: games.title, startsAt: gameSessions.startsAt, endsAt: gameSessions.endsAt, status: gameSessions.status, notes: gameSessions.notes }).from(gameSessions).innerJoin(games, eq(gameSessions.gameId, games.id)).leftJoin(gameMembers, eq(gameMembers.gameId, gameSessions.gameId)).where(and(or(eq(games.ownerId, userId), and(eq(gameMembers.userId, userId), eq(gameMembers.status, 'ACTIVE'))), inArray(gameSessions.status, ['SCHEDULED', 'COMPLETED']), ...(from ? [gte(gameSessions.endsAt, from)] : []), ...(to ? [lte(gameSessions.startsAt, to)] : []))).orderBy(asc(gameSessions.startsAt))
       return { items: rows.map((row) => ({ ...row, status: row.status as SessionStatus })), from, to }
     },
   }

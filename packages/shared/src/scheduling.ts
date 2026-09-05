@@ -54,4 +54,27 @@ export type ProposalInput = z.infer<typeof proposalInputSchema>
 export type FixedSessionInput = z.infer<typeof fixedSessionInputSchema>
 export type VoteCommand = z.infer<typeof voteCommandSchema>
 export type SessionCommand = z.infer<typeof sessionCommandSchema>
+
+export type SchedulingProposal = {
+  id: string
+  gameId: string
+  startsAt: string
+  endsAt: string
+  status: ProposalStatus
+  votes: { yes: number; maybe: number; no: number }
+  userVote: VoteValue | null
+}
+
+export type PlanningSession = {
+  id: string
+  gameId: string
+  proposalId: string | null
+  gameTitle: string
+  startsAt: string
+  endsAt: string
+  status: SessionStatus
+  notes: string | null
+}
+
+export type PlanningPage = { items: PlanningSession[]; from: string | null; to: string | null }
 export type PlanningQuery = z.infer<typeof planningQuerySchema>

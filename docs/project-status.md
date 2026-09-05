@@ -36,7 +36,7 @@ Seuls les statuts suivants sont autorisés :
 | DEV-002 | Commandes de développement | `IN_PROGRESS` | `chore/developer-commands` | Non créée | 60 fichiers, 142 tests verts ; lint et typecheck verts | Alias Docker Compose sans modification de sécurité | [Fiche DEV-002](features/009-developer-commands.md) |
 | DEV-003 | Drizzle Studio local | `IN_PROGRESS` | `chore/drizzle-studio` | Non créée | 61 fichiers, 146 tests verts ; lint, typecheck, build et image Studio vérifiés | Port local uniquement, réseau PostgreSQL privé, conteneur non-root | [Fiche DEV-003](features/010-drizzle-studio.md) |
 | F05 | Disponibilités et recherche de joueurs | `IN_PROGRESS` | `feat/availability-and-player-search` | Non créée | 72 fichiers, 173 tests monorepo verts ; lint, typecheck et builds verts | Session obligatoire, origine stricte, rate limit d’écriture, horaires privés, projection agrégée et validation bornée | [Fiche F05](features/011-availability-and-player-search.md) |
-| F06 | Séances, créneaux, votes et planning | `IN_PROGRESS` | `feat/sessions-scheduling` | Non créée | Conception et plan en cours | Contrôles prévus : appartenance, origine, votes uniques, transactions et dates bornées | [Fiche F06](features/012-sessions-scheduling.md) |
+| F06 | Séances, créneaux, votes et planning | `IN_PROGRESS` | `feat/sessions-scheduling` | Non créée | 84 fichiers, 203 tests monorepo verts ; lint, typecheck et build web verts | Appartenance/MJ, origine stricte, votes uniques, transaction de sélection, dates bornées | [Fiche F06](features/012-sessions-scheduling.md) |
 
 ## Blocages
 

@@ -64,6 +64,13 @@ describe('scheduling services', () => {
     expect((await listProposals({ gameId, userId: ownerId, repository: repo }))[0]?.status).toBe('SELECTED')
   })
 
+  it('rejects selecting a fourth one-shot session', async () => {
+    const repo = repository()
+    await repo.seedSessions(gameId, 3)
+    const [proposal] = await createProposals({ gameId, ownerId, slots: [slot], repository: repo, now: () => now })
+    await expect(selectProposal({ gameId, ownerId, proposalId: proposal.id, repository: repo, now: () => now })).rejects.toThrow('SCHEDULING_CONFLICT')
+  })
+
   it('returns only the user planning range', async () => {
     const repo = repository()
     await createSession({ gameId, ownerId, ...slot, notes: null, repository: repo, now: () => now })
