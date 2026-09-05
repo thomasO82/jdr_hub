@@ -47,11 +47,12 @@ recherche, sans exposer de données privées.
 ### Réalisé
 
 La conception est validée et documentée dans
-`docs/superpowers/specs/2026-09-05-public-games-seo-design.md`.
+`docs/superpowers/specs/2026-09-05-public-games-seo-design.md`. Les lectures
+publiques, le rendu SSR et les routes SEO sont implémentés sur la branche.
 
 ### Restant à faire
 
-L’implémentation API, SSR, SEO et les vérifications restent à réaliser.
+La PR et la vérification manuelle dans Docker restent à réaliser.
 
 ## Besoin utilisateur
 
@@ -62,11 +63,12 @@ publiques depuis une URL indexable.
 
 ### Réalisé
 
-Aucun parcours F03 n’est déclaré réalisé avant la fin des tests.
+Le catalogue public, le détail et les collections éditoriales utilisent le
+client serveur public ; les parties privées et fermées restent absentes.
 
 ### Restant à faire
 
-Catalogue, fiches publiques, pages MJ/tags/jeux et métadonnées SEO.
+La vérification responsive et la revue humaine restent à faire.
 
 ## Périmètre prévu
 
@@ -79,7 +81,12 @@ Catalogue, fiches publiques, pages MJ/tags/jeux et métadonnées SEO.
 
 ## Fonctionnalités effectivement réalisées
 
-Aucune à ce stade.
+- Projection publique explicite sans identifiants internes.
+- Catalogue `/parties` SSR avec recherche, MJ, pagination et multi-tags `AND`.
+- Détail `/parties/[slug]` et collections `/mj/[slug]`, `/tags/[slug]` et
+  `/jeux/[slug]` SSR.
+- Métadonnées canonical/Open Graph, `/sitemap.xml` et `/robots.txt`.
+- Endpoint `/public/slugs` limité aux ressources publiques indexables.
 
 ## Parcours utilisateur
 
@@ -90,11 +97,12 @@ une partie publique et peut partager sa fiche.
 
 ### Réalisé
 
-Aucun parcours F03 n’est encore vérifié.
+Les scénarios API et SSR sont couverts par les tests automatisés ; le contrôle
+visuel desktop/mobile reste à effectuer.
 
 ### Restant à faire
 
-Rendu SSR et contrôle manuel desktop/mobile.
+Contrôle visuel et parcours de partage à vérifier manuellement.
 
 ## Règles métier
 
@@ -106,7 +114,9 @@ Rendu SSR et contrôle manuel desktop/mobile.
 
 ### Implémentées
 
-Aucune avant le cycle TDD.
+Les repositories et helpers exposent une projection publique sans `id` ni
+`ownerId`, les statuts éligibles sont `OPEN` et `ACTIVE`, et les filtres tags
+répétés utilisent `AND`.
 
 ### Non couvertes ou reportées
 
@@ -121,11 +131,12 @@ explicite des colonnes publiques et Server Components Next.js pour le SSR.
 
 ### Réalisé
 
-La conception est décrite dans le document de spécification F03.
+La projection SQL, les services de lecture, le client public et les Server
+Components sont séparés par responsabilité.
 
 ### Restant à faire
 
-Implémenter les services, routes, client serveur et pages.
+La revue visuelle et la PR restent à faire.
 
 ## Modèle de données et migrations
 
@@ -136,7 +147,7 @@ par normalisation déterministe sans exposer d’identifiant technique.
 
 ### Réalisé
 
-Aucune migration F03 exécutée.
+Aucune migration F03 n’a été exécutée ; le schéma existant est réutilisé.
 
 ### Restant à faire
 
@@ -151,14 +162,16 @@ Vérifier les collisions de slug et les index utiles sans migration destructive.
 - `GET /public/gms/:slug`
 - `GET /public/tags/:slug`
 - `GET /public/systems/:slug`
+- `GET /public/slugs`
 
 ### Implémentées
 
-Aucune route F03 nouvelle à ce stade.
+Toutes les routes prévues sont implémentées, avec `/public/slugs` pour le
+sitemap.
 
 ### Restantes
 
-Toutes les routes publiques prévues.
+La revue du contrat public et le déploiement restent à vérifier.
 
 ## Interface et composants
 
@@ -171,11 +184,12 @@ Toutes les routes publiques prévues.
 
 ### Réalisés
 
-Aucun écran F03 vérifié.
+Les écrans SSR et leurs états vide/erreur sont implémentés en Tailwind dans les
+composants de catalogue, détail et collection.
 
 ### Restants
 
-Tous les écrans et leur adaptation responsive.
+Le contrôle responsive manuel reste reporté.
 
 ## Tests
 
@@ -189,25 +203,28 @@ Tous les écrans et leur adaptation responsive.
 
 ### Réalisés
 
-Aucun test F03 ajouté avant l’écriture du cycle TDD.
+Les tests API, unitaires, client et SSR F03 sont ajoutés ; la suite complète
+compte 120 tests verts.
 
 ### Restants
 
-Tous les tests prévus et la non-régression complète.
+La couverture E2E et le contrôle visuel restent reportés.
 
 ## Preuve TDD Red, Green, Refactor
 
 ### Red
 
-À renseigner après l’écriture et l’exécution des premiers tests F03.
+Les tests ont été écrits avant les services, routes et pages ; les premiers
+tests rouges signalaient les surfaces absentes.
 
 ### Green
 
-À renseigner après l’implémentation minimale.
+Les tests ciblés puis la suite complète passent après l’implémentation.
 
 ### Refactor
 
-À renseigner après la refactorisation et la vérification complète.
+La projection, le client public et les pages sont séparés par responsabilité,
+sans modification de schéma ni de dépendance.
 
 ## Contrôles de sécurité
 
@@ -222,11 +239,13 @@ Tous les tests prévus et la non-régression complète.
 
 ### Réalisés
 
-Aucun contrôle F03 exécuté avant l’implémentation.
+Tests de visibilité privée/fermée, projection sans identifiants, validation des
+limites, filtrage `AND`, XSS rendu échappé par React et slugs publics exécutés.
 
 ### Restants ou limites
 
-Les tests de sécurité et la vérification des headers restent à faire.
+La revue manuelle des en-têtes de déploiement et le contrôle SEO avec une URL
+publique restent à faire.
 
 ## Documentation technique consultée
 
