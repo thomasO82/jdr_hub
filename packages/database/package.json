@@ -10,6 +10,7 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
+    "db:seed": "pnpm build && node dist/seed.js",
     "db:generate": "drizzle-kit generate --config drizzle.config.ts",
     "lint": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json"
