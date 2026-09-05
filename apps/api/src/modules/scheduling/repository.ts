@@ -72,7 +72,7 @@ export function createPostgresSchedulingRepository(database: Database): Scheduli
 
   return {
     async findGame(gameId) {
-      const [row] = await database.select({ id: games.id, ownerId: games.ownerId, title: games.title, type: games.type, status: games.status }).from(games).where(eq(games.id, gameId)).limit(1)
+      const [row] = await database.select({ id: games.id, ownerId: games.ownerId, title: games.title, type: games.type, status: games.status }).from(games).where(or(eq(games.id, gameId), eq(games.slug, gameId))).limit(1)
       return row ? toGame(row) : null
     },
     async countSessions(gameId) {
