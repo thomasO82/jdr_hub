@@ -29,4 +29,23 @@ describe('games API routes', () => {
     registerGamesRoutes(app, { authConfig: config, authRepository: createInMemoryAuthRepository(), repository: createInMemoryGamesRepository() })
     expect((await app.request('/games?page=0')).status).toBe(400)
   })
+
+  it('serves public open games by slug and hides private games', async () => {
+    const app = new Hono<GamesRouteEnv>()
+    registerGamesRoutes(app, {
+      authConfig: config,
+      authRepository: createInMemoryAuthRepository(),
+      repository: createInMemoryGamesRepository([
+        { id: 'game-1', ownerId: 'owner', slug: 'crypte', title: 'La Crypte', system: 'D&D', description: 'Desc', type: 'ONE_SHOT', status: 'OPEN', visibility: 'PUBLIC', maxPlayers: 4, tags: [] },
+        { id: 'game-2', ownerId: 'owner', slug: 'privee', title: 'Privée', system: 'D&D', description: 'Desc', type: 'CAMPAIGN', status: 'OPEN', visibility: 'PRIVATE', maxPlayers: 4, tags: [] },
+      ]),
+    })
+
+    const publicResponse = await app.request('/public/games/crypte')
+    expect(publicResponse.status).toBe(200)
+    expect((await publicResponse.json()).data.slug).toBe('crypte')
+
+    const privateResponse = await app.request('/public/games/privee')
+    expect(privateResponse.status).toBe(404)
+  })
 })
