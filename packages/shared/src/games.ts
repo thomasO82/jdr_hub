@@ -13,7 +13,7 @@ export const createGameSchema = z.object({
   type: gameTypeSchema,
   maxPlayers: z.number().int().min(1).max(12),
   visibility: gameVisibilitySchema,
-  tags: z.array(tagSlugSchema).max(20).default([]),
+  tags: z.array(tagSlugSchema).max(20).refine((values) => new Set(values).size === values.length, 'Tags must be unique').default([]),
 }).strict()
 
 export const updateGameSchema = z.object({
@@ -23,7 +23,7 @@ export const updateGameSchema = z.object({
   type: gameTypeSchema.optional(),
   maxPlayers: z.number().int().min(1).max(12).optional(),
   visibility: gameVisibilitySchema.optional(),
-  tags: z.array(tagSlugSchema).max(20).optional(),
+  tags: z.array(tagSlugSchema).max(20).refine((values) => new Set(values).size === values.length, 'Tags must be unique').optional(),
 }).strict()
 
 export const gameQuerySchema = z.object({
