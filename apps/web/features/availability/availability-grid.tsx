@@ -29,8 +29,9 @@ export function AvailabilityGrid({ rules, onChange }: { rules: AvailabilityRule[
         return (
           <fieldset className="rounded-xl border border-outline-variant/40 bg-surface-container-low p-4" key={day}>
             <legend className="font-display text-base font-semibold">{day}</legend>
-            <label className="mt-3 flex min-h-10 items-center gap-2 text-sm font-semibold">
-              <input className="h-4 w-4 accent-primary" type="checkbox" checked={Boolean(rule)} onChange={(event) => toggleDay(dayOfWeek, event.target.checked)} aria-label={`Disponible le ${day}`} />
+            <label className="mt-3 flex min-h-10 cursor-pointer items-center gap-2 text-sm font-semibold">
+              <input className="peer sr-only" type="checkbox" checked={Boolean(rule)} onChange={(event) => toggleDay(dayOfWeek, event.target.checked)} aria-label={`Disponible le ${day}`} />
+              <span aria-hidden="true" className="grid h-5 w-5 shrink-0 place-items-center rounded-md border-2 border-outline-variant bg-surface text-sm text-on-primary transition-colors after:content-none peer-checked:border-primary peer-checked:bg-primary peer-checked:after:content-['✓'] peer-focus-visible:ring-2 peer-focus-visible:ring-primary peer-focus-visible:ring-offset-2" />
               Disponible
             </label>
             <label className="mt-3 block text-xs font-semibold uppercase tracking-wide text-on-surface-variant" htmlFor={`start-${dayOfWeek}`}>Début</label>

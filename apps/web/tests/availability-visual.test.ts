@@ -18,4 +18,11 @@ describe('availability visual structure', () => {
     expect(grid).toContain('disabled={!rule}')
     expect(grid).toContain('onChange={(event) => toggleDay')
   })
+
+  it('styles checked and keyboard-focused day checkboxes', () => {
+    const grid = read('../features/availability/availability-grid.tsx')
+    expect(grid).toContain('peer-checked:bg-primary')
+    expect(grid).toContain('peer-focus-visible:ring-2')
+    expect(grid).toContain('peer-checked:after:content-[\'✓\']')
+  })
 })
