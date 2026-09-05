@@ -6,20 +6,25 @@ F00
 
 ## Statut
 
-`IN_PROGRESS`
+`MERGED`
 
 ## Branche
 
-`chore/monorepo-foundation`, créée depuis `develop`
+`fix/f00-hardening`, créée depuis l’état vérifié de `develop` le 2026-09-03.
 
 ## Lien ou numéro de Pull Request
 
-Non créée — la Pull Request ciblera `develop`.
+[PR #3](https://github.com/thomasO82/jdr_hub/pull/3), fusionnée dans `develop` le 2026-09-03 par le propriétaire.
 
 ## Dates de début et de fin
 
 - Début : 2026-09-02
-- Fin : Non terminée
+- Fin : 2026-09-03 — PR #3 fusionnée
+
+### Synchronisation post-fusion — 2026-09-03
+
+La PR #3 a été fusionnée dans `develop`. Cette fiche reste historique ; les
+évolutions ultérieures sont suivies dans les fiches suivantes.
 
 ## Dépendances
 
@@ -44,11 +49,15 @@ Non créée — la Pull Request ciblera `develop`.
 
 ### Réalisé
 
-La conception F00 est validée comme prochaine étape documentaire. L’implémentation technique n’a pas commencé.
+La conception F00 est validée. Le workspace pnpm strict, les scripts racine,
+les quatre frontières de répertoires et les packages `@jdr-hub/shared` et
+`@jdr-hub/database` sont en place. Les tests d’architecture protègent aussi
+la séparation du code navigateur et du code de base de données.
 
 ### Restant à faire
 
-Créer le workspace, les applications, les packages, les conteneurs, le routage local et la CI.
+La pile Docker, le routage same-origin, la couche Drizzle minimale et les
+gates CI sont implémentés ; l’ouverture de la PR reste à faire.
 
 ## Besoin utilisateur
 
@@ -58,11 +67,12 @@ Fournir une base technique installable, testable et reproductible pour développ
 
 ### Réalisé
 
-Non applicable à ce stade : aucun comportement applicatif n’est encore disponible.
+Le socle de packages, l’API technique et le shell web sont disponibles pour
+les développements suivants ; aucun comportement métier n’est encore exposé.
 
 ### Restant à faire
 
-Rendre le socle exécutable localement et vérifiable par CI.
+Rendre le socle complet exécutable localement et vérifiable par CI.
 
 ## Périmètre prévu
 
@@ -80,8 +90,25 @@ Rendre le socle exécutable localement et vérifiable par CI.
 
 ## Fonctionnalités effectivement réalisées
 
-- La branche `chore/monorepo-foundation` a été créée depuis `develop`.
+- La branche `fix/f00-hardening` a été créée depuis `develop`.
 - La conception et les critères de F00 sont documentés.
+- Le workspace pnpm et sa configuration TypeScript stricte sont implémentés.
+- `packages/shared` et `packages/database` disposent de manifests, tsconfigs
+  et points d’entrée stables.
+- `apps/api` expose `GET /health` avec une enveloppe stable, un identifiant de
+  requête et un bootstrap Node validant `PORT`.
+- Les tests d’architecture vérifient les workspaces, les dépendances locales
+  interdites et l’absence d’import serveur depuis les sources navigateur.
+- Docker Compose définit `web-next`, `api-hono` et `postgres`; PostgreSQL
+  n’expose aucun port hôte et reste isolé sur un réseau interne.
+- Les images web et API utilisent des builds multi-stage et un runtime
+  non-root. Les quatre services disposent de healthchecks.
+- Caddy publie un unique point d’entrée local et route `/` vers Next.js et
+  `/api/*` vers Hono.
+- Drizzle et PostgreSQL disposent d’une fabrique serveur validant
+  `DATABASE_URL` ; aucun schéma métier n’est ajouté.
+- La CI GitHub Actions exécute les contrôles qualité, audit, scans de secrets,
+  code et images avec permissions minimales.
 
 ## Parcours utilisateur
 
@@ -91,11 +118,13 @@ Un développeur clone le dépôt, fournit uniquement des valeurs factices ou des
 
 ### Réalisé
 
-Non disponible : le socle n’est pas encore implémenté.
+Le parcours développeur est disponible : installation pnpm, tests d’architecture,
+API `/health`, shell web, routage same-origin, vérifications TypeScript/Next.js
+et démarrage des quatre services Docker sont reproductibles.
 
 ### Restant à faire
 
-Valider le parcours local et le parcours CI après implémentation.
+Relancer le parcours complet sur la branche finale avant la PR.
 
 ## Règles métier
 
@@ -121,11 +150,15 @@ Monorepo pnpm avec Next.js App Router, Hono REST, packages TypeScript partagés,
 
 ### Réalisé
 
-La stack et les frontières sont documentées dans le cahier des charges et la conception F00 ; aucun fichier applicatif n’a encore été créé.
+ Le workspace pnpm, les options TypeScript strictes et les frontières
+ `@jdr-hub/shared`/`@jdr-hub/database` sont implémentés. Le package database
+ fournit une fabrique Drizzle validée sans modèle métier, l’API Hono possède
+ son endpoint de santé et sa limite de corps, le proxy route le trafic local et
+ le shell Next.js rend la page technique avec le logo officiel.
 
 ### Restant à faire
 
-Implémenter les frontières workspace, les scripts, les services et les vérifications reproductibles.
+Maintenir les versions et les scans à jour lors des fonctionnalités suivantes.
 
 ## Modèle de données et migrations
 
@@ -135,7 +168,8 @@ Préparer l’accès Drizzle et PostgreSQL sans créer de migration métier. Les
 
 ### Réalisé
 
-Aucun schéma ni migration créé.
+Aucun schéma ni migration créé ; la frontière package est préparée sans
+introduire de modèle métier.
 
 ### Restant à faire
 
@@ -150,11 +184,14 @@ Ajouter la connectivité de test minimale sans introduire prématurément le mod
 
 ### Implémentées
 
-- Aucune route implémentée.
+- `GET /health` — route interne Hono avec enveloppe `{ data, error, meta }`
+  et `requestId` par requête.
+- Les réponses 404 et 500 utilisent également un `requestId`.
 
 ### Restantes
 
-- Endpoint de santé, validation de taille de corps et format d’erreur avec `requestId`.
+ - Ajouter les routes métier et leur autorisation dans les fonctionnalités
+   suivantes.
 
 ## Interface et composants
 
@@ -165,11 +202,13 @@ Ajouter la connectivité de test minimale sans introduire prématurément le mod
 
 ### Réalisés
 
-- Aucun composant applicatif.
+- Le shell technique Next.js rend une page Server Component avec un landmark
+  `main`, un message de démarrage en français et le logo officiel.
 
 ### Restants
 
-- Aucun écran fonctionnel ; le shell technique et les états de base restent à créer.
+- Les écrans fonctionnels et les états de base restent à créer ; le shell
+  technique est en place.
 
 ## Tests
 
@@ -185,31 +224,84 @@ Ajouter la connectivité de test minimale sans introduire prématurément le mod
 
 | Commande | Résultat | Date |
 | --- | --- | --- |
-| `rg`, contrôles Markdown et vérifications Git documentaires | Réussis pour la phase de conception ; aucun test applicatif n’existe encore | 2026-09-02 |
+| `CI=true pnpm install --frozen-lockfile` | Réussi avec pnpm 11.25.0 | 2026-09-02 |
+| `CI=true pnpm --filter @jdr-hub/api test` | Réussi : 7 tests dans 2 fichiers | 2026-09-02 |
+| `CI=true pnpm --filter @jdr-hub/api typecheck` | Réussi | 2026-09-02 |
+| `CI=true pnpm --filter @jdr-hub/api build` | Réussi | 2026-09-02 |
+| `CI=true pnpm --filter @jdr-hub/web test` | Réussi : 1 test dans 1 fichier | 2026-09-02 |
+| `CI=true pnpm --filter @jdr-hub/web typecheck` | Réussi | 2026-09-02 |
+| `CI=true pnpm --filter @jdr-hub/web build` | Réussi ; route statique `/` générée | 2026-09-02 |
+| `CI=true pnpm build` | Réussi ; builds API et web exécutés via les workspaces | 2026-09-02 |
+| `CI=true pnpm exec vitest run tests/architecture/workspace.test.ts tests/architecture/database-boundary.test.ts --exclude '.superpowers/**'` | Réussi : 5 tests dans 2 fichiers | 2026-09-02 |
+ | `CI=true pnpm typecheck` | Réussi | 2026-09-02 |
+| `git diff --check` | Réussi | 2026-09-02 |
+| `pnpm vitest run tests/infrastructure/compose-config.test.ts` | Réussi : 5 tests | 2026-09-03 |
+| `pnpm test` | Réussi : 31 tests dans 11 fichiers | 2026-09-03 |
+| `pnpm lint` | Réussi sur les 4 workspaces | 2026-09-03 |
+| `pnpm build` | Réussi : API et Next.js 16.2.11 | 2026-09-03 |
+| `pnpm typecheck` | Réussi | 2026-09-03 |
+| `pnpm audit --audit-level=high` | Réussi : aucune vulnérabilité connue | 2026-09-03 |
+| `curl --fail http://127.0.0.1:18080/` et `/api/health` | Réussi via Caddy, Next.js et Hono | 2026-09-03 |
+| `pnpm build` | Réussi : builds API et Next.js | 2026-09-03 |
+| `docker compose -f docker-compose.yml config --quiet` | Réussi, aucune sortie sensible | 2026-09-03 |
+| `docker compose -f docker-compose.yml build web-next api-hono` | Réussi : 2 images construites | 2026-09-03 |
+| `docker compose -f docker-compose.yml up -d --wait` | Réussi : 3 services sains | 2026-09-03 |
 
 ### Restants
 
-- Tous les tests F00 d’architecture, intégration, API, Compose, CI et builds.
+- Les tests d’intégration PostgreSQL réelle et l’exécution sur GitHub Actions
+  doivent être confirmés dans l’environnement cible.
 
 ## Preuve TDD Red, Green, Refactor
 
 ### Red
 
-- Tests écrits avant l’implémentation : À faire avant le code F00.
-- Commande exécutée : Non applicable avant la création des tests.
-- Échec initial et raison attendue : À consigner lorsque les tests rouges seront exécutés.
+- Test écrit avant l’implémentation : test d’architecture des packages et de
+  leurs points d’entrée.
+- Commande exécutée sur le snapshot propre `f99f100` :
+  `CI=true pnpm exec vitest run .superpowers/sdd/2026-09-02-monorepo-foundation/task-2-red-baseline.test.ts`.
+- Échec initial : `packages/shared/package.json` absent, comme attendu.
 
 ### Green
 
-- Implémentation minimale ajoutée : Aucune.
-- Commande exécutée : Non applicable.
-- Résultat : À consigner après l’implémentation minimale.
+- Implémentation minimale : manifests, tsconfigs et points d’entrée vides des
+  deux packages, plus les tests de frontière.
+- Résultat : 5 tests passants dans 2 fichiers et `pnpm typecheck` réussi.
 
 ### Refactor
 
-- Refactorisations effectuées sans changement de comportement : Aucune.
-- Commande exécutée : Non applicable.
-- Résultat final : À consigner après la phase Green et la refactorisation.
+- Le détecteur d’imports serveur est centralisé dans
+  `tests/architecture/helpers/database-boundary.ts` pour éviter la duplication.
+- Résultat final : tests ciblés, typecheck et contrôle du diff réussis.
+
+### Évolution datée — Shell Next.js, 2026-09-02
+
+- Red : `tests/smoke/web-shell.test.ts` échouait avec `ENOENT` avant la
+  création de `apps/web/app/page.tsx`.
+- Green : le smoke test passe ; typecheck et build Next.js passent.
+- Refactor : le shell reste un Server Component minimal, sans logique métier,
+  sans import database et sans HTML injecté.
+
+### Évolution datée — API Hono, 2026-09-02
+
+- Red : le test `apps/api/src/app.test.ts` échouait avant `createApiApp` avec
+  le module introuvable ; la configuration de port a ensuite reçu ses cas
+  invalides.
+- Green : `@jdr-hub/api test` passe avec 7 tests ; typecheck et build passent.
+- Refactor : le `requestId` est produit par middleware, le bootstrap est
+  séparé de l’export package, et `PORT` est validé dans un module dédié.
+
+### Évolution datée — Docker Compose, 2026-09-03
+
+- Red : `pnpm vitest run tests/infrastructure/compose-config.test.ts`
+  échouait avec 5 assertions car `docker-compose.yml` était absent.
+- Green : les 5 tests passent après ajout des trois services, de l’isolation
+  PostgreSQL et des healthchecks. Les images web/API se construisent et les
+  trois conteneurs atteignent l’état `healthy`.
+- Refactor : le helper de test a été corrigé après reproduction d’un défaut
+  d’extraction sur les lignes YAML vides. `next.config.ts` a été remplacé par
+  `next.config.mjs`, format officiellement supporté, afin que le runtime web
+  n’installe aucune dépendance de développement au démarrage.
 
 ## Contrôles de sécurité
 
@@ -226,10 +318,23 @@ Ajouter la connectivité de test minimale sans introduire prématurément le mod
 
 - La politique d’accès de l’IA a été consultée.
 - Aucun motif de secret n’a été détecté dans les documents de cette phase.
+- PostgreSQL n’a aucun port publié et utilise un réseau Docker interne.
+ - Les conteneurs applicatifs s’exécutent avec l’utilisateur non-root `node`,
+   abandonnent toutes les capacités Linux et activent `no-new-privileges` ; le
+   proxy n’ajoute que `NET_BIND_SERVICE` pour son binaire officiel.
+ - Les images utilisent des versions précises, des builds multi-stage et des
+   dépendances runtime séparées des dépendances de construction.
+ - Next.js envoie une baseline CSP, anti-clickjacking, `nosniff`, referrer et
+   permissions ; `unsafe-inline` reste limité au bootstrap Next.js et documenté.
+- `.dockerignore` exclut environnements, journaux, dumps et artefacts locaux ;
+  `.env.example` contient uniquement des valeurs locales factices.
+- Les healthchecks ont été observés verts sans lecture des logs de conteneurs.
 
 ### Restants ou limites
 
-- Tous les contrôles techniques seront exécutés après implémentation et consignés avant la Pull Request.
+- Le compte PostgreSQL local d’amorçage reste à séparer explicitement d’un
+  futur compte applicatif à privilèges minimaux lors de l’ajout de Drizzle.
+- Les scans CI sont définis ; leur exécution dépend de l’environnement GitHub.
 
 ## Documentation technique consultée
 
@@ -238,15 +343,30 @@ Ajouter la connectivité de test minimale sans introduire prématurément le mod
 - `docs/design-audit.md` et `docs/design-system.md` — sources design consultées pour les frontières du shell.
 - `docs/implementation-plan.md` — F00 et règles de livraison.
 - `docs/security/ai-access-policy.md` — politique d’accès appliquée, sans modification.
+- Documentation officielle Next.js — format ESM `next.config.mjs`, consultée
+  le 2026-09-03 faute de Context7 disponible dans la session.
 
 ## Fichiers principaux
 
-- À créer dans F00 : workspace pnpm, `apps/web`, `apps/api`, packages, Docker Compose, workflows CI et documentation de démarrage.
+- `package.json`, `pnpm-workspace.yaml`, `pnpm-lock.yaml` et `tsconfig.base.json`.
+- `apps/api/package.json`, `apps/api/tsconfig.json` et `apps/api/src/`.
+- `apps/web/package.json`, `apps/web/tsconfig.json`, `apps/web/next.config.mjs`,
+  `apps/web/app/` et `apps/web/public/branding/logo.svg`.
+- `docker-compose.yml`, `.dockerignore`, `.env.example`, les Dockerfiles web/API
+  et `docker/postgres/healthcheck.sh`.
+- `tests/infrastructure/compose-config.test.ts`.
+- `packages/shared/` et `packages/database/`.
+- `tests/architecture/workspace.test.ts`.
+- `tests/architecture/database-boundary.test.ts` et son helper.
 
 ## Limites connues
 
-- Le code applicatif et les configurations F00 ne sont pas encore implémentés.
-- Aucun test automatisé de projet n’est encore disponible dans le dépôt.
+- La connectivité PostgreSQL réelle reste à confirmer dans un environnement de
+  test dédié ; la pile Docker et le proxy local sont en place.
+- L’API actuelle se limite à la santé technique ; aucune route métier n’est
+  incluse.
+- La protection de la frontière database est un garde-fou d’architecture par
+  test ; elle devra être complétée par les configurations de build des apps.
 
 ## Travaux reportés
 
@@ -264,14 +384,26 @@ Après implémentation : installer avec pnpm, démarrer Compose, vérifier les h
 ### Réalisée
 
 - Vérification documentaire et de branche réalisée le 2026-09-02.
+- Construction des images, démarrage avec attente et observation des quatre
+  healthchecks verts le 2026-09-03 ; arrêt sans suppression du volume de
+  développement.
 
 ### Restante
 
-- Toute vérification d’exécution locale et CI.
+- Exécution réelle de la CI GitHub et scan Docker Scout à confirmer après PR.
 
 ## Commits importants
 
-- À venir : commits TDD Red, Green et Refactor de F00.
+- `bc49b0f chore: scaffold pnpm workspace`.
+- `f99f100 test: enforce workspace dependency boundaries`.
+- `b6007c3 chore: define shared package boundaries`.
+- `62a1edc feat: add Hono health endpoint`.
+- `e503d58 fix: harden Hono API bootstrap`.
+- `02e5d2d feat: add Next.js web shell`.
+- `8f42fe1 feat: add same-origin caddy routing`.
+- `458fd58 feat: add validated drizzle database boundary`.
+- `83bdf04 fix: harden api limits and container images`.
+- `14e70ca ci: add pinned quality and security gates`.
 
 ## Décisions associées
 

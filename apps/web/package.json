@@ -1,0 +1,24 @@
+{
+  "name": "@jdr-hub/web",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "lint": "next typegen && tsc --noEmit",
+    "test": "vitest run --root ../.. apps/web/tests/web-shell.test.ts",
+    "typecheck": "next typegen && tsc --noEmit",
+    "build": "next build"
+  },
+  "dependencies": {
+    "@tailwindcss/postcss": "4.2.2",
+    "lucide-react": "0.576.0",
+    "next": "16.2.11",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "tailwindcss": "4.2.2"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "vitest": "^3.2.7"
+  }
+}

@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [develop, main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+
+      - name: Setup Node.js
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: 24.8.0
+          cache: pnpm
+
+      - name: Install pnpm
+        run: corepack enable && corepack prepare pnpm@11.25.0 --activate
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Tests
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build
+
+      - name: Dependency audit
+        run: pnpm audit --audit-level=high
+
+      - name: Secret pattern scan
+        shell: bash
+        run: |
+          ! git grep -nE 'BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY|DISCORD_CLIENT_SECRET|DATABASE_URL=postgres' -- . ':(exclude).env.example'
+
+      - name: Static source scan
+        run: |
+          ! git grep -nE 'dangerouslySetInnerHTML|eval\(|new Function|child_process|shell: *true' -- apps packages
+
+      - name: Build images
+        run: docker compose -f docker-compose.yml build web-next api-hono
+
+      - name: Scan images
+        run: |
+          docker scout cves --only-severity high,critical --exit-code 1 jdr_hub-web-next:latest
+          docker scout cves --only-severity high,critical --exit-code 1 jdr_hub-api-hono:latest

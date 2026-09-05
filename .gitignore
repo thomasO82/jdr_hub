@@ -3,6 +3,8 @@ node_modules/
 
 # Builds
 .next/
+*.tsbuildinfo
+apps/web/next-env.d.ts
 dist/
 build/
 coverage/
@@ -24,6 +26,9 @@ Thumbs.db
 
 # Turborepo
 .turbo/
+
+# Contexte local du plugin de conception
+.superdesign/
 
 # Drizzle
 drizzle/meta/_journal.json.lock
