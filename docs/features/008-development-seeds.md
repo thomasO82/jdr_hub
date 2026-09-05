@@ -62,7 +62,12 @@ réutilisées.
 ## Vérifications
 
 - `pnpm exec vitest run packages/database/tests/seed.test.ts` — 3 tests verts.
+- `pnpm test` — 58 fichiers, 139 tests verts.
+- `pnpm lint` — vert.
+- `pnpm typecheck` — vert.
+- `pnpm build` — API et Next.js verts.
 - `pnpm --filter @jdr-hub/database build` — vert.
+- `git diff --check` — vert.
 
 ## Limites et travaux reportés
 
