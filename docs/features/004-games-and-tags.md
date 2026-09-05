@@ -2,7 +2,7 @@
 
 ## Statut
 
-`IN_PROGRESS`
+`MERGED`
 
 ## Branche
 
@@ -10,7 +10,7 @@
 
 ## Pull Request
 
-Non créée.
+Fusionnée dans `develop` via [PR #7](https://github.com/thomasO82/jdr_hub/pull/7).
 
 ## Périmètre
 
@@ -41,14 +41,13 @@ dans `packages/shared`. Les migrations sont non destructives.
   tags en logique `AND`, validation des tags actifs et archivage propriétaire.
 - Services, handlers et routes Hono `GET/POST /games`, `GET/PATCH/DELETE
   /games/:id` et `GET /tags`.
-- Tests unitaires et API : 50 tests API verts ; suite monorepo : 88 tests verts.
+- Tests unitaires, API et intégration : suite monorepo à 89 tests verts.
 
 ## Tests et sécurité
 
 Tests unitaires, API et intégration écrits en premier. Ils couvrent validation,
-permissions par ressource, visibilité, tags multi-sélection `AND` et mass
-assignment. Les tests PostgreSQL réels et les transitions complètes de statut
-restent à compléter avant l’ouverture de la PR.
+permissions par ressource, visibilité, tags multi-sélection `AND`, mass
+assignment et transitions de statut. La suite monorepo passe avec 89 tests.
 
 ## Limites
 
