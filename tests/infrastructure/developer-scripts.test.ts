@@ -13,6 +13,7 @@ describe('developer Docker scripts', () => {
 
     expect(scripts['dev:up']).toBe('docker compose -f docker-compose.yml up -d --wait')
     expect(scripts['dev:rebuild']).toBe('docker compose -f docker-compose.yml up -d --build --wait')
+    expect(scripts['build:recreate']).toBe('docker compose -f docker-compose.yml up -d --build --force-recreate --wait')
     expect(scripts['db:seed']).toBe('docker compose -f docker-compose.yml run --rm api-hono node node_modules/@jdr-hub/database/dist/seed-cli.js')
     expect(scripts['dev:down']).toBe('docker compose -f docker-compose.yml down')
   })
