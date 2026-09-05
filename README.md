@@ -26,9 +26,9 @@ PostgreSQL :
 pnpm db:seed
 ```
 
-La commande utilise `DATABASE_URL` de l’environnement, applique les migrations
-existantes et peut être relancée sans créer de doublons. Elle ne doit pas être
-exécutée contre une base de production.
+La commande charge automatiquement le `.env` racine s’il existe, applique les
+migrations existantes et peut être relancée sans créer de doublons. Elle ne doit
+pas être exécutée contre une base de production.
 
 Avec Docker Compose, la même opération peut être lancée dans le conteneur API
 pour utiliser automatiquement le réseau et la configuration Compose :

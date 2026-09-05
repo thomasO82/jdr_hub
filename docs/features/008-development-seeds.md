@@ -36,7 +36,8 @@ les filtres, les détails de parties et les écrans de candidatures en local.
 - Script transactionnel relançable avec upserts, précédé de l’application des
   migrations existantes.
 - Commandes `pnpm db:seed` et
-  `pnpm --filter @jdr-hub/database db:seed`.
+  `pnpm --filter @jdr-hub/database db:seed`, avec chargement automatique du
+  `.env` racine.
 
 ## Modèle de données et migrations
 
@@ -62,7 +63,9 @@ réutilisées.
 ## Vérifications
 
 - `pnpm exec vitest run packages/database/tests/seed.test.ts` — 3 tests verts.
-- `pnpm test` — 58 fichiers, 139 tests verts.
+- `pnpm exec vitest run tests/infrastructure/database-seed-config.test.ts` — 1
+  test vert.
+- `pnpm test` — 59 fichiers, 140 tests verts.
 - `pnpm lint` — vert.
 - `pnpm typecheck` — vert.
 - `pnpm build` — API et Next.js verts.
