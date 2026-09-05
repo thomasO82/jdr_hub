@@ -3,9 +3,10 @@ import { drizzle } from 'drizzle-orm/node-postgres'
 import { migrate } from 'drizzle-orm/node-postgres/migrator'
 import { Pool } from 'pg'
 import * as authSchema from './schema/auth.js'
+import * as availabilitySchema from './schema/availability.js'
 import * as gameSchema from './schema/games.js'
 
-export { authSchema, gameSchema }
+export { authSchema, availabilitySchema, gameSchema }
 /** Parse and validate the server-only PostgreSQL connection URL. */
 export function parseDatabaseUrl(rawUrl: string | undefined): URL {
   if (!rawUrl) {
@@ -37,7 +38,7 @@ export function createDatabase(rawUrl: string | undefined) {
 
   return {
     client,
-    db: drizzle(client, { schema: { ...authSchema, ...gameSchema } }),
+    db: drizzle(client, { schema: { ...authSchema, ...availabilitySchema, ...gameSchema } }),
   }
 }
 
