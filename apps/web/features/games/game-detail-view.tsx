@@ -1,11 +1,13 @@
 import Link from 'next/link'
 import type { PublicGame } from './games-api'
+import { AppShell } from '../layout/app-shell'
 import styles from './games-view.module.css'
 
 export function GameDetailView({ game }: { game: PublicGame }) {
   return (
-    <main className={styles.page}>
-      <section className={styles.detailShell} aria-labelledby="game-detail-title">
+    <AppShell>
+      <main className={styles.page}>
+        <section className={styles.detailShell} aria-labelledby="game-detail-title">
         <Link className={styles.backLink} href="/parties">← Toutes les parties</Link>
         <header className={styles.hero}>
           <div className={styles.heroContent}>
@@ -63,7 +65,8 @@ export function GameDetailView({ game }: { game: PublicGame }) {
             </section>
           </aside>
         </div>
-      </section>
-    </main>
+        </section>
+      </main>
+    </AppShell>
   )
 }

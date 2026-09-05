@@ -42,13 +42,15 @@ dans `packages/shared`. Les migrations sont non destructives.
 - Services, handlers et routes Hono `GET/POST /games`, `GET/PATCH/DELETE
   /games/:id`, `GET /public/games/:slug` et `GET /tags`.
 - Pages Next.js `/parties`, `/parties/nouvelle` et `/parties/[slug]` avec une
-  hiérarchie visuelle alignée sur les maquettes D02, D04 et D05 : recherche,
-  création, hero de partie, synopsis, tags, candidature et détails.
+  hiérarchie visuelle alignée sur les maquettes D02, D04 et D05 : shell partagé,
+  sidebar desktop, navigation mobile, panneau de filtres repliable, recherche,
+  cartes de catalogue, création, hero de partie, synopsis, tags, candidature et
+  détails.
 - Client serveur Next.js branché sur les réponses publiques de l’API pour le
   catalogue filtré et la fiche par slug, avec états vide et erreur explicites.
 - Migration de données idempotente avec un référentiel initial de tags actifs
   pour les filtres et la création de partie.
-- Tests unitaires et API : suite monorepo : 99 tests verts.
+- Tests unitaires, API et structure visuelle : suite monorepo : 100 tests verts.
 
 ## Tests et sécurité
 

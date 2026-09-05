@@ -1,0 +1,26 @@
+.appShell { min-height: 100svh; background: #f7f9fb; color: #191c1e; }
+.sidebar { position: fixed; inset: 0 auto 0 0; z-index: 10; display: flex; width: 256px; flex-direction: column; box-sizing: border-box; padding: 28px 16px 24px; border-right: 1px solid #e0e3e5; background: #fff; }
+.brand { display: flex; align-items: center; gap: 12px; padding: 0 8px; color: inherit; text-decoration: none; }
+.brand img { width: 44px; height: 44px; }
+.brand strong, .brand small { display: block; }
+.brand strong { color: #630ed4; font-size: 1.25rem; letter-spacing: -.03em; }
+.brand small { margin-top: 2px; color: #4a4455; font-size: .6rem; letter-spacing: .04em; text-transform: uppercase; }
+.desktopNavigation { display: grid; gap: 8px; margin-top: 44px; }
+.navLink, .activeLink { display: flex; align-items: center; gap: 16px; min-height: 48px; padding: 0 16px; border-radius: 9px; color: #4a4455; text-decoration: none; }
+.activeLink { border-right: 3px solid #630ed4; background: #f0e7ff; color: #630ed4; font-weight: 700; }
+.navLink:hover, .navLink:focus-visible { background: #f7f2ff; }
+.newGame { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 48px; margin-top: auto; border-radius: 12px; background: #630ed4; color: #fff; font-weight: 700; text-decoration: none; }
+.main { min-height: 100svh; margin-left: 256px; }
+.mobileHeader, .bottomNavigation, .mobileFab { display: none; }
+@media (max-width: 800px) {
+  .sidebar { display: none; }
+  .main { margin: 0; padding-top: 64px; padding-bottom: 88px; }
+  .mobileHeader { position: fixed; inset: 0 0 auto; z-index: 10; display: flex; align-items: center; justify-content: space-between; height: 64px; padding: 0 20px; border-bottom: 1px solid #e0e3e5; background: #fff; color: #630ed4; }
+  .mobileBrand { display: flex; align-items: center; gap: 8px; color: inherit; text-decoration: none; }
+  .mobileBrand img { width: 30px; height: 30px; }
+  .mobileBrand strong { font-size: 1.4rem; letter-spacing: -.04em; }
+  .mobileFab { position: fixed; right: 20px; bottom: 92px; z-index: 11; display: grid; width: 64px; height: 64px; place-items: center; border: 0; border-radius: 20px; background: #630ed4; color: #fff; box-shadow: 0 8px 20px rgb(99 14 212 / 28%); }
+  .bottomNavigation { position: fixed; inset: auto 0 0; z-index: 10; display: grid; grid-template-columns: repeat(5, 1fr); min-height: 76px; padding: 8px 12px; border-top: 1px solid #e0e3e5; background: #fff; }
+  .mobileNavLink, .mobileActiveLink { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border-radius: 14px; color: #4a4455; font-size: .7rem; text-decoration: none; }
+  .mobileActiveLink { background: #eaddff; color: #630ed4; font-weight: 700; }
+}
