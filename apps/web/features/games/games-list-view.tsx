@@ -1,6 +1,8 @@
 import Link from 'next/link'
 import { CalendarDays, Globe2, LayoutGrid, List, Search, UsersRound } from 'lucide-react'
-import { createGamesApi, type GamesPage } from './games-api'
+import { createPublicGamesApi } from '../../lib/public-games-api'
+import { createGamesApi } from './games-api'
+import type { PublicGamesPage } from '@jdr-hub/shared'
 import { FiltersToggle } from './filters-toggle'
 import { AppShell } from '../layout/app-shell'
 
@@ -19,7 +21,7 @@ function buildQuery(searchParams: SearchParams): string {
   return query.toString()
 }
 
-function GameCard({ game }: { game: GamesPage['items'][number] }) {
+function GameCard({ game }: { game: PublicGamesPage['items'][number] }) {
   const cover = game.type === 'CAMPAIGN'
     ? 'bg-gradient-to-br from-cover-night via-primary-container to-cover-violet'
     : 'bg-gradient-to-br from-cover-warm via-cover-amber to-cover-red'
@@ -40,7 +42,7 @@ function GameCard({ game }: { game: GamesPage['items'][number] }) {
             <span className="inline-flex items-center gap-1"><Globe2 aria-hidden="true" size={14} />En ligne</span>
           </div>
           <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
-            {game.tags.map((tag) => <li className="rounded-full bg-primary-fixed px-2 py-1 font-body text-xs font-semibold text-on-primary-fixed" key={tag}>#{tag}</li>)}
+            {game.tags.map((tag) => <li className="rounded-full bg-primary-fixed px-2 py-1 font-body text-xs font-semibold text-on-primary-fixed" key={tag.slug}>#{tag.name}</li>)}
           </ul>
         </div>
       </Link>
@@ -49,8 +51,17 @@ function GameCard({ game }: { game: GamesPage['items'][number] }) {
 }
 
 export async function GamesListView({ searchParams = {} }: { searchParams?: SearchParams }) {
-  const api = createGamesApi()
-  const [result, tags] = await Promise.all([api.list(buildQuery(searchParams)), api.tags()])
+  const api = createPublicGamesApi()
+  const query = new URLSearchParams(buildQuery(searchParams))
+  const queryInput = {
+    ...(query.get('q') ? { q: query.get('q')! } : {}),
+    ...(query.get('gmId') ? { gmId: query.get('gmId')! } : {}),
+    ...(query.get('gmName') ? { gmName: query.get('gmName')! } : {}),
+    tagSlugs: query.getAll('tagSlugs'),
+    ...(query.get('page') ? { page: Number(query.get('page')) } : {}),
+    ...(query.get('pageSize') ? { pageSize: Number(query.get('pageSize')) } : {}),
+  }
+  const [result, tags] = await Promise.all([api.list(queryInput), createGamesApi().tags()])
   const selectedTags = searchParams.tagSlugs
   const selectedTagValues = Array.isArray(selectedTags) ? selectedTags : selectedTags ? [selectedTags] : []
 
@@ -63,9 +74,9 @@ export async function GamesListView({ searchParams = {} }: { searchParams?: Sear
               <h2 className="m-0 font-display text-xl font-semibold">Filtres</h2>
               <Link className="font-body text-xs text-primary no-underline hover:underline" href="/parties">Réinitialiser</Link>
             </div>
-            {selectedTagValues.length > 0 && <div className="flex flex-wrap gap-1.5 py-3" aria-label="Filtres actifs">{selectedTagValues.map((slug) => <span className="rounded-full bg-primary-fixed px-2 py-1 font-body text-xs font-semibold text-on-primary-fixed" key={slug}>{tags?.find((tag) => tag.slug === slug)?.name ?? slug} ×</span>)}</div>}
+            {selectedTagValues.length > 0 && <div className="flex flex-wrap gap-1.5 py-3" aria-label="Filtres actifs">{selectedTagValues.map((slug) => <span className="rounded-full bg-primary-fixed px-2 py-1 font-body text-xs font-semibold text-on-primary-fixed" key={slug}>{slug} ×</span>)}</div>}
             <FiltersToggle>
-              <fieldset className="grid gap-2.5 border-0 p-0"><legend className="mb-1 font-label text-xs font-bold uppercase tracking-wider text-on-surface-variant">Système</legend>{(tags ?? []).map((tag) => <label className="flex items-center gap-2 font-body text-sm text-on-surface-variant" key={tag.slug}><input className="h-4 w-4 accent-primary" type="checkbox" name="tagSlugs" value={tag.slug} defaultChecked={selectedTagValues.includes(tag.slug)} /><span>{tag.name}</span></label>)}</fieldset>
+              <fieldset className="grid gap-2.5 border-0 p-0"><legend className="mb-1 font-label text-xs font-bold uppercase tracking-wider text-on-surface-variant">Tags</legend>{(tags ?? []).map((tag) => <label className="flex items-center gap-2 font-body text-sm text-on-surface-variant" key={tag.slug}><input className="h-4 w-4 accent-primary" type="checkbox" name="tagSlugs" value={tag.slug} defaultChecked={selectedTagValues.includes(tag.slug)} /><span>{tag.name}</span></label>)}</fieldset>
               <fieldset className="grid gap-2.5 border-0 p-0"><legend className="mb-1 font-label text-xs font-bold uppercase tracking-wider text-on-surface-variant">Type</legend><label className="flex items-center gap-2 font-body text-sm text-on-surface-variant"><input className="h-4 w-4 accent-primary" type="radio" name="visualType" value="ONE_SHOT" defaultChecked /><span>One-shot</span></label><label className="flex items-center gap-2 font-body text-sm text-on-surface-variant"><input className="h-4 w-4 accent-primary" type="radio" name="visualType" value="CAMPAIGN" /><span>Campagne</span></label></fieldset>
               <fieldset className="grid gap-2.5 border-0 p-0"><legend className="mb-1 font-label text-xs font-bold uppercase tracking-wider text-on-surface-variant">Format</legend><div className="grid grid-cols-2 gap-2"><label className="grid min-h-8 cursor-pointer place-items-center rounded-lg border border-primary-fixed-dim font-body text-xs text-on-surface-variant"><input className="peer sr-only" type="radio" name="visualFormat" value="ONLINE" defaultChecked /><span className="rounded-lg px-2 py-1 peer-checked:bg-primary-fixed peer-checked:font-semibold peer-checked:text-primary">En ligne</span></label><label className="grid min-h-8 cursor-pointer place-items-center rounded-lg border border-surface-container-highest font-body text-xs text-on-surface-variant"><input className="peer sr-only" type="radio" name="visualFormat" value="TABLE" /><span className="rounded-lg px-2 py-1 peer-checked:bg-primary-fixed peer-checked:font-semibold peer-checked:text-primary">Sur table</span></label></div></fieldset>
               <button className="min-h-10 rounded-lg border-0 bg-primary font-body text-sm font-semibold text-on-primary transition-colors hover:bg-primary-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary" type="submit">Appliquer les filtres</button>
@@ -78,7 +89,7 @@ export async function GamesListView({ searchParams = {} }: { searchParams?: Sear
               <div className="inline-flex shrink-0 gap-0.5 rounded-lg border border-surface-container-highest bg-surface p-1" aria-label="Affichage des parties"><button className="grid h-7 w-7 place-items-center rounded bg-primary-fixed text-primary" type="button" aria-label="Vue en grille" aria-pressed="true"><LayoutGrid aria-hidden="true" size={16} /></button><button className="grid h-7 w-7 place-items-center rounded text-on-surface-variant" type="button" aria-label="Vue en liste" aria-pressed="false"><List aria-hidden="true" size={16} /></button></div>
             </header>
             <label className="mt-6 flex min-h-11 items-center gap-2.5 rounded-lg border border-outline-variant bg-surface px-3.5 text-on-surface-variant focus-within:border-primary focus-within:outline-2 focus-within:outline-primary/30"><Search aria-hidden="true" size={20} /><span className="sr-only">Rechercher une partie</span><input className="w-full border-0 bg-transparent font-body text-sm text-on-surface outline-none" name="q" placeholder="Rechercher une partie..." defaultValue={typeof searchParams.q === 'string' ? searchParams.q : ''} /></label>
-            <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">{result?.items.map((game) => <GameCard game={game} key={game.id} />)}</div>
+            <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">{result?.items.map((game) => <GameCard game={game} key={game.slug} />)}</div>
             {!result && <p className="mt-5 rounded-xl border border-dashed border-outline-variant bg-surface p-10 text-center font-body text-sm text-on-surface-variant" role="alert">Impossible de charger les parties pour le moment.</p>}
             {result && result.items.length === 0 && <p className="mt-5 rounded-xl border border-dashed border-outline-variant bg-surface p-10 text-center font-body text-sm text-on-surface-variant">Aucune partie ne correspond à ces filtres.</p>}
           </section>

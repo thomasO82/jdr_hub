@@ -3,17 +3,19 @@ import { readAccessToken } from '../auth/cookies.js'
 import type { AuthConfig } from '../auth/config.js'
 import type { AuthRepository } from '../auth/repository.js'
 import { authenticateUser } from '../auth/services/authenticate-user.js'
-import { createGameSchema, gameQuerySchema, updateGameSchema } from '@jdr-hub/shared'
-import type { GamesRepository } from './repository.js'
+import { createGameSchema, gameQuerySchema, publicGamesQuerySchema, updateGameSchema } from '@jdr-hub/shared'
+import type { GamesRepository, PublicGamesRepository } from './repository.js'
 import { archiveGame } from './services/archive-game.js'
 import { createGame } from './services/create-game.js'
 import { getGame } from './services/get-game.js'
 import { getPublicGame } from './services/get-public-game.js'
+import { getPublicCollection } from './services/get-public-collection.js'
+import { listPublicGames } from './services/list-public-games.js'
 import { listGames } from './services/list-games.js'
 import { updateGame } from './services/update-game.js'
 
 type GameEnv = { Variables: { requestId: string } }
-type Dependencies = { authConfig: AuthConfig; authRepository: AuthRepository; repository: GamesRepository; now?: () => Date }
+type Dependencies = { authConfig: AuthConfig; authRepository: AuthRepository; repository: GamesRepository & PublicGamesRepository; now?: () => Date }
 
 function fail(c: Context<GameEnv>, status: 400 | 401 | 403 | 404 | 409) {
   return c.json({ data: null, error: { code: status === 401 ? 'AUTH_ERROR' : 'GAME_ERROR', message: status === 401 ? 'Authentication failed' : 'Game request failed' }, meta: { requestId: c.get('requestId') } }, status)
@@ -49,6 +51,19 @@ export function createGameHandlers(dependencies: Dependencies) {
       const game = await getPublicGame({ slug, repository: dependencies.repository })
       return game ? c.json({ data: game, error: null, meta: { requestId: c.get('requestId') } }) : fail(c, 404)
     },
+    publicList: async (c: Context<GameEnv>) => {
+      const parsed = publicGamesQuerySchema.safeParse({ ...c.req.query(), tagSlugs: c.req.queries().tagSlugs ?? c.req.query('tagSlugs') })
+      if (!parsed.success) return fail(c, 400)
+      return c.json({ data: await listPublicGames({ query: parsed.data, repository: dependencies.repository }), error: null, meta: { requestId: c.get('requestId') } })
+    },
+    publicCollection: async (c: Context<GameEnv>) => {
+      const slug = c.req.param('slug')
+      if (!slug || slug.length > 160) return fail(c, 400)
+      const kind = c.req.path.startsWith('/public/gms/') ? 'gm' : c.req.path.startsWith('/public/tags/') ? 'tag' : 'system'
+      const collection = await getPublicCollection({ kind, slug, repository: dependencies.repository })
+      return collection ? c.json({ data: collection, error: null, meta: { requestId: c.get('requestId') } }) : fail(c, 404)
+    },
+    publicSlugs: async (c: Context<GameEnv>) => c.json({ data: await dependencies.repository.listPublicSlugs(), error: null, meta: { requestId: c.get('requestId') } }),
     create: async (c: Context<GameEnv>) => {
       const user = await currentUser(c, dependencies)
       if (!user) return fail(c, 401)
