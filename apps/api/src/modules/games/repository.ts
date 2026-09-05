@@ -19,6 +19,7 @@ export type GameRecord = {
 export interface GamesRepository {
   create(input: CreateGameInput & { ownerId: string; slug: string }): Promise<GameRecord>
   findById(id: string): Promise<GameRecord | null>
+  findPublicBySlug(slug: string): Promise<GameRecord | null>
   update(id: string, ownerId: string, input: UpdateGameInput): Promise<GameRecord | null>
   archive(id: string, ownerId: string): Promise<boolean>
   list(query: GameQuery): Promise<{ items: GameRecord[]; page: number; pageSize: number }>
@@ -49,6 +50,15 @@ export function createPostgresGamesRepository(database: Database): GamesReposito
       const [game] = await database.select().from(games).where(eq(games.id, id)).limit(1)
       if (!game) return null
       return { ...game, type: game.type as GameRecord['type'], status: game.status as GameRecord['status'], visibility: game.visibility as GameRecord['visibility'], tags: await readTags(id) }
+    },
+    async findPublicBySlug(slug) {
+      const [game] = await database.select().from(games).where(and(
+        eq(games.slug, slug),
+        eq(games.visibility, 'PUBLIC'),
+        inArray(games.status, ['OPEN', 'ACTIVE']),
+      )).limit(1)
+      if (!game) return null
+      return { ...game, type: game.type as GameRecord['type'], status: game.status as GameRecord['status'], visibility: game.visibility as GameRecord['visibility'], tags: await readTags(game.id) }
     },
     async update(id, ownerId, input) {
       const { tags: _tags, ...gameInput } = input

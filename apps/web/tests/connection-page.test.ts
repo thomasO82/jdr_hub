@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest'
 const web = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const connectionPage = resolve(web, 'features/authentication/connection-view.tsx')
 const connectionRoute = resolve(web, 'app/connexion/page.tsx')
-const connectionStyles = resolve(web, 'features/authentication/connection-view.module.css')
+const globalStyles = resolve(web, 'app/globals.css')
 
 describe('connection page', () => {
   it('offers visitors only the local Discord OAuth entry point', () => {
@@ -21,6 +21,7 @@ describe('connection page', () => {
     expect(page).not.toContain('invité')
     expect(page).not.toContain('http')
     expect(page).not.toContain("'use client'")
+    expect(page).not.toContain('connection-view.module.css')
   })
 
   it('keeps the authentication route out of search indexes', () => {
@@ -39,20 +40,18 @@ describe('connection page', () => {
   })
 
   it('keeps the login call to action reachable on short viewports', () => {
-    expect(existsSync(connectionStyles)).toBe(true)
+    expect(existsSync(globalStyles)).toBe(true)
 
-    const styles = readFileSync(connectionStyles, 'utf8')
+    const page = readFileSync(connectionPage, 'utf8')
 
-    expect(styles).not.toContain('overflow: hidden')
-    expect(styles).toContain('overflow-x: hidden')
-    expect(styles).toContain('min-height: 52px')
-    expect(styles).toContain('.discordButton:focus-visible')
-    expect(styles).not.toContain('url(')
+    expect(page).toContain('min-h-screen')
+    expect(page).toContain('focus-visible:')
+    expect(page).not.toContain('style={{')
   })
 
   it('removes non-essential motion when visitors request it', () => {
-    const styles = readFileSync(connectionStyles, 'utf8')
+    const page = readFileSync(connectionPage, 'utf8')
 
-    expect(styles).toContain('@media (prefers-reduced-motion: reduce)')
+    expect(page).toContain('motion-reduce:transition-none')
   })
 })

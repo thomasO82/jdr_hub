@@ -40,8 +40,21 @@ dans `packages/shared`. Les migrations sont non destructives.
 - Repository PostgreSQL avec visibilité publique, recherche par titre, MJ et
   tags en logique `AND`, validation des tags actifs et archivage propriétaire.
 - Services, handlers et routes Hono `GET/POST /games`, `GET/PATCH/DELETE
-  /games/:id` et `GET /tags`.
-- Tests unitaires et API : 50 tests API verts ; suite monorepo : 88 tests verts.
+  /games/:id`, `GET /public/games/:slug` et `GET /tags`.
+- Pages Next.js `/parties`, `/parties/nouvelle` et `/parties/[slug]` avec une
+  hiérarchie visuelle alignée sur les maquettes D02, D04 et D05 : shell partagé,
+  sidebar desktop, navigation mobile, panneau de filtres repliable, recherche,
+  cartes de catalogue, création, hero de partie, synopsis, tags, candidature et
+  détails.
+- Client serveur Next.js branché sur les réponses publiques de l’API pour le
+  catalogue filtré et la fiche par slug, avec états vide et erreur explicites.
+- Interface migrée vers Tailwind CSS v4 uniquement : tokens globaux Arcane,
+  shell partagé, connexion Discord, catalogue, détail et création sans CSS
+  Module ni style inline.
+- Migration de données idempotente avec un référentiel initial de tags actifs
+  pour les filtres et la création de partie.
+- Tests unitaires, API, structure visuelle, typographie, formulaire et
+  architecture Tailwind : suite monorepo : 106 tests verts.
 
 ## Tests et sécurité
 
@@ -52,5 +65,7 @@ restent à compléter avant l’ouverture de la PR.
 
 ## Limites
 
-La recherche publique, les pages SEO, les candidatures, les membres et les
-séances seront traitées dans des fonctionnalités dédiées.
+La liste et la page détail utilisent encore des données de présentation ; le
+branchement SSR sur `GET /games` et `GET /games/:id`, les pages SEO complètes,
+les candidatures, les membres et les séances seront traités dans des
+fonctionnalités dédiées.
