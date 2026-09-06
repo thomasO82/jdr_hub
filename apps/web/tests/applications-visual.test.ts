@@ -10,4 +10,14 @@ describe('application visual structure', () => {
     expect(form).toContain('textarea')
     expect(form).not.toContain('module.css')
   })
+
+  it('checks the current user application before displaying the form', () => {
+    const form = read('../features/applications/application-form.tsx')
+    const status = read('../features/applications/application-status.tsx')
+    expect(form).toContain('useEffect')
+    expect(form).toContain('listMine')
+    expect(form).toContain('findApplicationForGame')
+    expect(status).toContain('Candidature envoyée')
+    expect(status).toContain('En attente de réponse du MJ')
+  })
 })

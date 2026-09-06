@@ -1,16 +1,28 @@
 'use client'
 
-import { FormEvent, useState } from 'react'
+import { FormEvent, useEffect, useState } from 'react'
 import { Send } from 'lucide-react'
 import { createApplicationsApi } from '../../lib/applications-api'
 import type { Application } from '@jdr-hub/shared'
 import { ApplicationStatus } from './application-status'
+import { findApplicationForGame } from './application-state'
 
 export function ApplicationForm({ gameId }: { gameId: string }) {
   const [message, setMessage] = useState('')
   const [application, setApplication] = useState<Application | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [pending, setPending] = useState(false)
+  const [checkingApplication, setCheckingApplication] = useState(true)
+
+  useEffect(() => {
+    let active = true
+    void createApplicationsApi().listMine().then((applications) => {
+      if (!active) return
+      setApplication(applications ? findApplicationForGame(applications, gameId) : null)
+      setCheckingApplication(false)
+    })
+    return () => { active = false }
+  }, [gameId])
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -22,6 +34,7 @@ export function ApplicationForm({ gameId }: { gameId: string }) {
     setApplication(result)
   }
 
+  if (checkingApplication) return <p className="mt-4 rounded-lg border border-primary-fixed-dim bg-primary-fixed/40 p-4 text-left font-body text-sm text-on-surface-variant" role="status">Vérification de votre candidature…</p>
   if (application) return <ApplicationStatus application={application} />
 
   return (

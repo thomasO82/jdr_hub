@@ -58,7 +58,17 @@ Voir `docs/superpowers/specs/2026-09-05-applications-design.md`.
 - La projection publique d’une partie expose son UUID afin que le frontend
   puisse transmettre `game.id` tout en conservant le slug pour la navigation.
 - Les valeurs non-UUID sont rejetées avant toute requête PostgreSQL typée
-  UUID, ce qui évite l’erreur de conversion auparavant renvoyée comme `409`.
+  UUID, ce qui évite l'erreur de conversion auparavant renvoyée comme `409`.
+
+### Correctif du 2026-09-06 — état de candidature sur le détail
+
+- Le détail de partie vérifie les candidatures de l'utilisateur connecté avant
+  d'afficher le formulaire.
+- Une candidature existante remplace le formulaire, y compris après un
+  rechargement de la page ou lorsqu'elle est déjà acceptée ou refusée.
+- L'état en attente est présenté par un encart accessible et visible :
+  « Candidature envoyée — En attente de réponse du MJ ».
+- La protection serveur contre les candidatures multiples reste inchangée.
 
 ## Parcours utilisateur
 
@@ -79,7 +89,7 @@ Voir `docs/superpowers/specs/2026-09-05-applications-design.md`.
 - **Refactor :** résolution UUID/slug, contrôle d'origine, projections et
   responsabilités ont été séparés sans affaiblir les assertions ; le correctif
   de septembre 2026 supprime la résolution slug des routes de participation.
-- Suite finale : 57 fichiers, 135 tests verts.
+- Suite finale sur la branche corrective : 99 fichiers, 253 tests verts.
 
 ### Vérification du correctif du 2026-09-06
 
@@ -91,6 +101,15 @@ Voir `docs/superpowers/specs/2026-09-05-applications-design.md`.
 - Branche : `fix/applications-id-only`.
 - PR : ouverture automatique bloquée par GitHub (`403 Resource not accessible by
   integration`) ; ouverture manuelle nécessaire.
+
+### Preuve TDD du correctif de visibilité
+
+- **Red :** les tests du helper d'état et de la vérification au chargement ont
+  échoué avant l'ajout du comportement.
+- **Green :** le helper sélectionne uniquement la candidature de la partie
+  affichée et le composant remplace le formulaire après vérification.
+- Tests ciblés : `apps/web/tests/application-state.test.ts` et
+  `apps/web/tests/applications-visual.test.ts`.
 
 ## Sécurité
 
@@ -108,7 +127,7 @@ Voir `docs/superpowers/specs/2026-09-05-applications-design.md`.
 
 ## Vérification
 
-- `pnpm test` — 57 fichiers, 135 tests verts.
+- `pnpm test` — 99 fichiers, 253 tests verts.
 - `pnpm lint` — vert.
 - `pnpm typecheck` — vert.
 - `pnpm build` — API et Next.js verts.
