@@ -52,7 +52,7 @@ export function createInMemoryAttendanceRepository(input: { sessions: SeedSessio
     if (attendance.some((entry) => entry.sessionId === session.sessionId && entry.userId === userId)) throw new Error('ATTENDANCE_CONFLICT')
     const attendanceRecord: AttendanceRecord = { id: id('attendance', sequence++), sessionId: session.sessionId, userId, status: 'EXCUSED', createdAt: now, updatedAt: now }
     const notification: NotificationRecord = { id: id('notification', sequence++), type: 'ABSENCE_REPORTED', recipientId: session.ownerId, gameId: session.gameId, sessionId: session.sessionId, actorId: userId, title: 'Absence signalée', body: 'Un joueur a signalé son absence pour une séance.', readAt: null, createdAt: now }
-    const delivery: DiscordDelivery = { id: id('delivery', sequence++), notificationId: notification.id, recipientDiscordId: session.ownerDiscordId ?? '', content: createAbsenceDiscordContent(session), channel: 'DISCORD_DM', status: 'PENDING', attempts: 0, nextAttemptAt: null, providerMessageId: null, lastErrorCode: null }
+    const delivery: DiscordDelivery = { id: id('delivery', sequence++), notificationId: notification.id, recipientDiscordId: session.ownerDiscordId ?? '', content: createAbsenceDiscordContent(session), channel: 'DISCORD_DM', status: 'PENDING', attempts: 0, processingAt: null, nextAttemptAt: null, providerMessageId: null, lastErrorCode: null }
     attendance.push(attendanceRecord)
     notifications.push(notification)
     deliveries.push(delivery)
@@ -78,6 +78,11 @@ export function createInMemoryAttendanceRepository(input: { sessions: SeedSessio
       const current = context(sessionId, ownerId)
       if (!session || !current) throw new Error('ATTENDANCE_NOT_FOUND')
       if (current.ownerId !== ownerId) throw new Error('ATTENDANCE_FORBIDDEN')
+      if (current.sessionStatus === 'COMPLETED') {
+        const existing = entries.map((entry) => attendance.find((item) => item.sessionId === sessionId && item.userId === entry.userId))
+        if (existing.some((record, index) => !record || record.status !== entries[index]?.status)) throw new Error('ATTENDANCE_CONFLICT')
+        return existing as AttendanceRecord[]
+      }
       if (!['SCHEDULED'].includes(current.sessionStatus) || !['OPEN', 'ACTIVE'].includes(current.gameStatus)) throw new Error('ATTENDANCE_CONFLICT')
       if (entries.some((entry) => session.memberStatuses[entry.userId] !== 'ACTIVE')) throw new Error('ATTENDANCE_FORBIDDEN')
       const records = entries.map((entry: AttendanceEntry) => {

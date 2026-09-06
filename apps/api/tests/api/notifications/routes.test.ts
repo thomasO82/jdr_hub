@@ -44,7 +44,19 @@ describe('notification API routes', () => {
   it('validates pagination bounds and unknown payload properties', async () => {
     const { app, cookie } = await createTestApp()
     expect((await app.request('/notifications?limit=0', { headers: { cookie } })).status).toBe(400)
+    expect((await app.request('/notifications?cursor=invalid', { headers: { cookie } })).status).toBe(400)
     const response = await app.request('/notifications/notification-1/read', { method: 'POST', headers: { cookie, origin: config.appOrigin, 'content-type': 'application/json' }, body: JSON.stringify({ reason: 'unexpected' }) })
     expect(response.status).toBe(400)
+  })
+
+  it('returns a generic server error when notification persistence fails', async () => {
+    const { app, cookie, repository } = await createTestApp()
+    repository.listForUser = async () => { throw new Error('database password') }
+
+    const response = await app.request('/notifications', { headers: { cookie } })
+    const payload = await response.json()
+    expect(response.status).toBe(500)
+    expect(payload).toMatchObject({ error: { message: expect.stringContaining('Réessayez') } })
+    expect(JSON.stringify(payload)).not.toContain('password')
   })
 })

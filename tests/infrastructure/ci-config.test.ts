@@ -19,6 +19,8 @@ describe('continuous integration security gates', () => {
     expect(workflow).toContain('pnpm lint')
     expect(workflow).toContain('pnpm typecheck')
     expect(workflow).toContain('pnpm test')
+    expect(workflow).toContain('pnpm test:integration')
+    expect(workflow).toContain('postgres:17.6-alpine@sha256:')
     expect(workflow).toContain('pnpm build')
     expect(workflow).toContain('pnpm audit --audit-level=high')
     expect(workflow.toLowerCase()).toContain('secret')

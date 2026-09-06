@@ -70,6 +70,17 @@ describe('attendance services', () => {
     await expect(validateAttendance({ sessionId: 'session-1', actorId: 'player-1', entries: [{ userId: 'player-1', status: 'PRESENT' }], repository })).rejects.toThrow('ATTENDANCE_FORBIDDEN')
   })
 
+  it('replays an identical attendance validation after completion without changing the result', async () => {
+    const repository = createInMemoryAttendanceRepository({ sessions: [{ ...session, memberStatuses: { 'player-1': 'ACTIVE' } }] })
+    const command = [{ userId: 'player-1', status: 'PRESENT' as const }]
+
+    const first = await validateAttendance({ sessionId: 'session-1', actorId: 'gm-1', entries: command, repository })
+    const replay = await validateAttendance({ sessionId: 'session-1', actorId: 'gm-1', entries: command, repository })
+
+    expect(replay).toEqual(first)
+    await expect(validateAttendance({ sessionId: 'session-1', actorId: 'gm-1', entries: [{ userId: 'player-1', status: 'ABSENT' }], repository })).rejects.toThrow('ATTENDANCE_CONFLICT')
+  })
+
   it('rejects a foreign attendance target and rolls back all changes', async () => {
     const repository = createInMemoryAttendanceRepository({ sessions: [{ ...session, memberStatuses: { 'player-1': 'ACTIVE' } }] })
     await expect(validateAttendance({ sessionId: 'session-1', actorId: 'gm-1', entries: [{ userId: 'outsider', status: 'ABSENT' }], repository })).rejects.toThrow('ATTENDANCE_FORBIDDEN')

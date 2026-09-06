@@ -51,6 +51,7 @@ export const notificationDeliveries = pgTable('notification_deliveries', {
   channel: varchar('channel', { length: 16 }).notNull(),
   status: varchar('status', { length: 16 }).notNull().default('PENDING'),
   attempts: integer('attempts').notNull().default(0),
+  processingAt: timestamp('processing_at', { withTimezone: true }),
   nextAttemptAt: timestamp('next_attempt_at', { withTimezone: true }),
   providerMessageId: varchar('provider_message_id', { length: 128 }),
   lastErrorCode: varchar('last_error_code', { length: 64 }),

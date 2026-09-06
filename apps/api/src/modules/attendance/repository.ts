@@ -47,10 +47,18 @@ const toNotification = (row: { id: string; type: string; recipientId: string; ga
   type: row.type as NotificationRecord['type'],
 })
 
-const toDelivery = (row: { id: string; notificationId: string; recipientDiscordId: string; content: string; channel: string; status: string; attempts: number; nextAttemptAt: Date | null; providerMessageId: string | null; lastErrorCode: string | null }): DiscordDelivery => ({
-  ...row,
+const toDelivery = (row: { id: string; notificationId: string; recipientDiscordId: string; content: string; channel: string; status: string; attempts: number; processingAt: Date | null; nextAttemptAt: Date | null; providerMessageId: string | null; lastErrorCode: string | null }): DiscordDelivery => ({
+  id: row.id,
+  notificationId: row.notificationId,
+  recipientDiscordId: row.recipientDiscordId,
+  content: row.content,
   channel: row.channel as DiscordDelivery['channel'],
   status: row.status as DiscordDelivery['status'],
+  attempts: row.attempts,
+  processingAt: row.processingAt,
+  nextAttemptAt: row.nextAttemptAt,
+  providerMessageId: row.providerMessageId,
+  lastErrorCode: row.lastErrorCode,
 })
 
 /** Persists an absence and its two notification projections atomically. */
@@ -76,7 +84,8 @@ export function createPostgresAttendanceRepository(database: Database): Attendan
       .innerJoin(games, eq(gameSessions.gameId, games.id))
       .leftJoin(gameMembers, and(eq(gameMembers.gameId, games.id), eq(gameMembers.userId, userId)))
       .leftJoin(users, eq(users.id, userId))
-      .where(eq(gameSessions.id, sessionId)).limit(1)
+      .where(eq(gameSessions.id, sessionId))
+      .limit(1)
 
     if (!row) return null
     const [owner] = await db.select({ discordId: users.discordId }).from(users).where(eq(users.id, row.ownerId)).limit(1)
@@ -105,6 +114,8 @@ export function createPostgresAttendanceRepository(database: Database): Attendan
 
     async reportAbsence({ sessionId, userId, now }) {
       return database.transaction(async (tx) => {
+        const [lockedSession] = await tx.select({ id: gameSessions.id }).from(gameSessions).where(eq(gameSessions.id, sessionId)).for('update').limit(1)
+        if (!lockedSession) throw new Error('ATTENDANCE_NOT_FOUND')
         const context = await readContext(sessionId, userId, tx)
         if (!context) throw new Error('ATTENDANCE_NOT_FOUND')
         if (context.memberStatus !== 'ACTIVE') throw new Error('ATTENDANCE_FORBIDDEN')
@@ -121,6 +132,7 @@ export function createPostgresAttendanceRepository(database: Database): Attendan
             channel: notificationDeliveries.channel,
             status: notificationDeliveries.status,
             attempts: notificationDeliveries.attempts,
+            processingAt: notificationDeliveries.processingAt,
             nextAttemptAt: notificationDeliveries.nextAttemptAt,
             providerMessageId: notificationDeliveries.providerMessageId,
             lastErrorCode: notificationDeliveries.lastErrorCode,
@@ -146,7 +158,7 @@ export function createPostgresAttendanceRepository(database: Database): Attendan
           createdAt: now,
         }).returning()
         if (!notificationRow) throw new Error('ATTENDANCE_CREATE_FAILED')
-        const [deliveryRow] = await tx.insert(notificationDeliveries).values({ notificationId: notificationRow.id, channel: 'DISCORD_DM', status: 'PENDING', attempts: 0, createdAt: now, updatedAt: now }).returning()
+        const [deliveryRow] = await tx.insert(notificationDeliveries).values({ notificationId: notificationRow.id, channel: 'DISCORD_DM', status: 'PENDING', attempts: 0, processingAt: null, createdAt: now, updatedAt: now }).returning()
         if (!deliveryRow) throw new Error('ATTENDANCE_CREATE_FAILED')
         return {
           attendance: toAttendance(attendanceRow),
@@ -162,6 +174,14 @@ export function createPostgresAttendanceRepository(database: Database): Attendan
           .from(gameSessions).innerJoin(games, eq(gameSessions.gameId, games.id)).where(eq(gameSessions.id, sessionId)).for('update').limit(1)
         if (!session) throw new Error('ATTENDANCE_NOT_FOUND')
         if (session.gameOwnerId !== ownerId) throw new Error('ATTENDANCE_FORBIDDEN')
+        const existingAttendance = session.status === 'COMPLETED'
+          ? await tx.select().from(sessionAttendance).where(and(eq(sessionAttendance.sessionId, sessionId), inArray(sessionAttendance.userId, entries.map((entry) => entry.userId))))
+          : []
+        if (session.status === 'COMPLETED') {
+          const byUserId = new Map(existingAttendance.map((record) => [record.userId, record]))
+          if (existingAttendance.length !== entries.length || entries.some((entry) => byUserId.get(entry.userId)?.status !== entry.status)) throw new Error('ATTENDANCE_CONFLICT')
+          return entries.map((entry) => toAttendance(byUserId.get(entry.userId)!))
+        }
         if (session.status !== 'SCHEDULED' || !['OPEN', 'ACTIVE'].includes(session.gameStatus)) throw new Error('ATTENDANCE_CONFLICT')
 
         const memberRows = await tx.select({ userId: gameMembers.userId }).from(gameMembers).where(and(eq(gameMembers.gameId, session.gameId), inArray(gameMembers.userId, entries.map((entry) => entry.userId)), eq(gameMembers.status, 'ACTIVE')))

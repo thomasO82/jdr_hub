@@ -1,9 +1,14 @@
+import { createHash } from 'node:crypto'
 import type { DiscordNotifier } from './discord-client.js'
-import type { DiscordDelivery, NotificationRepository } from './repository.js'
+import { MAX_NOTIFICATION_DELIVERY_ATTEMPTS, type NotificationRepository } from './repository.js'
 
 const retryableCodes = new Set(['DISCORD_RATE_LIMIT', 'DISCORD_UNAVAILABLE'])
 const knownDiscordCodes = new Set(['DISCORD_RATE_LIMIT', 'DISCORD_UNAVAILABLE', 'DISCORD_INVALID_RECIPIENT', 'DISCORD_INVALID_CONTENT', 'DISCORD_INVALID_IDEMPOTENCY_KEY'])
-const maxAttempts = 5
+
+/** Discord limits message nonces to 25 characters; the digest stays stable across retries. */
+export function createDeliveryIdempotencyKey(deliveryId: string): string {
+  return createHash('sha256').update(deliveryId, 'utf8').digest('base64url').slice(0, 25)
+}
 
 const safeErrorCode = (error: unknown): string => error instanceof Error && knownDiscordCodes.has(error.message) ? error.message : 'DISCORD_UNAVAILABLE'
 
@@ -14,12 +19,12 @@ export async function processDiscordDeliveries(input: { repository: Notification
   const claimed = await input.repository.claimPendingDeliveries({ now: now(), limit: input.limit })
   for (const delivery of claimed) {
     try {
-      const result = await input.notifier.sendDirectMessage({ recipientDiscordId: delivery.recipientDiscordId, content: delivery.content, idempotencyKey: delivery.id })
+      const result = await input.notifier.sendDirectMessage({ recipientDiscordId: delivery.recipientDiscordId, content: delivery.content, idempotencyKey: createDeliveryIdempotencyKey(delivery.id) })
       await input.repository.markSent({ deliveryId: delivery.id, providerMessageId: result.providerMessageId, now: now() })
     } catch (error) {
       const errorCode = safeErrorCode(error)
       const current = now()
-      if (retryableCodes.has(errorCode) && delivery.attempts < maxAttempts) {
+      if (retryableCodes.has(errorCode) && delivery.attempts < MAX_NOTIFICATION_DELIVERY_ATTEMPTS) {
         await input.repository.markRetryableFailure({ deliveryId: delivery.id, errorCode, nextAttemptAt: nextRetryAt(current, delivery.attempts), now: current })
       } else {
         await input.repository.markPermanentFailure({ deliveryId: delivery.id, errorCode, now: current })

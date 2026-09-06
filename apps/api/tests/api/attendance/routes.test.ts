@@ -60,4 +60,14 @@ describe('attendance API routes', () => {
     const ownerResponse = await app.request('/sessions/session-1/attendance', { method: 'POST', headers: { ...headers, cookie: owner.cookie }, body: JSON.stringify({ entries: [{ userId: member.user.id, status: 'PRESENT' }] }) })
     expect(ownerResponse.status).toBe(200)
   })
+
+  it('returns a generic server error when attendance persistence fails', async () => {
+    const { app, member, repository } = await createTestApp()
+    repository.reportAbsence = async () => { throw new Error('database password') }
+    const response = await app.request('/sessions/session-1/absence', { method: 'POST', headers: { cookie: member.cookie, origin: config.appOrigin, 'content-type': 'application/json' }, body: '{}' })
+    const payload = await response.json()
+    expect(response.status).toBe(500)
+    expect(payload).toMatchObject({ error: { message: expect.stringContaining('Réessayez') } })
+    expect(JSON.stringify(payload)).not.toContain('password')
+  })
 })

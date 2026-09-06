@@ -17,15 +17,16 @@ export type AttendanceDependencies = {
 
 export type AttendanceRouteEnv = { Variables: { requestId: string } }
 
-function error(c: Context<AttendanceRouteEnv>, status: 400 | 401 | 403 | 404 | 409 | 429) {
-  return c.json({ data: null, error: { code: 'ATTENDANCE_ERROR', message: 'La demande de présence n’a pas pu être traitée.' }, meta: { requestId: c.get('requestId') } }, status)
+function error(c: Context<AttendanceRouteEnv>, status: 400 | 401 | 403 | 404 | 409 | 429 | 500) {
+  const message = status === 500 ? 'Une erreur interne est survenue. Réessayez plus tard.' : 'La demande de présence n’a pas pu être traitée.'
+  return c.json({ data: null, error: { code: status === 500 ? 'INTERNAL_ERROR' : 'ATTENDANCE_ERROR', message }, meta: { requestId: c.get('requestId') } }, status)
 }
 
-function domainStatus(value: unknown): 400 | 403 | 404 | 409 {
+function domainStatus(value: unknown): 400 | 403 | 404 | 409 | 500 {
   if (value instanceof Error && value.message === 'ATTENDANCE_FORBIDDEN') return 403
   if (value instanceof Error && value.message === 'ATTENDANCE_NOT_FOUND') return 404
   if (value instanceof Error && value.message === 'ATTENDANCE_CONFLICT') return 409
-  return 400
+  return 500
 }
 
 const serializeAttendance = (record: { id: string; sessionId: string; userId: string; status: string; createdAt: Date; updatedAt: Date }) => ({

@@ -95,12 +95,13 @@ conception F07/F07B.
 
 - `packages/shared/src/attendance.ts` avec schémas stricts et bornés ;
 - tables `session_attendance`, `notifications` et
-  `notification_deliveries`, migration `0006_attendance_notifications` ;
+  `notification_deliveries`, migrations `0006_attendance_notifications` et
+  `0007_equal_hedge_knight` pour le bail de traitement outbox ;
 - repository transactionnel d’absence et validation MJ ;
 - adaptateur Discord natif `fetch` v10, ouverture/réutilisation de DM,
   `allowed_mentions: { parse: [] }`, contenu borné et erreurs internes sûres ;
 - worker de livraison toutes les 30 secondes, cinq tentatives maximum,
-  backoff borné et statuts `SENT`/`FAILED` ;
+  backoff borné, clé Discord compacte et reprise des traitements expirés ;
 - routes `POST /sessions/:id/absence`,
   `POST /sessions/:id/attendance`, `GET /notifications` et
   `POST /notifications/:id/read` ;
@@ -147,6 +148,9 @@ de déploiement et n’a pas été appelée pendant les tests.
   `(notification_id, channel)` ;
 - transaction absence → notification → livraison ;
 - reprise des erreurs réseau/rate limit, dead-letter après cinq tentatives ;
+- bail de cinq minutes pour reprendre une livraison restée `PROCESSING` après
+  l’arrêt d’un worker ;
+- rejeu identique d’une validation terminée accepté sans nouvel effet ;
 - partie fermée, séance annulée/terminée, membre quitté et utilisateur
   extérieur refusés.
 
@@ -186,7 +190,9 @@ Ajouter les présences, notifications et livraisons Discord avec clés
 
 La migration additive `packages/database/migrations/0006_attendance_notifications.sql`
 crée les trois tables, leurs index, longueurs bornées, cascades ciblées et
-contraintes d’unicité. Aucun objet F01–F06 n’est supprimé ou modifié.
+contraintes d’unicité. `0007_equal_hedge_knight.sql` ajoute le champ nullable
+`processing_at` sans modifier les données existantes. Aucun objet F01–F06
+n’est supprimé ou modifié.
 
 ### Restant à faire
 
@@ -206,8 +212,8 @@ ultérieures.
 
 - les quatre routes exigent une session valide ;
 - les mutations exigent l’origine applicative et un payload Zod strict ;
-- les erreurs publiques utilisent `ATTENDANCE_ERROR` ou
-  `NOTIFICATION_ERROR` et ne révèlent pas les détails Discord ;
+- les erreurs métier utilisent `ATTENDANCE_ERROR` ou `NOTIFICATION_ERROR`, les
+  erreurs inattendues `INTERNAL_ERROR`, sans révéler les détails Discord ;
 - les projections ne contiennent ni token, ni `discordId`, ni contenu
   fournisseur.
 
@@ -228,7 +234,7 @@ Aucune route F07 restante. Les routes chat/SSE sont F07B.
 
 - `NotificationBell` et `NotificationPanel` dans le shell partagé ;
 - `AbsenceDialog` avec confirmation, succès, erreur générique, Escape et
-  focus-visible ;
+  focus-visible, restauration du focus et piège clavier ;
 - client web avec `credentials: 'include'`, origine de mutation et messages
   français ;
 - action d’absence sur les cartes de planning et bouton de la colonne latérale.
@@ -255,10 +261,11 @@ Aucune route F07 restante. Les routes chat/SSE sont F07B.
 | `pnpm exec vitest run packages/shared/tests/attendance.test.ts apps/api/tests/unit/attendance/policy.test.ts` | 7 tests verts | 2026-09-06 |
 | `pnpm exec vitest run packages/database/tests/attendance-schema.test.ts` | 3 tests verts | 2026-09-06 |
 | `pnpm exec vitest run apps/api/tests/unit/notifications/config.test.ts apps/api/tests/unit/notifications/discord-client.test.ts` | 6 tests verts | 2026-09-06 |
-| `pnpm exec vitest run apps/api/tests/unit/attendance/services.test.ts apps/api/tests/unit/notifications/services.test.ts apps/api/tests/unit/notifications/worker.test.ts` | 10 tests verts | 2026-09-06 |
-| `pnpm exec vitest run apps/api/tests/api/attendance/routes.test.ts apps/api/tests/api/notifications/routes.test.ts` | 6 tests verts | 2026-09-06 |
+| `pnpm exec vitest run apps/api/tests/unit/attendance/services.test.ts apps/api/tests/unit/notifications/services.test.ts apps/api/tests/unit/notifications/worker.test.ts` | 13 tests verts | 2026-09-06 |
+| `pnpm exec vitest run apps/api/tests/api/attendance/routes.test.ts apps/api/tests/api/notifications/routes.test.ts` | 8 tests verts | 2026-09-06 |
 | `pnpm exec vitest run apps/web/tests/notifications-api.test.ts apps/web/tests/attendance-api.test.ts apps/web/tests/notifications-visual.test.ts apps/web/tests/attendance-visual.test.ts apps/web/tests/tailwind-only.test.ts` | 11 tests verts | 2026-09-06 |
-| `pnpm test` | 98 fichiers, 243 tests verts | 2026-09-06 |
+| `pnpm test` | 98 fichiers, 248 tests verts | 2026-09-06 |
+| `pnpm test:integration` avec PostgreSQL de test | 3 tests verts : transactions, rejeu, reprise outbox | 2026-09-06 |
 | `pnpm lint` | 4 packages verts | 2026-09-06 |
 | `pnpm typecheck` | 4 packages verts | 2026-09-06 |
 | `pnpm --filter @jdr-hub/api build` | Build API vert | 2026-09-06 |
@@ -268,7 +275,6 @@ Aucune route F07 restante. Les routes chat/SSE sont F07B.
 
 ### Restants
 
-- test d’intégration PostgreSQL dédié aux repositories ;
 - test E2E Discord simulé et vérification manuelle du parcours dans un
   navigateur.
 
@@ -283,9 +289,11 @@ Aucune route F07 restante. Les routes chat/SSE sont F07B.
 ### Green
 
 - Les implémentations minimales ont fait passer les tests ciblés : 7, 3, 6,
-  10, 6 puis 11 tests selon les tranches.
+  13, 8 puis 11 tests selon les tranches.
 - Une reconstruction des packages `shared`/`database` a été nécessaire avant
   les typechecks, car leurs déclarations `dist` étaient obsolètes.
+- La suite PostgreSQL a d’abord révélé le verrouillage interdit d’un `LEFT
+  JOIN` nullable ; le verrou a été isolé sur la ligne de séance.
 
 ### Refactor
 
@@ -307,6 +315,8 @@ Aucune route F07 restante. Les routes chat/SSE sont F07B.
 - validation Zod stricte avec tailles maximales et refus des propriétés
   inconnues ;
 - transaction d’absence et clés uniques contre les doublons ;
+- clé Discord dérivée par empreinte et limitée à 25 caractères ;
+- bail de traitement et reprise transactionnelle des livraisons `PROCESSING` ;
 - PostgreSQL interne au réseau Docker, conteneurs non-root, images épinglées et
   secrets de vérification manifestement fictifs ;
 - réponses et interface sans stack trace, token, `discordId` ou détail de
@@ -331,8 +341,7 @@ Aucune route F07 restante. Les routes chat/SSE sont F07B.
   dashboard ;
 - le DM Discord est asynchrone : une indisponibilité du fournisseur laisse la
   notification interne disponible et marque la livraison pour retry ou échec ;
-- les tests d’intégration PostgreSQL et E2E Discord restent à ajouter dans un
-  harness isolé ;
+- les tests E2E Discord restent à ajouter dans un harness isolé ;
 - F07B implémentera séparément la conversation textuelle par partie, SSE et
   Redis Streams ; aucun départ de salon Discord ne déclenche d’action.
 

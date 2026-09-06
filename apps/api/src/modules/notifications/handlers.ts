@@ -17,8 +17,13 @@ export type NotificationsDependencies = {
 
 export type NotificationRouteEnv = { Variables: { requestId: string } }
 
-function error(c: Context<NotificationRouteEnv>, status: 400 | 401 | 403 | 404 | 429) {
-  return c.json({ data: null, error: { code: 'NOTIFICATION_ERROR', message: 'La notification n’a pas pu être traitée.' }, meta: { requestId: c.get('requestId') } }, status)
+function listStatus(value: unknown): 400 | 500 {
+  return value instanceof Error && value.message === 'NOTIFICATION_INVALID_CURSOR' ? 400 : 500
+}
+
+function error(c: Context<NotificationRouteEnv>, status: 400 | 401 | 403 | 404 | 429 | 500) {
+  const message = status === 500 ? 'Une erreur interne est survenue. Réessayez plus tard.' : 'La notification n’a pas pu être traitée.'
+  return c.json({ data: null, error: { code: status === 500 ? 'INTERNAL_ERROR' : 'NOTIFICATION_ERROR', message }, meta: { requestId: c.get('requestId') } }, status)
 }
 
 export function createNotificationHandlers(dependencies: NotificationsDependencies) {
@@ -50,7 +55,7 @@ export function createNotificationHandlers(dependencies: NotificationsDependenci
       try {
         const data = await listNotifications({ userId: user.id, cursor: parsed.data.cursor ?? null, limit: parsed.data.limit, repository: dependencies.repository })
         return c.json({ data, error: null, meta: { requestId: c.get('requestId') } })
-      } catch { return error(c, 400) }
+      } catch (value) { return error(c, listStatus(value)) }
     },
     markRead: async (c: Context<NotificationRouteEnv>) => {
       const user = await currentUser(c)
@@ -63,7 +68,7 @@ export function createNotificationHandlers(dependencies: NotificationsDependenci
       try {
         const marked = await markNotificationRead({ notificationId, userId: user.id, repository: dependencies.repository, now })
         return marked ? c.body(null, 204) : error(c, 404)
-      } catch { return error(c, 400) }
+      } catch { return error(c, 500) }
     },
   }
 }

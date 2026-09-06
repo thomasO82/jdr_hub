@@ -11,6 +11,8 @@ describe('absence dialog visual component', () => {
     expect(source).toContain('Absence signalée')
     expect(source).toContain('role="dialog"')
     expect(source).toContain('aria-modal="true"')
+    expect(source).toContain('aria-live="polite"')
+    expect(source).toContain('focusable')
     expect(source).toContain('focus-visible:')
   })
 })

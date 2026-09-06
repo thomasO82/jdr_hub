@@ -1,7 +1,10 @@
-import { and, asc, desc, eq, isNull, lt, or, sql } from 'drizzle-orm'
+import { and, asc, desc, eq, gte, isNull, lt, or, sql } from 'drizzle-orm'
 import { authSchema, attendanceSchema, gameSchema, schedulingSchema, type createDatabase } from '@jdr-hub/database'
 import type { NotificationChannel, NotificationType } from '@jdr-hub/shared'
 import { createAbsenceDiscordContent } from './discord-content.js'
+
+export const MAX_NOTIFICATION_DELIVERY_ATTEMPTS = 5
+export const NOTIFICATION_PROCESSING_LEASE_MS = 5 * 60_000
 
 export type NotificationRecord = {
   id: string
@@ -30,6 +33,7 @@ export type DiscordDelivery = {
   channel: Extract<NotificationChannel, 'DISCORD_DM'>
   status: 'PENDING' | 'PROCESSING' | 'SENT' | 'FAILED'
   attempts: number
+  processingAt: Date | null
   nextAttemptAt: Date | null
   providerMessageId: string | null
   lastErrorCode: string | null
@@ -65,10 +69,18 @@ const toNotification = (row: { id: string; type: string; recipientId: string; ga
   type: row.type as NotificationType,
 })
 
-const toDelivery = (row: { id: string; notificationId: string; recipientDiscordId: string; content: string; channel: string; status: string; attempts: number; nextAttemptAt: Date | null; providerMessageId: string | null; lastErrorCode: string | null }): DiscordDelivery => ({
-  ...row,
+const toDelivery = (row: { id: string; notificationId: string; recipientDiscordId: string; content: string; channel: string; status: string; attempts: number; processingAt: Date | null; nextAttemptAt: Date | null; providerMessageId: string | null; lastErrorCode: string | null }): DiscordDelivery => ({
+  id: row.id,
+  notificationId: row.notificationId,
+  recipientDiscordId: row.recipientDiscordId,
+  content: row.content,
   channel: row.channel as DiscordDelivery['channel'],
   status: row.status as DiscordDelivery['status'],
+  attempts: row.attempts,
+  processingAt: row.processingAt,
+  nextAttemptAt: row.nextAttemptAt,
+  providerMessageId: row.providerMessageId,
+  lastErrorCode: row.lastErrorCode,
 })
 
 export function createPostgresNotificationRepository(database: Database): NotificationRepository {
@@ -80,6 +92,7 @@ export function createPostgresNotificationRepository(database: Database): Notifi
   return {
     async listForUser({ userId, cursor, limit }) {
       const decoded = decodeCursor(cursor)
+      if (cursor && !decoded) throw new Error('NOTIFICATION_INVALID_CURSOR')
       const cursorCondition = decoded
         ? or(lt(notifications.createdAt, decoded.createdAt), and(eq(notifications.createdAt, decoded.createdAt), lt(notifications.id, decoded.id)))
         : undefined
@@ -100,6 +113,17 @@ export function createPostgresNotificationRepository(database: Database): Notifi
 
     async claimPendingDeliveries({ now, limit }) {
       return database.transaction(async (tx) => {
+        const staleBefore = new Date(now.getTime() - NOTIFICATION_PROCESSING_LEASE_MS)
+        const staleProcessing = and(
+          eq(notificationDeliveries.status, 'PROCESSING'),
+          or(
+            lt(notificationDeliveries.processingAt, staleBefore),
+            and(isNull(notificationDeliveries.processingAt), lt(notificationDeliveries.updatedAt, staleBefore)),
+          ),
+        )
+        await tx.update(notificationDeliveries).set({ status: 'PENDING', nextAttemptAt: now, processingAt: null, lastErrorCode: 'DISCORD_WORKER_TIMEOUT', updatedAt: now }).where(and(staleProcessing, lt(notificationDeliveries.attempts, MAX_NOTIFICATION_DELIVERY_ATTEMPTS)))
+        await tx.update(notificationDeliveries).set({ status: 'FAILED', processingAt: null, lastErrorCode: 'DISCORD_WORKER_TIMEOUT', updatedAt: now }).where(and(staleProcessing, gte(notificationDeliveries.attempts, MAX_NOTIFICATION_DELIVERY_ATTEMPTS)))
+
         const candidates = await tx.select({
           id: notificationDeliveries.id,
           notificationId: notificationDeliveries.notificationId,
@@ -109,6 +133,7 @@ export function createPostgresNotificationRepository(database: Database): Notifi
           channel: notificationDeliveries.channel,
           status: notificationDeliveries.status,
           attempts: notificationDeliveries.attempts,
+          processingAt: notificationDeliveries.processingAt,
           nextAttemptAt: notificationDeliveries.nextAttemptAt,
           providerMessageId: notificationDeliveries.providerMessageId,
           lastErrorCode: notificationDeliveries.lastErrorCode,
@@ -117,29 +142,29 @@ export function createPostgresNotificationRepository(database: Database): Notifi
           .innerJoin(games, eq(notifications.gameId, games.id))
           .innerJoin(gameSessions, eq(notifications.sessionId, gameSessions.id))
           .innerJoin(users, eq(notifications.recipientId, users.id))
-          .where(and(eq(notificationDeliveries.channel, 'DISCORD_DM'), eq(notificationDeliveries.status, 'PENDING'), lt(notificationDeliveries.attempts, 5), or(isNull(notificationDeliveries.nextAttemptAt), sql`${notificationDeliveries.nextAttemptAt} <= ${now}`)))
+          .where(and(eq(notificationDeliveries.channel, 'DISCORD_DM'), eq(notificationDeliveries.status, 'PENDING'), lt(notificationDeliveries.attempts, MAX_NOTIFICATION_DELIVERY_ATTEMPTS), or(isNull(notificationDeliveries.nextAttemptAt), sql`${notificationDeliveries.nextAttemptAt} <= ${now}`)))
           .orderBy(asc(notificationDeliveries.nextAttemptAt), asc(notificationDeliveries.createdAt))
           .limit(limit).for('update', { skipLocked: true })
 
         const claimed: DiscordDelivery[] = []
         for (const candidate of candidates) {
-          const [updated] = await tx.update(notificationDeliveries).set({ status: 'PROCESSING', attempts: sql`${notificationDeliveries.attempts} + 1`, updatedAt: now }).where(and(eq(notificationDeliveries.id, candidate.id), eq(notificationDeliveries.status, 'PENDING'))).returning({ attempts: notificationDeliveries.attempts })
-          if (updated) claimed.push(toDelivery({ ...candidate, content: createAbsenceDiscordContent({ gameTitle: candidate.gameTitle, sessionStartsAt: candidate.sessionStartsAt }), status: 'PROCESSING', attempts: updated.attempts }))
+          const [updated] = await tx.update(notificationDeliveries).set({ status: 'PROCESSING', attempts: sql`${notificationDeliveries.attempts} + 1`, processingAt: now, updatedAt: now }).where(and(eq(notificationDeliveries.id, candidate.id), eq(notificationDeliveries.status, 'PENDING'))).returning({ attempts: notificationDeliveries.attempts, processingAt: notificationDeliveries.processingAt })
+          if (updated) claimed.push(toDelivery({ ...candidate, content: createAbsenceDiscordContent({ gameTitle: candidate.gameTitle, sessionStartsAt: candidate.sessionStartsAt }), status: 'PROCESSING', attempts: updated.attempts, processingAt: updated.processingAt }))
         }
         return claimed
       })
     },
 
     async markSent({ deliveryId, providerMessageId, now }) {
-      await database.update(notificationDeliveries).set({ status: 'SENT', providerMessageId, updatedAt: now }).where(and(eq(notificationDeliveries.id, deliveryId), eq(notificationDeliveries.status, 'PROCESSING')))
+      await database.update(notificationDeliveries).set({ status: 'SENT', providerMessageId, processingAt: null, updatedAt: now }).where(and(eq(notificationDeliveries.id, deliveryId), eq(notificationDeliveries.status, 'PROCESSING')))
     },
 
     async markRetryableFailure({ deliveryId, errorCode, nextAttemptAt, now }) {
-      await database.update(notificationDeliveries).set({ status: 'PENDING', nextAttemptAt, lastErrorCode: errorCode, updatedAt: now }).where(and(eq(notificationDeliveries.id, deliveryId), eq(notificationDeliveries.status, 'PROCESSING')))
+      await database.update(notificationDeliveries).set({ status: 'PENDING', nextAttemptAt, processingAt: null, lastErrorCode: errorCode, updatedAt: now }).where(and(eq(notificationDeliveries.id, deliveryId), eq(notificationDeliveries.status, 'PROCESSING')))
     },
 
     async markPermanentFailure({ deliveryId, errorCode, now }) {
-      await database.update(notificationDeliveries).set({ status: 'FAILED', lastErrorCode: errorCode, updatedAt: now }).where(and(eq(notificationDeliveries.id, deliveryId), eq(notificationDeliveries.status, 'PROCESSING')))
+      await database.update(notificationDeliveries).set({ status: 'FAILED', processingAt: null, lastErrorCode: errorCode, updatedAt: now }).where(and(eq(notificationDeliveries.id, deliveryId), eq(notificationDeliveries.status, 'PROCESSING')))
     },
   }
 }
