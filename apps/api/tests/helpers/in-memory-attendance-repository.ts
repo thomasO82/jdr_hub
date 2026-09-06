@@ -1,7 +1,6 @@
 import type { AttendanceEntry, AttendanceRecord, GameStatus, SessionContext, SessionStatus } from '@jdr-hub/shared'
 import type { AbsenceEvent, AttendanceRepository } from '../../src/modules/attendance/repository.js'
-import type { DiscordDelivery, NotificationRecord } from '../../src/modules/notifications/repository.js'
-import { createAbsenceDiscordContent } from '../../src/modules/notifications/discord-content.js'
+import type { NotificationRecord } from '../../src/modules/notifications/repository.js'
 
 type SeedSession = Omit<SessionContext, 'memberStatus'> & {
   memberStatuses: Record<string, string>
@@ -10,7 +9,7 @@ type SeedSession = Omit<SessionContext, 'memberStatus'> & {
 type InMemoryAttendanceRepository = AttendanceRepository & {
   attendance: AttendanceRecord[]
   notifications: NotificationRecord[]
-  deliveries: DiscordDelivery[]
+  deliveries: never[]
   sessionStatuses: Map<string, SessionStatus>
 }
 
@@ -21,7 +20,7 @@ export function createInMemoryAttendanceRepository(input: { sessions: SeedSessio
   const sessionStatuses = new Map(input.sessions.map((session) => [session.sessionId, session.sessionStatus]))
   const attendance: AttendanceRecord[] = []
   const notifications: NotificationRecord[] = []
-  const deliveries: DiscordDelivery[] = []
+  const deliveries: never[] = []
   let sequence = 1
 
   const context = (sessionId: string, userId: string): SessionContext | null => {
@@ -36,8 +35,6 @@ export function createInMemoryAttendanceRepository(input: { sessions: SeedSessio
       gameStatus: session.gameStatus,
       sessionStatus: sessionStatuses.get(sessionId) ?? session.sessionStatus,
       memberStatus: userId === session.ownerId ? 'ACTIVE' : session.memberStatuses[userId] ?? 'NONE',
-      memberDiscordId: session.memberDiscordId,
-      ownerDiscordId: session.ownerDiscordId,
     }
   }
 
@@ -45,18 +42,15 @@ export function createInMemoryAttendanceRepository(input: { sessions: SeedSessio
     const existing = attendance.find((entry) => entry.sessionId === session.sessionId && entry.userId === userId)
     if (existing) {
       const notification = notifications.find((entry) => entry.sessionId === session.sessionId && entry.actorId === userId)
-      const delivery = notification ? deliveries.find((entry) => entry.notificationId === notification.id) : undefined
-      if (!notification || !delivery) throw new Error('ATTENDANCE_CONFLICT')
-      return { attendance: existing, notification, delivery }
+      if (!notification) throw new Error('ATTENDANCE_CONFLICT')
+      return { attendance: existing, notification }
     }
     if (attendance.some((entry) => entry.sessionId === session.sessionId && entry.userId === userId)) throw new Error('ATTENDANCE_CONFLICT')
     const attendanceRecord: AttendanceRecord = { id: id('attendance', sequence++), sessionId: session.sessionId, userId, status: 'EXCUSED', createdAt: now, updatedAt: now }
     const notification: NotificationRecord = { id: id('notification', sequence++), type: 'ABSENCE_REPORTED', recipientId: session.ownerId, gameId: session.gameId, sessionId: session.sessionId, actorId: userId, title: 'Absence signalée', body: 'Un joueur a signalé son absence pour une séance.', readAt: null, createdAt: now }
-    const delivery: DiscordDelivery = { id: id('delivery', sequence++), notificationId: notification.id, recipientDiscordId: session.ownerDiscordId ?? '', content: createAbsenceDiscordContent(session), channel: 'DISCORD_DM', status: 'PENDING', attempts: 0, processingAt: null, nextAttemptAt: null, providerMessageId: null, lastErrorCode: null }
     attendance.push(attendanceRecord)
     notifications.push(notification)
-    deliveries.push(delivery)
-    return { attendance: attendanceRecord, notification, delivery }
+    return { attendance: attendanceRecord, notification }
   }
 
   return {

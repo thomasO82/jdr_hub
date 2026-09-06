@@ -3,7 +3,6 @@ import {
   absenceCommandSchema,
   attendanceCommandSchema,
   attendanceStatusSchema,
-  notificationChannelSchema,
   notificationQuerySchema,
   notificationTypeSchema,
 } from '../src/attendance.js'
@@ -12,7 +11,6 @@ describe('attendance and notification shared contracts', () => {
   it('accepts supported attendance statuses and notification values', () => {
     expect(attendanceStatusSchema.parse('EXCUSED')).toBe('EXCUSED')
     expect(notificationTypeSchema.parse('ABSENCE_REPORTED')).toBe('ABSENCE_REPORTED')
-    expect(notificationChannelSchema.parse('DISCORD_DM')).toBe('DISCORD_DM')
   })
 
   it('accepts a strict absence command and rejects a client-provided reason', () => {

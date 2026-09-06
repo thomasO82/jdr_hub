@@ -11,22 +11,18 @@ const session = {
   ownerId: 'gm-1',
   gameStatus: 'ACTIVE' as const,
   sessionStatus: 'SCHEDULED' as const,
-  ownerDiscordId: '100000000000000001',
-  memberDiscordId: '100000000000000002',
 }
 
 describe('attendance services', () => {
-  it('reports an absence as EXCUSED and creates one local notification and delivery', async () => {
+  it('reports an absence as EXCUSED and creates only one local notification', async () => {
     const repository = createInMemoryAttendanceRepository({ sessions: [{ ...session, memberStatuses: { 'player-1': 'ACTIVE' } }] })
     const result = await reportAbsence({ sessionId: 'session-1', userId: 'player-1', repository, now: () => new Date('2026-09-06T12:00:00.000Z') })
 
     expect(result.attendance.status).toBe('EXCUSED')
     expect(result.notification).toMatchObject({ type: 'ABSENCE_REPORTED', recipientId: 'gm-1', actorId: 'player-1' })
-    expect(result.delivery).toMatchObject({ channel: 'DISCORD_DM', status: 'PENDING', recipientDiscordId: '100000000000000001' })
-    expect(result.delivery.content).toContain('Les Brumes de Valombre')
-    expect(result.delivery.content).not.toContain('game-1')
+    expect('delivery' in result).toBe(false)
     expect(repository.notifications).toHaveLength(1)
-    expect(repository.deliveries).toHaveLength(1)
+    expect(repository.deliveries).toHaveLength(0)
   })
 
   it('is idempotent for a repeated absence and never creates duplicate effects', async () => {
@@ -36,7 +32,7 @@ describe('attendance services', () => {
 
     expect(second).toEqual(first)
     expect(repository.notifications).toHaveLength(1)
-    expect(repository.deliveries).toHaveLength(1)
+    expect(repository.deliveries).toHaveLength(0)
   })
 
   it('rejects outsiders, inactive members and closed sessions without creating an event', async () => {

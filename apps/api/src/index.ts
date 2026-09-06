@@ -10,19 +10,14 @@ import { createPostgresAvailabilityRepository } from './modules/availability/rep
 import { createPostgresSchedulingRepository } from './modules/scheduling/repository.js'
 import { createPostgresAttendanceRepository } from './modules/attendance/repository.js'
 import { createPostgresNotificationRepository } from './modules/notifications/repository.js'
-import { createDiscordNotifier } from './modules/notifications/discord-client.js'
-import { parseNotificationConfig } from './modules/notifications/config.js'
-import { processDiscordDeliveries, startNotificationWorker } from './modules/notifications/worker.js'
 
 async function startApi(): Promise<void> {
   const port = parsePort(process.env.PORT)
   const database = createDatabase(process.env.DATABASE_URL)
   const authConfig = parseAuthConfig(process.env)
-  const notificationConfig = parseNotificationConfig(process.env)
   const authRepository = createPostgresAuthRepository(database.db)
   const attendanceRepository = createPostgresAttendanceRepository(database.db)
   const notificationRepository = createPostgresNotificationRepository(database.db)
-  const notifier = createDiscordNotifier(notificationConfig)
   await migrateDatabase(database)
 
   const server = serve({
@@ -37,12 +32,7 @@ async function startApi(): Promise<void> {
     }).fetch,
     port,
   })
-  const stopNotificationWorker = startNotificationWorker({
-    process: () => processDiscordDeliveries({ repository: notificationRepository, notifier, limit: 20 }),
-    intervalMs: 30_000,
-  })
   const shutdown = () => {
-    stopNotificationWorker()
     server.close(() => { void database.client.end() })
   }
   process.once('SIGTERM', shutdown)

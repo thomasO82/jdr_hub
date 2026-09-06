@@ -10,7 +10,6 @@ import {
   schedulingSchema,
 } from '@jdr-hub/database'
 import { createPostgresAttendanceRepository } from '../../src/modules/attendance/repository.js'
-import { createPostgresNotificationRepository } from '../../src/modules/notifications/repository.js'
 
 const databaseUrl = process.env.DATABASE_URL
 if (!databaseUrl) throw new Error('DATABASE_URL is required for PostgreSQL integration tests')
@@ -42,9 +41,6 @@ async function seedSession(): Promise<Seed> {
 }
 
 async function clean(seed: Seed): Promise<void> {
-  const notificationRows = await database.db.select({ id: notifications.id }).from(notifications).where(eq(notifications.sessionId, seed.sessionId))
-  const notificationIds = notificationRows.map((row) => row.id)
-  if (notificationIds.length > 0) await database.db.delete(notificationDeliveries).where(inArray(notificationDeliveries.notificationId, notificationIds))
   await database.db.delete(notifications).where(eq(notifications.sessionId, seed.sessionId))
   await database.db.delete(sessionAttendance).where(eq(sessionAttendance.sessionId, seed.sessionId))
   await database.db.delete(gameSessions).where(eq(gameSessions.id, seed.sessionId))
@@ -65,7 +61,7 @@ describe('PostgreSQL attendance and notification repositories', () => {
       expect(second).toEqual(first)
       expect((await database.db.select().from(sessionAttendance).where(eq(sessionAttendance.sessionId, seed.sessionId)))).toHaveLength(1)
       expect((await database.db.select().from(notifications).where(eq(notifications.sessionId, seed.sessionId)))).toHaveLength(1)
-      expect((await database.db.select().from(notificationDeliveries).where(eq(notificationDeliveries.notificationId, first.notification.id)))).toHaveLength(1)
+      expect((await database.db.select().from(notificationDeliveries).where(eq(notificationDeliveries.notificationId, first.notification.id)))).toHaveLength(0)
     } finally {
       await clean(seed)
     }
@@ -87,23 +83,6 @@ describe('PostgreSQL attendance and notification repositories', () => {
     }
   })
 
-  it('recovers a processing Discord delivery after its lease expires', async () => {
-    const seed = await seedSession()
-    try {
-      const attendanceRepository = createPostgresAttendanceRepository(database.db)
-      const event = await attendanceRepository.reportAbsence({ sessionId: seed.sessionId, userId: seed.playerId, now: new Date('2026-09-06T12:00:00.000Z') })
-      const repository = createPostgresNotificationRepository(database.db)
-      const firstClaim = await repository.claimPendingDeliveries({ now: new Date('2026-09-06T12:00:00.000Z'), limit: 1 })
-      const recoveredClaim = await repository.claimPendingDeliveries({ now: new Date('2026-09-06T12:06:00.000Z'), limit: 1 })
-
-      expect(firstClaim[0]).toMatchObject({ id: event.delivery.id, status: 'PROCESSING', attempts: 1 })
-      expect(recoveredClaim[0]).toMatchObject({ id: event.delivery.id, status: 'PROCESSING', attempts: 2 })
-      await repository.markSent({ deliveryId: event.delivery.id, providerMessageId: 'discord-message-integration', now: new Date('2026-09-06T12:07:00.000Z') })
-      expect((await database.db.select({ status: notificationDeliveries.status, processingAt: notificationDeliveries.processingAt }).from(notificationDeliveries).where(eq(notificationDeliveries.id, event.delivery.id)))[0]).toMatchObject({ status: 'SENT', processingAt: null })
-    } finally {
-      await clean(seed)
-    }
-  })
 })
 
 afterAll(async () => {

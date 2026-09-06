@@ -23,7 +23,7 @@ async function createTestApp() {
   }))
   const repository = createInMemoryAttendanceRepository({ sessions: [{
     sessionId: 'session-1', gameId: 'game-1', gameTitle: 'La crypte', sessionStartsAt: new Date('2026-09-10T18:00:00.000Z'), ownerId: owner.id,
-    gameStatus: 'ACTIVE', sessionStatus: 'SCHEDULED', ownerDiscordId: '100000000000000001', memberDiscordId: '100000000000000002', memberStatuses: { [member.id]: 'ACTIVE' },
+    gameStatus: 'ACTIVE', sessionStatus: 'SCHEDULED', memberStatuses: { [member.id]: 'ACTIVE' },
   }] })
   const app = new Hono<AttendanceRouteEnv>()
   app.use('*', async (c, next) => { c.set('requestId', 'test-request'); await next() })
