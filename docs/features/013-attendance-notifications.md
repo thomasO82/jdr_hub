@@ -6,10 +6,10 @@ F07
 
 ## Statut
 
-`IN_REVIEW`
+`IN_PROGRESS`
 
-> La Pull Request cible `develop`. Le statut reste `IN_REVIEW` jusqu’à la revue
-> et à la confirmation de fusion par le propriétaire.
+> La Pull Request n’est pas encore ouverte. Le statut deviendra `IN_REVIEW`
+> uniquement après l’ouverture effective de la PR.
 
 ## Branche
 
@@ -18,7 +18,7 @@ F07
 ## Lien ou numéro de Pull Request
 
 Non créée automatiquement : `gh` n’est pas installé dans l’environnement.
-PR ouverte vers `develop` après vérification complète.
+Ouverture manuelle : https://github.com/thomasO82/jdr_hub/pull/new/feat/attendance-notifications
 
 ## Dates de début et de fin
 
