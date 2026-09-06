@@ -144,7 +144,9 @@ projections JDR Hub, le contenu texte et la date ISO. Elles n'exposent ni
 Le service appelle une politique dédiée avant chaque lecture, écriture et
 connexion SSE. La politique vérifie le statut de la partie et l'appartenance
 active dans la même projection ; une modification du roster révoque donc le
-prochain accès sans dépendre d'un état React ou Redis.
+prochain accès sans dépendre d'un état React ou Redis. Une connexion SSE
+revalide aussi l'accès sur chaque heartbeat et avant chaque événement afin de
+fermer rapidement le flux d'un membre retiré.
 
 Les onglets, l'URL et la connexion SSE ne donnent aucun privilège. Un utilisateur
 non authentifié reçoit une erreur d'authentification ; un utilisateur sans
