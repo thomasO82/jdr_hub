@@ -12,6 +12,22 @@ permissions:
 jobs:
   quality:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17.6-alpine@sha256:ef257d85f76e48da1c64832459b59fcaba1a4dac97bf5d7450c77753542eee94
+        env:
+          POSTGRES_DB: jdr_hub_test
+          POSTGRES_USER: jdr_hub_app
+          POSTGRES_PASSWORD: ci-only-development-password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U jdr_hub_app -d jdr_hub_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      DATABASE_URL: postgresql://jdr_hub_app:ci-only-development-password@127.0.0.1:5432/jdr_hub_test
     steps:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
@@ -36,6 +52,9 @@ jobs:
 
       - name: Tests
         run: pnpm test
+
+      - name: PostgreSQL integration tests
+        run: pnpm test:integration
 
       - name: Build
         run: pnpm build

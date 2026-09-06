@@ -1,0 +1,1 @@
+ALTER TABLE "notification_deliveries" ADD COLUMN "processing_at" timestamp with time zone;

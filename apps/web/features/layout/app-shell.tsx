@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import {
-  Bell,
   CalendarDays,
   CircleUserRound,
   Dices,
@@ -9,6 +8,7 @@ import {
   UsersRound,
 } from 'lucide-react'
 import type { ReactNode } from 'react'
+import { NotificationBell } from '../notifications/notification-bell'
 
 const navigation = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
@@ -40,6 +40,9 @@ export function AppShell({ children, active = 'Games' }: { children: ReactNode; 
             </Link>
           ))}
         </nav>
+        <div className="relative mt-6 flex justify-end">
+          <NotificationBell />
+        </div>
         <Link className="mt-auto flex min-h-12 items-center justify-center gap-2 rounded-xl bg-primary font-semibold text-on-primary no-underline transition-colors hover:bg-primary-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary" href="/parties/nouvelle">
           <Plus aria-hidden="true" size={20} />
           New Game
@@ -51,7 +54,7 @@ export function AppShell({ children, active = 'Games' }: { children: ReactNode; 
           <img className="h-8 w-8" src="/branding/logo.svg" alt="JDR Hub" />
           <strong className="font-display text-2xl tracking-tight">JDR Hub</strong>
         </Link>
-        <Bell aria-label="Notifications" size={24} />
+        <NotificationBell />
       </header>
 
       <div className="min-h-screen lg:ml-64">{children}</div>
