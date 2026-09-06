@@ -119,8 +119,10 @@ export function createPostgresInvitationRepository(database: Database): Invitati
     async create(input) {
       try {
         return await database.transaction(async (tx) => {
-          const [game] = await tx.select({ id: games.id }).from(games).where(eq(games.id, input.gameId)).for('update').limit(1)
+          const [game] = await tx.select({ id: games.id, ownerId: games.ownerId, status: games.status }).from(games).where(eq(games.id, input.gameId)).for('update').limit(1)
           if (!game) throw new Error('INVITATION_NOT_FOUND')
+          if (game.ownerId !== input.inviterId) throw new Error('INVITATION_FORBIDDEN')
+          if (!['OPEN', 'ACTIVE'].includes(game.status)) throw new Error('INVITATION_CONFLICT')
           await tx.update(invitations)
             .set({ status: 'EXPIRED', updatedAt: input.now })
             .where(and(eq(invitations.gameId, input.gameId), eq(invitations.inviteeId, input.inviteeId), eq(invitations.status, 'PENDING'), lte(invitations.expiresAt, input.now)))
@@ -169,6 +171,7 @@ export function createPostgresInvitationRepository(database: Database): Invitati
         if (!ownerAction && !inviteeAction) throw new Error('INVITATION_FORBIDDEN')
         if (row.invitationStatus === status) return read(tx, invitationId)
         if (row.invitationStatus !== 'PENDING' || row.expiresAt.getTime() <= now.getTime()) throw new Error('INVITATION_CONFLICT')
+        if (!['OPEN', 'ACTIVE'].includes(row.gameStatus)) throw new Error('INVITATION_CONFLICT')
         if (status === 'ACCEPTED') {
           const [members] = await tx.select({ total: count() }).from(gameMembers)
             .where(and(eq(gameMembers.gameId, row.gameId), eq(gameMembers.role, 'PLAYER'), eq(gameMembers.status, 'ACTIVE')))

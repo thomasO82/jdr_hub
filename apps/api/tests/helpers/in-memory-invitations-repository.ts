@@ -31,7 +31,16 @@ export function createInMemoryInvitationsRepository(input: {
     async isActiveMember(gameId, userId) { return members.has(`${gameId}:${userId}`) || ownerFor(gameId) === userId },
     async findPending(gameId, inviteeId) { return [...invitations.values()].find((invitation) => invitation.gameId === gameId && invitation.inviteeId === inviteeId && invitation.status === 'PENDING') ?? null },
     async create(inputData) {
-      if ([...invitations.values()].some((invitation) => invitation.gameId === inputData.gameId && invitation.inviteeId === inputData.inviteeId && invitation.status === 'PENDING')) throw new Error('INVITATION_CONFLICT')
+      const game = games.get(inputData.gameId)
+      if (!game) throw new Error('INVITATION_NOT_FOUND')
+      for (const invitation of invitations.values()) {
+        if (invitation.gameId !== inputData.gameId || invitation.inviteeId !== inputData.inviteeId || invitation.status !== 'PENDING') continue
+        if (invitation.expiresAt.getTime() <= inputData.now.getTime()) {
+          invitations.set(invitation.id, { ...invitation, status: 'EXPIRED', updatedAt: inputData.now })
+        } else {
+          throw new Error('INVITATION_CONFLICT')
+        }
+      }
       const invitation: InvitationRecord = {
         id: randomUUID(),
         gameId: inputData.gameId,

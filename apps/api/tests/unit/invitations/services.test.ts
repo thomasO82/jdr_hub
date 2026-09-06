@@ -58,6 +58,14 @@ describe('invitation services', () => {
     expect(listed[0]).toMatchObject({ id: invitation.id, status: 'EXPIRED' })
   })
 
+  it('allows a new invitation after the previous pending one has expired', async () => {
+    const repo = repository()
+    await createInvitation({ gameId, ownerId, inviteeId, repository: repo, now: () => new Date('2026-08-01T12:00:00.000Z') })
+    const replacement = await createInvitation({ gameId, ownerId, inviteeId, repository: repo, now: () => now })
+    expect(replacement.status).toBe('PENDING')
+    expect(replacement.expiresAt).toBe('2026-09-13T12:00:00.000Z')
+  })
+
   it('does not allow an invitee to decide another user invitation', async () => {
     const repo = repository()
     const invitation = await createInvitation({ gameId, ownerId, inviteeId: secondInviteeId, repository: repo, now: () => now })
