@@ -54,6 +54,7 @@ export function createInMemoryInvitationsRepository(input: {
     async updateStatus(inputData) {
       const invitation = invitations.get(inputData.invitationId)
       if (!invitation) return null
+      if (invitation.status !== 'PENDING' || invitation.expiresAt.getTime() <= inputData.now.getTime()) throw new Error('INVITATION_CONFLICT')
       if (inputData.status === 'ACCEPTED') {
         const game = games.get(invitation.gameId)
         if (!game || activeCount(invitation.gameId) >= game.maxPlayers) throw new Error('INVITATION_CONFLICT')
