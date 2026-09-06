@@ -14,6 +14,8 @@ import { registerAttendanceRoutes } from './modules/attendance/routes.js'
 import type { AttendanceDependencies } from './modules/attendance/handlers.js'
 import { registerNotificationRoutes } from './modules/notifications/routes.js'
 import type { NotificationsDependencies } from './modules/notifications/handlers.js'
+import { registerInvitationRoutes } from './modules/invitations/routes.js'
+import type { InvitationsDependencies } from './modules/invitations/handlers.js'
 
 type ApiVariables = {
   requestId: string
@@ -32,7 +34,7 @@ const SECURITY_HEADERS = {
   'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
 } as const
 
-export function createApiApp(options?: { auth: { config: AuthConfig; repository: AuthRepository }; games?: GamesDependencies; applications?: ApplicationsDependencies; availability?: AvailabilityDependencies; scheduling?: SchedulingDependencies; attendance?: AttendanceDependencies; notifications?: NotificationsDependencies }): ApiApp {
+export function createApiApp(options?: { auth: { config: AuthConfig; repository: AuthRepository }; games?: GamesDependencies; applications?: ApplicationsDependencies; availability?: AvailabilityDependencies; scheduling?: SchedulingDependencies; attendance?: AttendanceDependencies; notifications?: NotificationsDependencies; invitations?: InvitationsDependencies }): ApiApp {
   const app = new Hono<{ Variables: ApiVariables }>()
 
   app.use('*', async (c, next) => {
@@ -103,6 +105,9 @@ export function createApiApp(options?: { auth: { config: AuthConfig; repository:
   }
   if (options?.notifications) {
     registerNotificationRoutes(app, options.notifications)
+  }
+  if (options?.invitations) {
+    registerInvitationRoutes(app, options.invitations)
   }
 
   app.notFound((c) =>
