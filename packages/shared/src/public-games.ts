@@ -18,6 +18,7 @@ export const publicGamesQuerySchema = z.object({
 
 export type PublicGamesQuery = z.infer<typeof publicGamesQuerySchema>
 export type PublicGame = {
+  id: string
   slug: string
   title: string
   system: string

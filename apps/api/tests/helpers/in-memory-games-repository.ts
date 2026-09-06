@@ -7,6 +7,7 @@ type InMemoryRepository = GamesRepository & PublicGamesRepository
 
 function publicGame(game: GameRecord): PublicGame {
   return {
+    id: game.id,
     slug: game.slug,
     title: game.title,
     system: game.system,

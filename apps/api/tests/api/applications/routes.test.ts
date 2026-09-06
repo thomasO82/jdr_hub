@@ -26,7 +26,7 @@ async function createTestApp() {
   const authRepository = createInMemoryAuthRepository()
   const owner = await authenticatedUser(authRepository, 'MJ')
   const player = await authenticatedUser(authRepository, 'Joueur')
-  const applications = createInMemoryApplicationsRepository({ games: [{ id: 'game-1', ownerId: owner.user.id, visibility: 'PUBLIC', status: 'OPEN', maxPlayers: 2 }] })
+  const applications = createInMemoryApplicationsRepository({ games: [{ id: 'game-1', slug: 'sdfg', ownerId: owner.user.id, visibility: 'PUBLIC', status: 'OPEN', maxPlayers: 2 }] })
   const app = new Hono<ApplicationsRouteEnv>()
   app.use('*', async (c, next) => { c.set('requestId', 'test-request'); await next() })
   registerApplicationRoutes(app, { authConfig: config, authRepository, repository: applications, now: () => now })
@@ -49,6 +49,16 @@ describe('applications API routes', () => {
     expect((await app.request('/applications', { headers: { cookie: player.cookie } })).status).toBe(200)
     expect((await app.request('/games/game-1/applications', { method: 'POST', headers, body: JSON.stringify({ userId: 'forged' }) })).status).toBe(400)
     expect((await app.request('/games/game-1/applications', { method: 'POST', headers, body: '{}' })).status).toBe(409)
+  })
+
+  it('does not accept a public game slug in the application route', async () => {
+    const { app, player } = await createTestApp()
+    const response = await app.request('/games/sdfg/applications', {
+      method: 'POST',
+      headers: { cookie: player.cookie, origin: config.appOrigin, 'content-type': 'application/json' },
+      body: '{}',
+    })
+    expect(response.status).toBe(404)
   })
 
   it('lets only the game owner list and decide applications', async () => {
