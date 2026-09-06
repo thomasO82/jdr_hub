@@ -10,6 +10,10 @@ import { registerAvailabilityRoutes } from './modules/availability/routes.js'
 import type { AvailabilityDependencies } from './modules/availability/handlers.js'
 import { registerSchedulingRoutes } from './modules/scheduling/routes.js'
 import type { SchedulingDependencies } from './modules/scheduling/handlers.js'
+import { registerAttendanceRoutes } from './modules/attendance/routes.js'
+import type { AttendanceDependencies } from './modules/attendance/handlers.js'
+import { registerNotificationRoutes } from './modules/notifications/routes.js'
+import type { NotificationsDependencies } from './modules/notifications/handlers.js'
 
 type ApiVariables = {
   requestId: string
@@ -28,7 +32,7 @@ const SECURITY_HEADERS = {
   'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
 } as const
 
-export function createApiApp(options?: { auth: { config: AuthConfig; repository: AuthRepository }; games?: GamesDependencies; applications?: ApplicationsDependencies; availability?: AvailabilityDependencies; scheduling?: SchedulingDependencies }): ApiApp {
+export function createApiApp(options?: { auth: { config: AuthConfig; repository: AuthRepository }; games?: GamesDependencies; applications?: ApplicationsDependencies; availability?: AvailabilityDependencies; scheduling?: SchedulingDependencies; attendance?: AttendanceDependencies; notifications?: NotificationsDependencies }): ApiApp {
   const app = new Hono<{ Variables: ApiVariables }>()
 
   app.use('*', async (c, next) => {
@@ -93,6 +97,12 @@ export function createApiApp(options?: { auth: { config: AuthConfig; repository:
   }
   if (options?.scheduling) {
     registerSchedulingRoutes(app, options.scheduling)
+  }
+  if (options?.attendance) {
+    registerAttendanceRoutes(app, options.attendance)
+  }
+  if (options?.notifications) {
+    registerNotificationRoutes(app, options.notifications)
   }
 
   app.notFound((c) =>
