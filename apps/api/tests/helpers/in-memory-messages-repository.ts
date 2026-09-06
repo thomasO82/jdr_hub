@@ -28,9 +28,10 @@ const decodeCursor = (cursor: string | null): { id: string; createdAt: Date } | 
   }
 }
 
-export function createInMemoryMessagesRepository(input: { games: SeedGame[]; messages?: MessageRecord[] }): InMemoryMessagesRepository {
+export function createInMemoryMessagesRepository(input: { games: SeedGame[]; messages?: MessageRecord[]; authors?: Record<string, { name: string; avatarUrl: string | null }> }): InMemoryMessagesRepository {
   const games = input.games.map((game) => ({ ...game, members: { ...game.members } }))
   const messages = (input.messages ?? []).map((message) => ({ ...message }))
+  const authors = input.authors ?? {}
   let sequence = messages.length + 1
   const findGame = (gameIdOrSlug: string) => games.find((game) => game.id === gameIdOrSlug || game.slug === gameIdOrSlug)
   const getAccess = async ({ gameIdOrSlug, userId }: { gameIdOrSlug: string; userId: string }): Promise<MessageAccess | null> => {
@@ -59,7 +60,8 @@ export function createInMemoryMessagesRepository(input: { games: SeedGame[]; mes
       const access = await getAccess({ gameIdOrSlug, userId: authorId })
       if (!game) throw new Error('MESSAGE_NOT_FOUND')
       if (!access?.canWrite) throw new Error('MESSAGE_FORBIDDEN')
-      const message: MessageRecord = { id: `message-${sequence++}`, gameId: game.id, authorId, authorName: authorId, authorAvatarUrl: null, content, createdAt: now }
+      const author = authors[authorId] ?? { name: authorId, avatarUrl: null }
+      const message: MessageRecord = { id: `message-${sequence++}`, gameId: game.id, authorId, authorName: author.name, authorAvatarUrl: author.avatarUrl, content, createdAt: now }
       messages.push(message)
       return message
     },

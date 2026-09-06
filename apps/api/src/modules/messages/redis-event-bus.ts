@@ -60,6 +60,10 @@ export function createRedisGameMessageEventBus(redisUrl: string): GameMessageEve
         reader.destroy()
       }
     },
+
+    async close() {
+      if (publisher.isOpen) await publisher.quit()
+    },
   }
 }
 

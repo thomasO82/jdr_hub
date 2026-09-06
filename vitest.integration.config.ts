@@ -2,6 +2,7 @@ import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
   test: {
-    include: ['apps/api/tests/integration/postgres-attendance-notifications.test.ts'],
+    include: ['apps/api/tests/integration/**'],
+    fileParallelism: false,
   },
 })

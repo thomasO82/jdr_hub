@@ -101,6 +101,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     healthcheck:
       test:
         - CMD
@@ -135,6 +137,27 @@ services:
       timeout: 5s
       retries: 5
       start_period: 10s
+    security_opt:
+      - no-new-privileges:true
+
+  redis:
+    image: redis:7.4.2-alpine@sha256:02419de7eddf55aa5bcf49efb74e88fa8d931b4d77c07eff8a6b2144472b6952
+    init: true
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    expose:
+      - "6379"
+    networks:
+      - database-internal
+    healthcheck:
+      test:
+        - CMD
+        - redis-cli
+        - ping
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    cap_drop:
+      - ALL
     security_opt:
       - no-new-privileges:true
 

@@ -15,4 +15,5 @@ export interface GameMessageEventBus {
     signal: AbortSignal
     onEvent: (event: StreamMessageEvent) => Promise<void>
   }): Promise<void>
+  close?(): Promise<void>
 }
