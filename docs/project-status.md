@@ -59,6 +59,10 @@ Seuls les statuts suivants sont autorisés :
 - 2026-09-06 — F06 : la branche `feat/sessions-scheduling` est poussée et
   vérifiée ; l'ouverture automatique est indisponible car `gh` n'est pas
   installé. La PR doit être ouverte manuellement et F06 reste `IN_PROGRESS`.
+- 2026-09-06 — F08 : la branche `feat/dashboard-and-gm-management` est
+  poussée et vérifiée, mais l'intégration GitHub a refusé la création de PR
+  (`403 Resource not accessible by integration`) et `gh` n'est pas installé.
+  La PR doit être ouverte manuellement et F08 reste `IN_PROGRESS`.
 
 ## Mise à jour architecture — 2026-09-05
 

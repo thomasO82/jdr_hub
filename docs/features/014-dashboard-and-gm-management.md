@@ -18,7 +18,9 @@ F08
 
 ## Lien ou numéro de Pull Request
 
-Non créée.
+Création automatique refusée par l'intégration GitHub (`403 Resource not
+accessible by integration`). Ouverture manuelle :
+https://github.com/thomasO82/jdr_hub/pull/new/feat/dashboard-and-gm-management
 
 ## Dates de début et de fin
 
