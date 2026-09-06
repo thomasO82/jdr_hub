@@ -35,8 +35,9 @@ Les tests fusionnés deviennent immuables. Ils ne peuvent être modifiés, affai
 | F04 | Candidatures, membres et invitations | `feat/applications-and-invitations` | F02, F01 |
 | F05 | Disponibilités et recherche de joueurs | `feat/availability-and-player-search` | F01, F02 |
 | F06 | Séances, créneaux, votes et planning | `feat/scheduling-and-planning` | F02, F04, F05 |
-| F07 | Présence, absence et notifications Discord | `feat/attendance-notifications` | F01, F04, F06 |
-| F08 | Dashboard et gestion MJ | `feat/dashboard-and-gm-management` | F02, F04, F06, F07 |
+| F07 | Présence, absence et notifications applicatives | `feat/attendance-notifications` | F01, F04, F06 |
+| F07B | Messagerie textuelle par partie | `feat/game-messaging` | F01, F02, F04, F07 |
+| F08 | Dashboard et gestion MJ | `feat/dashboard-and-gm-management` | F02, F04, F06, F07, F07B |
 | F09 | XP, niveaux et historique | `feat/xp-and-levels` | F06, F07, F08 |
 | F10 | Responsive, accessibilité et états UI | `refactor/responsive-accessibility` | F01 à F09 selon l’écran |
 | F11 | Durcissement release, sauvegardes et exploitation | `chore/release-hardening` | F00 à F10 |
@@ -417,11 +418,11 @@ D05, D07/D13, D08, D09, M07, M11, M05 et dashboard.
 - PR : `sessions`, `scheduling`, propositions, votes et lecture planning.
 - Migration : `time_proposals`, `time_votes`, `game_sessions`, contraintes uniques `(proposalId,userId)`, index dates/partie et statuts.
 
-## F07 — Présence, absence et notifications Discord
+## F07 — Présence, absence et notifications applicatives
 
 ### Objectif
 
-Permettre de signaler une absence à une séance et de notifier le MJ via une intégration Discord maîtrisée ; permettre ensuite la validation de présence.
+Permettre de signaler une absence à une séance, de notifier le MJ dans JDR Hub et de valider ensuite les présences. Les DMs Discord ne font plus partie du flux courant depuis la décision 005.
 
 ### Dépendances
 
@@ -431,34 +432,33 @@ F01, F04 et F06.
 
 - Seul un participant autorisé peut signaler son absence pour une séance à laquelle il appartient.
 - La demande crée un événement d’absence et une notification au MJ ; elle ne modifie pas directement le roster.
-- Le canal de notification doit être autorisé par l’architecture du Bot, avec permissions minimales et contenu non confidentiel.
-- Les notifications sont idempotentes, limitées, réessayables avec gestion des erreurs/rate limits Discord.
+- Les notifications applicatives sont idempotentes, limitées et consultables dans JDR Hub.
 - La validation de séance et présence est réservée au MJ selon la matrice d’autorisation.
 
 ### Critères d’acceptation
 
 - Le participant signale son absence depuis desktop et mobile, confirme l’action et voit son état.
-- Le MJ reçoit au plus une notification pour le même événement logique, sans token ni contenu sensible.
+- Le MJ retrouve au plus une notification pour le même événement logique, sans token ni contenu sensible.
 - Un non-membre, un autre utilisateur ou une séance annulée ne peut pas signaler l’absence.
 - Le MJ valide une séance ; les présences sont persistées et deviennent l’entrée du calcul XP ultérieur.
 
 ### Tests à écrire en premier — Red
 
 - Autorisation membre/non-membre et séance d’une autre partie.
-- Rejeu de la requête et retry Discord sans message en double.
+- Rejeu de la requête sans notification interne en double.
 - Échec de notification sans perte de l’événement local ni fuite d’exception.
 
 ### Tests nécessaires
 
-- Unitaires : transitions attendance, clé d’idempotence, composition sobre du message et politique de retry.
-- Intégration : `session_attendance`, transaction de validation, outbox/file si nécessaire.
+- Unitaires : transitions attendance, clé d’idempotence et politique de notification.
+- Intégration : `session_attendance`, transaction de validation et notification interne.
 - API : absence, validation, erreurs 401/403/404/409/429 et réponse sans données sensibles.
 - Composants : bouton, dialog de confirmation, statut présence/absence et notification d’échec.
-- E2E : signalement desktop/mobile, réception Discord simulée et validation MJ.
+- E2E : signalement desktop/mobile et validation MJ.
 
 ### Contrôles de sécurité
 
-CSRF, autorisation par ressource, rate limiting absence/notification, échappement et longueur du message Discord, protection `@everyone`/`@here`, secrets du Bot hors dépôt, permissions minimales, logs corrélés sans données personnelles inutiles.
+CSRF, autorisation par ressource, rate limiting absence/notification, erreurs sobres, secrets absents des logs et données personnelles minimisées.
 
 ### Écrans concernés
 
@@ -466,8 +466,41 @@ D09, D05, M07 et dashboard ; notifications applicatives du shell.
 
 ### PR et migration
 
-- PR : attendance, service de notification Discord, idempotence et journal d’événements.
-- Migration : `session_attendance`, `notifications`, clés d’idempotence/outbox si retenues ; migration réversible et examinée.
+- PR : attendance, notifications applicatives, idempotence et journal d’événements.
+- Migration : `session_attendance`, `notifications` et clés d’idempotence ; migration réversible et examinée.
+
+## F07B — Messagerie textuelle par partie
+
+### Objectif
+
+Ajouter une conversation textuelle de groupe par partie pour le MJ et les
+membres actifs, sans imposer de Bot Discord aux utilisateurs.
+
+### Règles métier
+
+- le MJ propriétaire et les membres `ACTIVE` peuvent lire ;
+- seuls ces utilisateurs peuvent écrire lorsque la partie est `OPEN` ou
+  `ACTIVE` ;
+- une partie `CLOSED` ou `COMPLETED` est lisible mais non modifiable ;
+- un départ ou une exclusion révoque immédiatement l'accès ; quitter Discord
+  n'a aucun effet ;
+- les messages privés, pièces jointes, réactions, édition, suppression et chat
+  général sont hors MVP.
+
+### Architecture et sécurité
+
+PostgreSQL conserve les messages. REST porte les lectures et créations, SSE
+diffuse les événements aux navigateurs et Redis Streams relaie uniquement les
+identifiants entre instances API. Les messages sont validés, bornés à 2 000
+caractères, rendus comme texte échappé et protégés par rate limiting. Le flux
+SSE revalide l'accès et limite les connexions par utilisateur et partie.
+
+### Tests et migration
+
+La migration additive `0008_game_messages.sql` est couverte par des tests
+PostgreSQL. Les contrats, politiques, services, routes, flux Redis/SSE et
+composants web suivent le cycle TDD Red/Green/Refactor. Les détails et
+commandes sont consignés dans `docs/features/015-game-messaging.md`.
 
 ## F08 — Dashboard et gestion MJ
 
@@ -483,7 +516,7 @@ F02, F04, F06 et F07.
 
 - Le dashboard agrège prochaine séance, parties actives, candidatures, invitations, votes à traiter, absence et résumé XP sans réimplémenter les règles métier.
 - La gestion MJ est limitée aux parties dont l’utilisateur est propriétaire ; les onglets n’accordent aucun privilège par eux-mêmes.
-- Le MVP n’inclut pas de chat temps réel ; un éventuel message de candidature reste limité au workflow défini.
+- Le MVP inclut uniquement la messagerie textuelle de groupe par partie ; les messages privés et le chat général restent hors périmètre.
 - Les états loading, empty, error et notifications sont explicites.
 
 ### Critères d’acceptation
@@ -692,7 +725,8 @@ Le backlog du cahier des charges est conservé sous une forme TDD et PR-isolée 
 | S3 | F04 | Candidatures, roster et invitations |
 | S4 | F05 | Disponibilités et recherche joueurs |
 | S5 | F06 | Séances, votes et planning |
-| S6 | F07 | Absence et notification Discord |
+| S6 | F07 | Absence et notification applicative |
+| S6B | F07B | Messagerie textuelle par partie |
 | S7 | F08 | Dashboard et gestion MJ |
 | S8 | F09 | XP, niveaux et historique |
 | S9 | F10 | Responsive, accessibilité, états et performance |
@@ -700,7 +734,7 @@ Le backlog du cahier des charges est conservé sous une forme TDD et PR-isolée 
 
 ## Limites explicites du MVP
 
-Ne pas inclure sans demande explicite : VTT, cartes/tokens/jets synchronisés, chat temps réel complet, paiement/abonnement, application mobile native, calendrier externe, RAG, assistant IA, réputation complexe, matchmaking avancé et bot Discord avancé au-delà des notifications nécessaires.
+Ne pas inclure sans demande explicite : VTT, cartes/tokens/jets synchronisés, messages privés, chat général, paiement/abonnement, application mobile native, calendrier externe, RAG, assistant IA, réputation complexe, matchmaking avancé et bot Discord.
 
 La création d’une partie doit néanmoins modéliser correctement le type, les tags, le fuseau, la planification et les séances. Le choix final du thème landing, le wording du mode en ligne et le périmètre public du catalogue mobile sont des validations humaines préalables à leur figement visuel.
 

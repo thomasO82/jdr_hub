@@ -65,6 +65,21 @@ les entrées de membres actifs.
 Les notifications push natives, l’XP et la messagerie de groupe par partie ne
 font pas partie de cette branche.
 
+## Addendum du 2026-09-06 — remplacement des DMs Discord
+
+La décision acceptée dans `docs/decisions/005-in-app-messaging-replaces-discord-dms.md`
+remplace la livraison Discord prévue dans cette fiche pour l'exécution actuelle
+du MVP. Cette section conserve le périmètre historique de F07 et trace le
+changement sans réécrire les éléments réalisés sur la branche d'origine.
+
+- `DISCORD_BOT_TOKEN`, le worker Discord et l'envoi de DM ne sont plus démarrés ;
+- les notifications d'absence restent persistées et consultables dans JDR Hub ;
+- `notification_deliveries` est conservée pour éviter une migration destructive,
+  mais ne reçoit plus de nouvelles livraisons ;
+- le chat textuel par partie, SSE et Redis Streams sont livrés séparément dans
+  F07B (`feat/game-messaging`) ;
+- quitter un serveur ou un salon Discord n'a aucun effet applicatif.
+
 ## Besoin utilisateur
 
 ### Prévu
