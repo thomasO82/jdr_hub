@@ -1,4 +1,4 @@
-import { and, count, eq } from 'drizzle-orm'
+import { and, count, eq, lte } from 'drizzle-orm'
 import { authSchema, gameSchema, invitationsSchema, type createDatabase } from '@jdr-hub/database'
 import { alias } from 'drizzle-orm/pg-core'
 import type { GameStatus, Invitation, InvitationStatus } from '@jdr-hub/shared'
@@ -123,7 +123,7 @@ export function createPostgresInvitationRepository(database: Database): Invitati
           if (!game) throw new Error('INVITATION_NOT_FOUND')
           await tx.update(invitations)
             .set({ status: 'EXPIRED', updatedAt: input.now })
-            .where(and(eq(invitations.gameId, input.gameId), eq(invitations.inviteeId, input.inviteeId), eq(invitations.status, 'PENDING')))
+            .where(and(eq(invitations.gameId, input.gameId), eq(invitations.inviteeId, input.inviteeId), eq(invitations.status, 'PENDING'), lte(invitations.expiresAt, input.now)))
           const [created] = await tx.insert(invitations).values({ ...input }).returning({ id: invitations.id })
           if (!created) throw new Error('INVITATION_CREATE_FAILED')
           const result = await read(tx, created.id)
