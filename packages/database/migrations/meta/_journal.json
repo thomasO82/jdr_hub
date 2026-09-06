@@ -43,6 +43,13 @@
       "when": 1788647668685,
       "tag": "0005_scheduling",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1788693439257,
+      "tag": "0006_attendance_notifications",
+      "breakpoints": true
     }
   ]
 }
