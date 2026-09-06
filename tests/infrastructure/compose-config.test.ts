@@ -61,7 +61,7 @@ describe('secure Docker Compose foundation', () => {
   it('hardens every runtime service and pins base images', () => {
     const compose = composeSource()
 
-    for (const service of ['proxy-caddy', 'web-next', 'api-hono', 'postgres']) {
+    for (const service of ['proxy-caddy', 'web-next', 'api-hono', 'postgres', 'redis']) {
       const block = serviceBlock(compose, service)
       expect(block).toMatch(/^ {4}security_opt:/m)
       expect(block).toMatch(/no-new-privileges:true/)
@@ -75,5 +75,12 @@ describe('secure Docker Compose foundation', () => {
 
     expect(compose).toMatch(/image: caddy:[^\n]+@sha256:[0-9a-f]{64}/)
     expect(compose).toMatch(/image: postgres:[^\n]+@sha256:[0-9a-f]{64}/)
+  })
+
+  it('keeps Redis capability-dropped while allowing its non-root entrypoint switch', () => {
+    const redis = serviceBlock(composeSource(), 'redis')
+
+    expect(redis).toMatch(/^ {4}cap_drop:\n {6}- ALL$/m)
+    expect(redis).toMatch(/^ {4}cap_add:\n {6}- SETUID\n {6}- SETGID$/m)
   })
 })

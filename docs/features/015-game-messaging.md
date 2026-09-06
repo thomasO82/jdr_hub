@@ -206,6 +206,14 @@ propriétaire. Le skill dédié d'audit de chaîne d'approvisionnement n'était 
 disponible ; la sortie de pnpm a toutefois confirmé le contrôle de politique
 de chaîne d'approvisionnement du lockfile.
 
+### Correctif Compose du 2026-09-06
+
+L'image Redis utilisée par Compose démarre via un entrypoint qui bascule vers
+l'utilisateur non-root `redis`. `cap_drop: ALL` empêchait cette opération et
+faisait sortir le conteneur avec `operation not permitted`. Compose conserve le
+drop de capacités et autorise uniquement `SETUID` et `SETGID`, vérifiés par un
+test de configuration et par un démarrage réel de la stack.
+
 ## Vérification manuelle recommandée
 
 1. Ouvrir une partie `OPEN` avec un MJ et un membre actif dans deux fenêtres.
