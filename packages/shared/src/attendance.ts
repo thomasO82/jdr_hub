@@ -64,6 +64,8 @@ export type AttendanceRecord = {
 export type SessionContext = {
   sessionId: string
   gameId: string
+  gameTitle: string
+  sessionStartsAt: Date
   ownerId: string
   gameStatus: GameStatus
   sessionStatus: SessionStatus
