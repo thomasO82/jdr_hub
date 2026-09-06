@@ -1,15 +1,21 @@
 import type { Application, ApplicationDecision } from '@jdr-hub/shared'
 
 type ApiEnvelope<T> = { data: T | null }
-type ApplicationsApiOptions = { baseUrl?: string; fetcher?: typeof fetch }
+type ApplicationsApiOptions = { baseUrl?: string; origin?: string; fetcher?: typeof fetch }
 
 function apiUrl(baseUrl: string, path: string): string {
   return `${baseUrl.replace(/\/$/, '')}${path}`
 }
 
+function browserOrigin(): string | undefined {
+  return typeof window === 'undefined' ? undefined : window.location.origin
+}
+
 export function createApplicationsApi(options: ApplicationsApiOptions = {}) {
   const baseUrl = options.baseUrl ?? process.env.NEXT_PUBLIC_API_URL ?? '/api'
+  const origin = options.origin ?? browserOrigin()
   const fetcher = options.fetcher ?? fetch
+  const mutationHeaders = { 'content-type': 'application/json', ...(origin ? { origin } : {}) }
 
   async function request<T>(path: string, init?: RequestInit): Promise<T | null> {
     try {
@@ -22,12 +28,12 @@ export function createApplicationsApi(options: ApplicationsApiOptions = {}) {
 
   return {
     submit(gameId: string, message?: string): Promise<Application | null> {
-      return request<Application>(`/games/${encodeURIComponent(gameId)}/applications`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(message ? { message } : {}) })
+      return request<Application>(`/games/${encodeURIComponent(gameId)}/applications`, { method: 'POST', headers: mutationHeaders, body: JSON.stringify(message ? { message } : {}) })
     },
     listMine(): Promise<Application[] | null> { return request<Application[]>('/applications') },
     listForGame(gameId: string): Promise<Application[] | null> { return request<Application[]>(`/games/${encodeURIComponent(gameId)}/applications`) },
     decide(applicationId: string, status: ApplicationDecision['status']): Promise<Application | null> {
-      return request<Application>(`/applications/${encodeURIComponent(applicationId)}`, { method: 'PATCH', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ status }) })
+      return request<Application>(`/applications/${encodeURIComponent(applicationId)}`, { method: 'PATCH', headers: mutationHeaders, body: JSON.stringify({ status }) })
     },
   }
 }

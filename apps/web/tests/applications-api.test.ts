@@ -4,7 +4,7 @@ import { createApplicationsApi } from '../lib/applications-api'
 describe('applications API client', () => {
   it('uses the application routes and sends only the user message', async () => {
     const requests: Array<{ url: string; init?: RequestInit }> = []
-    const api = createApplicationsApi({ baseUrl: 'http://api.test', fetcher: async (input, init) => {
+    const api = createApplicationsApi({ baseUrl: 'http://api.test', origin: 'http://app.test', fetcher: async (input, init) => {
       requests.push(init ? { url: String(input), init } : { url: String(input) })
       return new Response(JSON.stringify({ data: { id: 'application-1', status: 'PENDING' }, error: null }), { status: 201, headers: { 'content-type': 'application/json' } })
     } })
@@ -19,5 +19,6 @@ describe('applications API client', () => {
       'http://api.test/applications/application-1',
     ])
     expect(requests[0]?.init?.body).toBe(JSON.stringify({ message: 'Disponible le jeudi.' }))
+    expect(requests[0]?.init?.headers).toMatchObject({ origin: 'http://app.test' })
   })
 })
