@@ -156,6 +156,7 @@ et échappé par React ; aucun HTML utilisateur n'est interprété.
 | `pnpm exec vitest run apps/api/tests/api/messages/routes.test.ts apps/api/tests/api/app-security.test.ts` | 14 tests verts | 2026-09-06 |
 | `pnpm exec vitest run apps/web/tests/game-messages-api.test.ts apps/web/tests/game-chat-visual.test.ts` | 6 tests verts | 2026-09-06 |
 | `pnpm test:integration` avec PostgreSQL et Redis de test | 7 fichiers, 11 tests verts | 2026-09-06 |
+| `pnpm audit --audit-level=high` | Aucune vulnérabilité haute/critique ; une vulnérabilité modérée transitive `esbuild` préexistante via `drizzle-kit` | 2026-09-06 |
 | `pnpm --filter @jdr-hub/web build` | Build Next.js/Turbopack vert | 2026-09-06 |
 
 ### Restants
