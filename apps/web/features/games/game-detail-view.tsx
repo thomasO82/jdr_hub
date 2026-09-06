@@ -2,6 +2,7 @@ import Link from 'next/link'
 import type { PublicGame } from '@jdr-hub/shared'
 import { AppShell } from '../layout/app-shell'
 import { ApplicationForm } from '../applications/application-form'
+import { GameChatView } from '../messages/game-chat-view'
 
 export function GameDetailView({ game }: { game: PublicGame }) {
   return (
@@ -31,6 +32,7 @@ export function GameDetailView({ game }: { game: PublicGame }) {
               <section className="rounded-2xl border border-surface-container-highest bg-surface p-5 shadow-sm"><h2 className="m-0 font-display text-xl font-semibold">Détails de la partie</h2><dl className="mt-5 grid gap-4">{[['Système', game.system], ['Joueurs', `${game.maxPlayers} places maximum`], ['Type', game.type === 'CAMPAIGN' ? 'Campagne' : 'One-shot'], ['Statut', game.status === 'ACTIVE' ? 'En cours' : 'Inscriptions ouvertes']].map(([label, value]) => <div key={label}><dt className="font-label text-xs font-bold uppercase tracking-wider text-on-surface-variant">{label}</dt><dd className="m-0 mt-1 font-body">{value}</dd></div>)}</dl></section>
             </aside>
           </div>
+          <GameChatView gameId={game.slug} />
         </section>
       </main>
     </AppShell>
