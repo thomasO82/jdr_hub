@@ -59,6 +59,10 @@ Seuls les statuts suivants sont autorisés :
 - 2026-09-06 — F06 : la branche `feat/sessions-scheduling` est poussée et
   vérifiée ; l'ouverture automatique est indisponible car `gh` n'est pas
   installé. La PR doit être ouverte manuellement et F06 reste `IN_PROGRESS`.
+- 2026-09-06 — FIX-001 : la branche `fix/applications-id-only` est poussée et
+  vérifiée, mais l'intégration GitHub a refusé la création de PR vers
+  `develop` (`403 Resource not accessible by integration`). Le correctif reste
+  `IN_PROGRESS` jusqu'à l'ouverture manuelle de la PR.
 
 ## Mise à jour architecture — 2026-09-05
 

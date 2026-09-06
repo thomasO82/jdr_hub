@@ -81,6 +81,17 @@ Voir `docs/superpowers/specs/2026-09-05-applications-design.md`.
   de septembre 2026 supprime la résolution slug des routes de participation.
 - Suite finale : 57 fichiers, 135 tests verts.
 
+### Vérification du correctif du 2026-09-06
+
+- Tests écrits avant le changement : rejet du slug par le service et l’API,
+  présence de l’UUID dans la projection publique et transmission de `game.id`
+  par la vue.
+- Vérification finale : 98 fichiers, 250 tests verts ; lint, typecheck et
+  builds API/web verts.
+- Branche : `fix/applications-id-only`.
+- PR : ouverture automatique bloquée par GitHub (`403 Resource not accessible by
+  integration`) ; ouverture manuelle nécessaire.
+
 ## Sécurité
 
 - Session active obligatoire et origine exacte pour POST/PATCH.
@@ -90,6 +101,9 @@ Voir `docs/superpowers/specs/2026-09-05-applications-design.md`.
 - Anti-doublon par vérification métier et contrainte unique SQL.
 - Acceptation transactionnelle verrouillée et limite `maxPlayers` contrôlée.
 - Projections sans token Discord, cookie, session ou données privées inutiles.
+- Les identifiants de partie sont validés comme UUID avant toute requête
+  PostgreSQL typée UUID ; les slugs publics ne sont pas acceptés par les
+  routes de participation.
 - Messages rendus par React avec échappement par défaut.
 
 ## Vérification
