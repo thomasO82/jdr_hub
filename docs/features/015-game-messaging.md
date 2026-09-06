@@ -17,7 +17,9 @@ F07B
 
 ## Lien ou numéro de Pull Request
 
-Non créée.
+Non créée automatiquement : GitHub refuse la création par intégration
+(`403 Resource not accessible by integration`).
+Ouverture manuelle : https://github.com/thomasO82/jdr_hub/pull/new/feat/game-messaging
 
 ## Dates de début et de fin
 

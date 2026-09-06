@@ -59,6 +59,11 @@ Seuls les statuts suivants sont autorisés :
 - 2026-09-06 — F06 : la branche `feat/sessions-scheduling` est poussée et
   vérifiée ; l'ouverture automatique est indisponible car `gh` n'est pas
   installé. La PR doit être ouverte manuellement et F06 reste `IN_PROGRESS`.
+- 2026-09-06 — F07B : la branche `feat/game-messaging` est poussée et
+  vérifiée, mais l'intégration GitHub refuse l'ouverture automatique
+  (`403 Resource not accessible by integration`). La PR doit être ouverte
+  manuellement et F07B reste `IN_PROGRESS` :
+  https://github.com/thomasO82/jdr_hub/pull/new/feat/game-messaging
 
 ## Mise à jour architecture — 2026-09-05
 
