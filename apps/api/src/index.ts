@@ -10,14 +10,20 @@ import { createPostgresAvailabilityRepository } from './modules/availability/rep
 import { createPostgresSchedulingRepository } from './modules/scheduling/repository.js'
 import { createPostgresAttendanceRepository } from './modules/attendance/repository.js'
 import { createPostgresNotificationRepository } from './modules/notifications/repository.js'
+import { parseMessageConfig } from './modules/messages/config.js'
+import { createPostgresGameMessageRepository } from './modules/messages/repository.js'
+import { createRedisGameMessageEventBus } from './modules/messages/redis-event-bus.js'
 
 async function startApi(): Promise<void> {
   const port = parsePort(process.env.PORT)
   const database = createDatabase(process.env.DATABASE_URL)
   const authConfig = parseAuthConfig(process.env)
+  const messageConfig = parseMessageConfig(process.env)
   const authRepository = createPostgresAuthRepository(database.db)
   const attendanceRepository = createPostgresAttendanceRepository(database.db)
   const notificationRepository = createPostgresNotificationRepository(database.db)
+  const messageRepository = createPostgresGameMessageRepository(database.db)
+  const messageEventBus = createRedisGameMessageEventBus(messageConfig.redisUrl)
   await migrateDatabase(database)
 
   const server = serve({
@@ -29,6 +35,7 @@ async function startApi(): Promise<void> {
       scheduling: { authConfig, authRepository, repository: createPostgresSchedulingRepository(database.db) },
       attendance: { authConfig, authRepository, repository: attendanceRepository },
       notifications: { authConfig, authRepository, repository: notificationRepository },
+      messages: { authConfig, authRepository, repository: messageRepository, eventBus: messageEventBus },
     }).fetch,
     port,
   })
