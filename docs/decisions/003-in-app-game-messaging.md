@@ -60,4 +60,3 @@ La messagerie sera livrée dans une fonctionnalité distincte
 - **Synchronisation avec un salon Discord :** rejetée pour éviter de coupler
   le roster applicatif à un événement externe et de créer un canal de chat
   hors contrôle de JDR Hub.
-

@@ -284,4 +284,3 @@ cela a un sens (`Réessayer`, revenir à la partie, se reconnecter).
   sont requises par Docker Compose ;
 - prévoir une vérification manuelle du flux SSE derrière Caddy et avec deux
   instances API avant d'ouvrir la PR F07B.
-
