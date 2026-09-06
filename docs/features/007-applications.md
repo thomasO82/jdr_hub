@@ -41,7 +41,8 @@ Voir `docs/superpowers/specs/2026-09-05-applications-design.md`.
 - Services `submit-application`, `list-my-applications`,
   `list-game-applications` et `decide-application` indépendants de Hono.
 - API `POST /games/:id/applications`, `GET /applications`,
-  `GET /games/:id/applications` et `PATCH /applications/:id`.
+  `GET /games/:id/applications`, `GET /games/:id/application` et
+  `PATCH /applications/:id`.
 - Acceptation transactionnelle avec contrôle de capacité et création du membre
   `PLAYER`; les endpoints de participation utilisent exclusivement l’UUID de
   la partie.
@@ -69,6 +70,8 @@ Voir `docs/superpowers/specs/2026-09-05-applications-design.md`.
 - L'état en attente est présenté par un encart accessible et visible :
   « Candidature envoyée — En attente de réponse du MJ ».
 - La protection serveur contre les candidatures multiples reste inchangée.
+- Le propriétaire est identifié côté serveur par sa session ; le frontend ne
+  reçoit pas son identifiant et le formulaire est simplement absent pour lui.
 
 ## Parcours utilisateur
 
@@ -109,7 +112,9 @@ Voir `docs/superpowers/specs/2026-09-05-applications-design.md`.
 - **Green :** le helper sélectionne uniquement la candidature de la partie
   affichée et le composant remplace le formulaire après vérification.
 - Tests ciblés : `apps/web/tests/application-state.test.ts` et
-  `apps/web/tests/applications-visual.test.ts`.
+  `apps/web/tests/applications-visual.test.ts`, ainsi que le test API de l'état
+  de candidature propriétaire/joueur.
+- Le test API couvre également le refus `401` sans session.
 
 ## Sécurité
 
@@ -123,11 +128,13 @@ Voir `docs/superpowers/specs/2026-09-05-applications-design.md`.
 - Les identifiants de partie sont validés comme UUID avant toute requête
   PostgreSQL typée UUID ; les slugs publics ne sont pas acceptés par les
   routes de participation.
+- L'état de candidature d'une partie est authentifié et ne retourne que la
+  candidature de l'utilisateur courant ; l'accès sans session renvoie `401`.
 - Messages rendus par React avec échappement par défaut.
 
 ## Vérification
 
-- `pnpm test` — 99 fichiers, 253 tests verts.
+- `pnpm test` — 99 fichiers, 255 tests verts.
 - `pnpm lint` — vert.
 - `pnpm typecheck` — vert.
 - `pnpm build` — API et Next.js verts.

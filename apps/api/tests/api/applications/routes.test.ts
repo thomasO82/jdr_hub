@@ -61,6 +61,18 @@ describe('applications API routes', () => {
     expect(response.status).toBe(404)
   })
 
+  it('hides the application form for the owner and exposes only the viewer state', async () => {
+    const { app, owner, player } = await createTestApp()
+    expect((await app.request('/games/game-1/application')).status).toBe(401)
+    const ownerResponse = await app.request('/games/game-1/application', { headers: { cookie: owner.cookie } })
+    const playerResponse = await app.request('/games/game-1/application', { headers: { cookie: player.cookie } })
+
+    expect(ownerResponse.status).toBe(200)
+    expect((await ownerResponse.json()).data).toEqual({ canApply: false, application: null })
+    expect(playerResponse.status).toBe(200)
+    expect((await playerResponse.json()).data).toEqual({ canApply: true, application: null })
+  })
+
   it('lets only the game owner list and decide applications', async () => {
     const { app, owner, player } = await createTestApp()
     const headers = { cookie: player.cookie, origin: config.appOrigin, 'content-type': 'application/json' }

@@ -24,6 +24,11 @@ export type Application = {
   updatedAt: Date
 }
 
+export type ApplicationViewerState = {
+  canApply: boolean
+  application: Application | null
+}
+
 export type GameMember = {
   gameId: string
   userId: string

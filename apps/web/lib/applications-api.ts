@@ -1,4 +1,4 @@
-import type { Application, ApplicationDecision } from '@jdr-hub/shared'
+import type { Application, ApplicationDecision, ApplicationViewerState } from '@jdr-hub/shared'
 
 type ApiEnvelope<T> = { data: T | null }
 type ApplicationsApiOptions = { baseUrl?: string; fetcher?: typeof fetch }
@@ -23,6 +23,9 @@ export function createApplicationsApi(options: ApplicationsApiOptions = {}) {
   return {
     submit(gameId: string, message?: string): Promise<Application | null> {
       return request<Application>(`/games/${encodeURIComponent(gameId)}/applications`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(message ? { message } : {}) })
+    },
+    getMineForGame(gameId: string): Promise<ApplicationViewerState | null> {
+      return request<ApplicationViewerState>(`/games/${encodeURIComponent(gameId)}/application`)
     },
     listMine(): Promise<Application[] | null> { return request<Application[]>('/applications') },
     listForGame(gameId: string): Promise<Application[] | null> { return request<Application[]>(`/games/${encodeURIComponent(gameId)}/applications`) },

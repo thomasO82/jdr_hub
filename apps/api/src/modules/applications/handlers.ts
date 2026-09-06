@@ -6,6 +6,7 @@ import type { AuthRepository } from '../auth/repository.js'
 import { authenticateUser } from '../auth/services/authenticate-user.js'
 import type { ApplicationRepository } from './repository.js'
 import { decideApplication } from './services/decide-application.js'
+import { getApplicationViewerState } from './services/get-application-viewer-state.js'
 import { listGameApplications } from './services/list-game-applications.js'
 import { listMyApplications } from './services/list-my-applications.js'
 import { submitApplication } from './services/submit-application.js'
@@ -62,6 +63,16 @@ export function createApplicationHandlers(dependencies: ApplicationsDependencies
       const user = await currentUser(c)
       if (!user) return error(c, 401)
       return c.json({ data: await listMyApplications({ userId: user.id, repository: dependencies.repository }), error: null, meta: { requestId: c.get('requestId') } })
+    },
+    getMineForGame: async (c: Context<ApplicationsRouteEnv>) => {
+      const user = await currentUser(c)
+      if (!user) return error(c, 401)
+      const gameId = requiredParam(c, 'id')
+      if (!gameId) return error(c, 400)
+      try {
+        const state = await getApplicationViewerState({ gameId, userId: user.id, repository: dependencies.repository })
+        return c.json({ data: state, error: null, meta: { requestId: c.get('requestId') } })
+      } catch (value) { return error(c, domainStatus(value)) }
     },
     listForGame: async (c: Context<ApplicationsRouteEnv>) => {
       const user = await currentUser(c)

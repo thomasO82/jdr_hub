@@ -1,5 +1,8 @@
-import type { Application } from '@jdr-hub/shared'
+import type { ApplicationViewerState } from '@jdr-hub/shared'
 
-export function findApplicationForGame(applications: Application[], gameId: string): Application | null {
-  return applications.find((application) => application.gameId === gameId) ?? null
+export type ApplicationView = 'FORM' | 'STATUS' | 'HIDDEN'
+
+export function getApplicationView(state: ApplicationViewerState): ApplicationView {
+  if (state.application) return 'STATUS'
+  return state.canApply ? 'FORM' : 'HIDDEN'
 }

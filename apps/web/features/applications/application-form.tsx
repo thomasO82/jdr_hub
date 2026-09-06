@@ -5,7 +5,7 @@ import { Send } from 'lucide-react'
 import { createApplicationsApi } from '../../lib/applications-api'
 import type { Application } from '@jdr-hub/shared'
 import { ApplicationStatus } from './application-status'
-import { findApplicationForGame } from './application-state'
+import { getApplicationView } from './application-state'
 
 export function ApplicationForm({ gameId }: { gameId: string }) {
   const [message, setMessage] = useState('')
@@ -13,12 +13,15 @@ export function ApplicationForm({ gameId }: { gameId: string }) {
   const [error, setError] = useState<string | null>(null)
   const [pending, setPending] = useState(false)
   const [checkingApplication, setCheckingApplication] = useState(true)
+  const [canApply, setCanApply] = useState(true)
+
 
   useEffect(() => {
     let active = true
-    void createApplicationsApi().listMine().then((applications) => {
+    void createApplicationsApi().getMineForGame(gameId).then((state) => {
       if (!active) return
-      setApplication(applications ? findApplicationForGame(applications, gameId) : null)
+      setApplication(state?.application ?? null)
+      setCanApply(state?.canApply ?? true)
       setCheckingApplication(false)
     })
     return () => { active = false }
@@ -35,7 +38,9 @@ export function ApplicationForm({ gameId }: { gameId: string }) {
   }
 
   if (checkingApplication) return <p className="mt-4 rounded-lg border border-primary-fixed-dim bg-primary-fixed/40 p-4 text-left font-body text-sm text-on-surface-variant" role="status">Vérification de votre candidature…</p>
-  if (application) return <ApplicationStatus application={application} />
+  const view = getApplicationView({ canApply, application })
+  if (view === 'STATUS' && application) return <ApplicationStatus application={application} />
+  if (view === 'HIDDEN') return null
 
   return (
     <form className="mt-4 grid gap-3 text-left" onSubmit={submit}>
