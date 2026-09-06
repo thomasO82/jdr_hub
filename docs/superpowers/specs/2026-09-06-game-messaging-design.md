@@ -125,6 +125,9 @@ données utilisateur.
 
 ### Routes
 
+- `:gameId` accepte l'UUID interne ou le slug public afin que le détail public
+  puisse ouvrir la conversation sans exposer une nouvelle donnée ; le
+  repository résout toujours l'identifiant interne avant la requête.
 - `GET /games/:gameId/messages?limit=20&cursor=...` — lecture authentifiée,
   vérification de ressource, page de messages et curseur suivant ;
 - `POST /games/:gameId/messages` — création authentifiée, origine stricte,
