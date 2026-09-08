@@ -3,5 +3,6 @@ import { createDashboardHandlers, type DashboardDependencies, type DashboardRout
 
 export function registerDashboardRoutes(app: Hono<DashboardRouteEnv>, dependencies: DashboardDependencies): void {
   const handlers = createDashboardHandlers(dependencies)
-  app.get('/dashboard', handlers.get)
+  app.get('/dashboard', handlers.dashboard)
+  app.get('/games/:gameId/manage', handlers.management)
 }

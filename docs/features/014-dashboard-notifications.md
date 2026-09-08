@@ -14,7 +14,7 @@ MERGED
 
 ## Lien ou numéro de Pull Request
 
-[PR #19](https://github.com/thomasO82/jdr_hub/pull/19), fusionnée le 2026-09-08
+[PR #19](https://github.com/thomasO82/jdr_hub/pull/19), fusion confirmée par le propriétaire dans `develop`
 
 ## Dates de début et de fin
 

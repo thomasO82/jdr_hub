@@ -14,6 +14,10 @@ import { registerAttendanceRoutes } from './modules/attendance/routes.js'
 import type { AttendanceDependencies } from './modules/attendance/handlers.js'
 import { registerNotificationRoutes } from './modules/notifications/routes.js'
 import type { NotificationsDependencies } from './modules/notifications/handlers.js'
+import { registerInvitationRoutes } from './modules/invitations/routes.js'
+import type { InvitationsDependencies } from './modules/invitations/handlers.js'
+import { registerMemberRoutes } from './modules/members/routes.js'
+import type { MembersDependencies } from './modules/members/handlers.js'
 import { registerDashboardRoutes } from './modules/dashboard/routes.js'
 import type { DashboardDependencies } from './modules/dashboard/handlers.js'
 
@@ -34,7 +38,7 @@ const SECURITY_HEADERS = {
   'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
 } as const
 
-export function createApiApp(options?: { auth: { config: AuthConfig; repository: AuthRepository }; games?: GamesDependencies; applications?: ApplicationsDependencies; availability?: AvailabilityDependencies; scheduling?: SchedulingDependencies; attendance?: AttendanceDependencies; notifications?: NotificationsDependencies; dashboard?: DashboardDependencies }): ApiApp {
+export function createApiApp(options?: { auth: { config: AuthConfig; repository: AuthRepository }; games?: GamesDependencies; applications?: ApplicationsDependencies; availability?: AvailabilityDependencies; scheduling?: SchedulingDependencies; attendance?: AttendanceDependencies; notifications?: NotificationsDependencies; invitations?: InvitationsDependencies; members?: MembersDependencies; dashboard?: DashboardDependencies }): ApiApp {
   const app = new Hono<{ Variables: ApiVariables }>()
 
   app.use('*', async (c, next) => {
@@ -105,6 +109,12 @@ export function createApiApp(options?: { auth: { config: AuthConfig; repository:
   }
   if (options?.notifications) {
     registerNotificationRoutes(app, options.notifications)
+  }
+  if (options?.invitations) {
+    registerInvitationRoutes(app, options.invitations)
+  }
+  if (options?.members) {
+    registerMemberRoutes(app, options.members)
   }
   if (options?.dashboard) {
     registerDashboardRoutes(app, options.dashboard)

@@ -7,8 +7,9 @@ ces informations réellement exploitables depuis le point d'entrée authentifié
 de l'application et fournir au MJ une vue cohérente de ses parties.
 
 La fonctionnalité couvre une seule PR : le dashboard joueur/MJ et la gestion
-MJ des candidatures, invitations, roster et séances. Elle ne crée pas de chat,
-de calendrier externe, de nouvelle règle d'XP ou de nouveau modèle métier.
+MJ des candidatures, invitations, roster et séances. Elle ajoute le modèle
+minimal des invitations absent de F04. Elle ne crée pas de chat, de calendrier
+externe ni de nouvelle règle d'XP.
 
 ## Objectif
 
@@ -38,7 +39,9 @@ tentative lorsque c'est pertinent.
 
 La gestion MJ reste découpée en routes et services par domaine. Elle réutilise
 les repositories et les invariants de F04, F06 et F07 ; elle ne recopie pas la
-logique de capacité, de statut de séance, de vote ou de notification.
+logique de capacité, de statut de séance, de vote ou de notification. Le
+nouveau module `invitations` porte uniquement son cycle de vie et délègue la
+réservation de place et l'ajout au roster à une transaction dédiée.
 
 Une grosse requête SQL croisant tous les modules est écartée car elle couplerait
 les domaines et rendrait l'autorisation par ressource plus difficile à vérifier.
@@ -54,6 +57,17 @@ présents dans le dépôt :
 - `GET /dashboard` pour la projection authentifiée de l'utilisateur connecté ;
 - `GET /games/:gameId/manage` pour la projection de gestion d'une partie dont
   l'utilisateur est propriétaire ;
+- `POST /games/:gameId/invitations` pour inviter un utilisateur depuis une
+  partie possédée par le MJ ;
+- `GET /games/:gameId/invitations` pour lister les invitations émises d'une
+  partie possédée par le MJ ;
+- `GET /invitations` pour lister les invitations reçues par l'utilisateur ;
+- `PATCH /invitations/:invitationId` pour accepter, refuser ou annuler une
+  invitation selon le rôle de l'appelant ;
+- `GET /games/:gameId/members` pour consulter le roster d'une partie possédée
+  par le MJ ;
+- `DELETE /games/:gameId/members/:userId` pour retirer un joueur actif d'une
+  partie possédée par le MJ ;
 - les actions de gestion des candidatures, invitations, roster et séances,
   en conservant les routes métier propres à chaque module.
 
@@ -101,12 +115,34 @@ Le MJ peut consulter et administrer uniquement les parties qu'il possède. Les
 onglets, liens et boutons sont des aides d'interface ; ils ne constituent
 jamais une permission. Les actions d'acceptation, de refus, d'invitation,
 d'ajout ou de retrait de membre et de gestion de séance passent par les
-services métier existants et respectent leurs transactions, contraintes,
-statuts et règles de concurrence.
+services métier spécialisés et respectent leurs transactions, contraintes,
+statuts et règles de concurrence. L'ajout au roster passe par l'acceptation
+d'une candidature ou d'une invitation ; aucun endpoint de mass-assignment
+permettant d'ajouter directement un utilisateur n'est créé.
 
 Toute action sensible fournit un retour de succès ou d'échec en français. Une
 erreur de concurrence ou de statut indique une action possible, par exemple
 actualiser la liste, sans exposer l'exception technique.
+
+### Invitations
+
+Une invitation possède une partie, un invitant, un invité, un statut, une date
+d'expiration et des dates de création/mise à jour. Les statuts sont
+`PENDING`, `ACCEPTED`, `REJECTED`, `CANCELLED` et `EXPIRED`.
+
+Le MJ propriétaire peut inviter un utilisateur à une partie `OPEN` ou `ACTIVE`.
+Le serveur fixe une expiration de sept jours ; le client ne peut pas imposer
+sa durée. Une seule invitation active existe pour le couple partie/invité.
+Une invitation est refusée si l'utilisateur est déjà membre actif, si la partie
+n'accepte plus de nouveaux participants ou si une invitation en attente existe
+déjà.
+
+L'invité peut accepter ou refuser uniquement sa propre invitation avant son
+expiration. L'acceptation verrouille la partie, vérifie la capacité, ajoute le
+membre `PLAYER` et passe l'invitation à `ACCEPTED` dans une seule transaction.
+Le refus ne modifie pas le roster. Le MJ propriétaire peut annuler une
+invitation en attente depuis la gestion de la partie. Les invitations échues
+sont exposées comme `EXPIRED` sans mutation issue du navigateur.
 
 ## Design et responsive
 
@@ -221,8 +257,8 @@ ils ne portent ni règle métier ni requête Drizzle.
    d'une autre partie en manipulant l'URL ou les identifiants.
 6. L'acceptation ou le refus d'une candidature respecte la capacité et les
    contraintes de F04, y compris en cas de concurrence.
-7. Les invitations, le roster et les séances utilisent les contrats et
-   transactions des modules existants.
+7. Les invitations, le roster et les séances utilisent leurs contrats et
+   transactions dédiés, sans exposer de privilège depuis le frontend.
 8. Les compteurs affichés restent cohérents après une action réussie ou un
    rejeu idempotent.
 9. Les vues desktop, tablette et mobile restent utilisables au clavier,
@@ -248,6 +284,8 @@ ils ne portent ni règle métier ni requête Drizzle.
 - projection explicite sans champs privés ;
 - erreurs stables avec `requestId` ;
 - actions de candidatures, invitations, roster et séances ;
+- création, consultation, acceptation, refus et annulation des invitations
+  selon leurs permissions ;
 - rejeu et conflit de concurrence ;
 - rate limiting et vérification d'origine sur les mutations.
 
@@ -276,15 +314,20 @@ ils ne portent ni règle métier ni requête Drizzle.
 - nouvelle mécanique d'XP ou de niveau ;
 - administration globale ou outils de modération ;
 - refonte des règles métier F04, F06 ou F07 ;
-- nouvelle table PostgreSQL, sauf index justifié par une mesure et validé
+- nouvelle table PostgreSQL autre que la table `invitations` définie dans cette
+  spécification, sauf index additionnel justifié par une mesure et validé
   séparément.
 
 ## Fichiers et responsabilités attendus
 
 - `apps/api/src/modules/dashboard/` : routes, handlers, service d'agrégation,
   repository/projections et politique du dashboard ;
-- `apps/api/src/modules/games/`, `applications/`, `invitations/`, `members/`
-  et `sessions/` : raccordement aux actions déjà spécialisées ;
+- `apps/api/src/modules/invitations/` : cycle de vie, autorisation et
+  transaction d'acceptation ;
+- `apps/api/src/modules/games/`, `applications/`, `members/` et `sessions/` :
+  raccordement aux actions déjà spécialisées ;
+- `packages/database/src/schema/invitations.ts` et une migration additive :
+  persistance de la table et de ses contraintes ;
 - `packages/shared/src/` : contrats Zod et types de projection réellement
   partagés ;
 - `apps/web/app/` : définitions de routes uniquement ;
@@ -304,5 +347,7 @@ La PR mettra à jour :
   limites ;
 - `docs/security/authorization-matrix.md` si les permissions dashboard/MJ
   nécessitent une nouvelle ligne ;
+- la migration et les contraintes de la table `invitations`, avec une
+  procédure de vérification PostgreSQL ;
 - la preuve TDD Red, Green, Refactor, les contrôles de sécurité et les
   vérifications manuelles.

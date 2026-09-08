@@ -39,7 +39,7 @@ Seuls les statuts suivants sont autorisés :
 | F05 | Disponibilités et recherche de joueurs | `MERGED` | `feat/availability-and-player-search` | Fusion confirmée par le propriétaire dans `develop` | 72 fichiers, 173 tests monorepo verts ; lint, typecheck et builds verts | Session obligatoire, origine stricte, rate limit d’écriture, horaires privés, projection agrégée et validation bornée | [Fiche F05](features/011-availability-and-player-search.md) |
 | F06 | Séances, créneaux, votes et planning | `IN_PROGRESS` | `feat/sessions-scheduling` | Non créée | 84 fichiers, 203 tests monorepo verts ; lint, typecheck et build web verts | Appartenance/MJ, origine stricte, votes uniques, transaction de sélection, dates bornées | [Fiche F06](features/012-sessions-scheduling.md) |
 | F07 | Présences, absences et notifications Discord | `IN_PROGRESS` | `feat/attendance-notifications` | Création bloquée par GitHub (`403`) ; [ouverture manuelle](https://github.com/thomasO82/jdr_hub/pull/new/feat/attendance-notifications) | 98 fichiers, 248 tests monorepo verts + 3 intégration PostgreSQL ; lint, typecheck, builds API/web et Compose healthy | Session/origine/rate limit, autorisation par membre/MJ, transaction idempotente, bail outbox, bot serveur, mentions désactivées, retries bornés | [Fiche F07](features/013-attendance-notifications.md) |
-| F08 | Tableau de bord et notifications visibles | `MERGED` | `feat/dashboard-notifications` | [PR #19](https://github.com/thomasO82/jdr_hub/pull/19), fusionnée le 2026-09-08 | 104 fichiers, 266 tests monorepo verts + 6 intégration PostgreSQL ; lint, typecheck et builds API/web verts | Session obligatoire, projection privée, filtrage destinataire, erreurs génériques, résumé limité et marquage autorisé | [Fiche F08](features/014-dashboard-notifications.md) |
+| F08 | Dashboard et gestion MJ | `IN_PROGRESS` | `feat/dashboard-and-gm-management` | Non créée | 115 fichiers, 308 tests monorepo verts + 8 tests d'intégration PostgreSQL ; lint, typecheck et build verts | Session/origine/rate limit, autorisation par ressource, projection minimale, notifications destinataire-scopées, validation stricte, contrainte d'invitation et transactions | [Fiche F08](features/014-dashboard-and-gm-management.md) |
 
 ## Blocages
 
@@ -60,9 +60,10 @@ Seuls les statuts suivants sont autorisés :
 - 2026-09-06 — F06 : la branche `feat/sessions-scheduling` est poussée et
   vérifiée ; l'ouverture automatique est indisponible car `gh` n'est pas
   installé. La PR doit être ouverte manuellement et F06 reste `IN_PROGRESS`.
-- 2026-09-08 — F08 : l'ouverture automatique a été refusée par l'intégration
-  GitHub (`403 Resource not accessible by integration`), puis la PR #19 a été
-  ouverte manuellement et fusionnée. Le blocage est résolu.
+- 2026-09-06 — F08 : la branche `feat/dashboard-and-gm-management` est
+  poussée et vérifiée, mais l'intégration GitHub a refusé la création de PR
+  (`403 Resource not accessible by integration`) et `gh` n'est pas installé.
+  La PR doit être ouverte manuellement et F08 reste `IN_PROGRESS`.
 
 ## Mise à jour architecture — 2026-09-05
 

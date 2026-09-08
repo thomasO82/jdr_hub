@@ -10,10 +10,12 @@ import { createPostgresAvailabilityRepository } from './modules/availability/rep
 import { createPostgresSchedulingRepository } from './modules/scheduling/repository.js'
 import { createPostgresAttendanceRepository } from './modules/attendance/repository.js'
 import { createPostgresNotificationRepository } from './modules/notifications/repository.js'
+import { createPostgresInvitationRepository } from './modules/invitations/repository.js'
+import { createPostgresMemberRepository } from './modules/members/repository.js'
+import { createPostgresDashboardRepository } from './modules/dashboard/repository.js'
 import { createDiscordNotifier } from './modules/notifications/discord-client.js'
 import { parseNotificationConfig } from './modules/notifications/config.js'
 import { processDiscordDeliveries, startNotificationWorker } from './modules/notifications/worker.js'
-import { createPostgresDashboardRepository } from './modules/dashboard/repository.js'
 
 async function startApi(): Promise<void> {
   const port = parsePort(process.env.PORT)
@@ -23,6 +25,8 @@ async function startApi(): Promise<void> {
   const authRepository = createPostgresAuthRepository(database.db)
   const attendanceRepository = createPostgresAttendanceRepository(database.db)
   const notificationRepository = createPostgresNotificationRepository(database.db)
+  const invitationRepository = createPostgresInvitationRepository(database.db)
+  const memberRepository = createPostgresMemberRepository(database.db)
   const dashboardRepository = createPostgresDashboardRepository(database.db)
   const notifier = createDiscordNotifier(notificationConfig)
   await migrateDatabase(database)
@@ -36,6 +40,8 @@ async function startApi(): Promise<void> {
       scheduling: { authConfig, authRepository, repository: createPostgresSchedulingRepository(database.db) },
       attendance: { authConfig, authRepository, repository: attendanceRepository },
       notifications: { authConfig, authRepository, repository: notificationRepository },
+      invitations: { authConfig, authRepository, repository: invitationRepository },
+      members: { authConfig, authRepository, repository: memberRepository },
       dashboard: { authConfig, authRepository, repository: dashboardRepository, notificationsRepository: notificationRepository },
     }).fetch,
     port,

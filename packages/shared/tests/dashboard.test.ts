@@ -1,7 +1,14 @@
 import { describe, expect, it } from 'vitest'
-import { dashboardDataSchema } from '../src/dashboard.js'
+import { dashboardBlockStateSchema, dashboardDataSchema } from '../src/dashboard.js'
 
-describe('dashboard contracts', () => {
+describe('dashboard shared contracts', () => {
+  it('accepts explicit rendered block states only', () => {
+    expect(dashboardBlockStateSchema.safeParse('READY').success).toBe(true)
+    expect(dashboardBlockStateSchema.safeParse('EMPTY').success).toBe(true)
+    expect(dashboardBlockStateSchema.safeParse('ERROR').success).toBe(true)
+    expect(dashboardBlockStateSchema.safeParse('LOADING').success).toBe(false)
+  })
+
   it('accepts a dashboard whose notification block is absent when there are no unread notifications', () => {
     const result = dashboardDataSchema.parse({
       nextSession: { status: 'EMPTY', data: null },
