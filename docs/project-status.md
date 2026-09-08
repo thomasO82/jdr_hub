@@ -40,7 +40,8 @@ Seuls les statuts suivants sont autorisés :
 | F06 | Séances, créneaux, votes et planning | `IN_PROGRESS` | `feat/sessions-scheduling` | Non créée | 84 fichiers, 203 tests monorepo verts ; lint, typecheck et build web verts | Appartenance/MJ, origine stricte, votes uniques, transaction de sélection, dates bornées | [Fiche F06](features/012-sessions-scheduling.md) |
 | F07 | Présences, absences et notifications Discord | `IN_PROGRESS` | `feat/attendance-notifications` | Création bloquée par GitHub (`403`) ; [ouverture manuelle](https://github.com/thomasO82/jdr_hub/pull/new/feat/attendance-notifications) | 98 fichiers, 248 tests monorepo verts + 3 intégration PostgreSQL ; lint, typecheck, builds API/web et Compose healthy | Session/origine/rate limit, autorisation par membre/MJ, transaction idempotente, bail outbox, bot serveur, mentions désactivées, retries bornés | [Fiche F07](features/013-attendance-notifications.md) |
 | F08 | Dashboard et gestion MJ | `IN_PROGRESS` | `feat/dashboard-and-gm-management` | Non créée | 115 fichiers, 308 tests monorepo verts + 8 tests d'intégration PostgreSQL ; lint, typecheck et build verts | Session/origine/rate limit, autorisation par ressource, projection minimale, notifications destinataire-scopées, validation stricte, contrainte d'invitation et transactions | [Fiche F08](features/014-dashboard-and-gm-management.md) |
-| F09 | XP, niveaux et historique de progression | `IN_PROGRESS` | `feat/xp-and-levels` | Création bloquée par GitHub (`403`) ; [ouverture manuelle](https://github.com/thomasO82/jdr_hub/pull/new/feat/xp-and-levels) | 122 fichiers et 326 tests verts ; 11 tests d'intégration PostgreSQL ; lint, typecheck et builds verts | Session authentifiée, historique privé, limites Zod, idempotence DB, transaction présence/XP, absence de champs internes | [Fiche F09](features/015-xp-and-levels.md) |
+| F09 | XP, niveaux et historique de progression | `MERGED` | `feat/xp-and-levels` | Fusion confirmée par le propriétaire dans `develop` | 122 fichiers et 326 tests verts ; 11 tests d'intégration PostgreSQL ; lint, typecheck et builds verts | Session authentifiée, historique privé, limites Zod, idempotence DB, transaction présence/XP, absence de champs internes | [Fiche F09](features/015-xp-and-levels.md) |
+| F10 | Responsive, accessibilité et états UI | `IN_PROGRESS` | `feat/responsive-accessibility` | Non créée | 125 fichiers et 333 tests verts ; lint, typecheck et build verts | Aucun changement API/auth ; erreurs traduites, focus clavier, cibles tactiles et réduction des animations | [Fiche F10](features/016-responsive-accessibility.md) |
 
 ## Blocages
 
@@ -65,10 +66,6 @@ Seuls les statuts suivants sont autorisés :
   poussée et vérifiée, mais l'intégration GitHub a refusé la création de PR
   (`403 Resource not accessible by integration`) et `gh` n'est pas installé.
   La PR doit être ouverte manuellement et F08 reste `IN_PROGRESS`.
-- 2026-09-08 — F09 : la branche `feat/xp-and-levels` est poussée et vérifiée,
-  mais l'intégration GitHub a refusé la création de PR (`403 Resource not
-  accessible by integration`). La PR doit être ouverte manuellement et F09
-  reste `IN_PROGRESS`.
 
 ## Mise à jour architecture — 2026-09-05
 

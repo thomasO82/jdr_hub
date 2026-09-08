@@ -47,7 +47,7 @@ export function NotificationBell({ className = '' }: { className?: string }) {
 
   const unreadCount = page?.unreadCount ?? 0
   return <div className={`relative ${className}`}>
-    <button aria-controls="notifications-panel" aria-expanded={open} aria-haspopup="dialog" aria-label={unreadCount > 0 ? `Notifications, ${unreadCount} non lue${unreadCount > 1 ? 's' : ''}` : 'Notifications'} className="relative grid min-h-12 min-w-12 place-items-center rounded-lg text-primary transition-colors hover:bg-primary-fixed/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary" onClick={() => setOpen((current) => !current)} type="button">
+    <button aria-controls="notifications-panel" aria-expanded={open} aria-haspopup="dialog" aria-label={unreadCount > 0 ? `Notifications, ${unreadCount} non lue${unreadCount > 1 ? 's' : ''}` : 'Notifications'} className="relative grid min-h-12 min-w-12 place-items-center rounded-lg text-primary transition-colors hover:bg-primary-fixed/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary motion-reduce:transition-none" onClick={() => setOpen((current) => !current)} type="button">
       <Bell aria-hidden="true" size={22} />
       {unreadCount > 0 ? <span aria-hidden="true" className="absolute right-1 top-1 min-w-5 rounded-full bg-primary px-1 font-label text-xs font-bold leading-5 text-on-primary">{unreadCount > 99 ? '99+' : unreadCount}</span> : null}
     </button>
