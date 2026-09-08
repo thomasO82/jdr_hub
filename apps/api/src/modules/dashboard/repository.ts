@@ -9,6 +9,7 @@ import type {
   DashboardGame,
   DashboardInvitationSummary,
   DashboardSession,
+  DashboardSessionSummary,
   DashboardUser,
   GameManagementView,
   GameMemberView,
@@ -22,6 +23,7 @@ import type {
 
 export interface DashboardRepository {
   getUser(userId: string): Promise<DashboardUser | null>
+  findNextSession(input: { userId: string; now: Date }): Promise<DashboardSessionSummary | null>
   getNextSession(userId: string, now: Date): Promise<DashboardSession | null>
   listActiveGames(userId: string): Promise<DashboardGame[]>
   listApplicationSummary(userId: string): Promise<DashboardApplicationSummary>
@@ -118,6 +120,17 @@ export function createPostgresDashboardRepository(database: Database): Dashboard
     .orderBy(asc(invitations.createdAt), asc(invitations.id))
 
   return {
+    async findNextSession({ userId, now }) {
+      const [row] = await database.select({ id: gameSessions.id, gameId: gameSessions.gameId, gameTitle: games.title, startsAt: gameSessions.startsAt, endsAt: gameSessions.endsAt, status: gameSessions.status, ownerId: games.ownerId })
+        .from(gameSessions)
+        .innerJoin(games, eq(gameSessions.gameId, games.id))
+        .leftJoin(gameMembers, and(eq(gameMembers.gameId, games.id), eq(gameMembers.userId, userId)))
+        .where(and(eq(gameSessions.status, 'SCHEDULED'), gte(gameSessions.startsAt, now), accessibleGameCondition(userId)))
+        .orderBy(asc(gameSessions.startsAt), asc(gameSessions.id))
+        .limit(1)
+      if (!row) return null
+      return { id: row.id, gameId: row.gameId, gameTitle: row.gameTitle, startsAt: row.startsAt.toISOString(), endsAt: row.endsAt.toISOString(), status: row.status as DashboardSessionSummary['status'], role: row.ownerId === userId ? 'GM' : 'PLAYER', canReportAbsence: row.ownerId !== userId }
+    },
     async getUser(userId) {
       const [user] = await database.select({ id: users.id, username: users.username, avatarUrl: users.avatarUrl }).from(users).where(eq(users.id, userId)).limit(1)
       return user ?? null
@@ -144,7 +157,7 @@ export function createPostgresDashboardRepository(database: Database): Dashboard
       if (ids.length === 0) return []
       const counts = await database.select({ gameId: gameMembers.gameId, total: count() }).from(gameMembers).where(and(inArray(gameMembers.gameId, ids), eq(gameMembers.role, 'PLAYER'), eq(gameMembers.status, 'ACTIVE'))).groupBy(gameMembers.gameId)
       const byGame = new Map(counts.map((row) => [row.gameId, Number(row.total)]))
-      return [...uniqueGames.values()].map((game): DashboardGame => ({ ...game, system: game.system, type: game.type as GameType, status: game.status as GameStatus, activePlayers: byGame.get(game.id) ?? 0 }))
+      return [...uniqueGames.values()].map((game): DashboardGame => ({ ...game, type: game.type as GameType, status: game.status as GameStatus, activePlayers: byGame.get(game.id) ?? 0 }))
     },
     async listApplicationSummary(userId) {
       const rows = await database.select({ status: applications.status, total: count() }).from(applications).where(eq(applications.userId, userId)).groupBy(applications.status)

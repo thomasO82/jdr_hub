@@ -6,14 +6,9 @@ import { createSessionCredential } from '../../../src/modules/auth/services/sess
 import { registerDashboardRoutes, type DashboardRouteEnv } from '../../../src/modules/dashboard/routes.js'
 import { createInMemoryAuthRepository } from '../../helpers/in-memory-auth-repository.js'
 import { createInMemoryDashboardRepository } from '../../helpers/in-memory-dashboard-repository.js'
+import { createInMemoryNotificationsRepository } from '../../helpers/in-memory-notifications-repository.js'
 
-const config = parseAuthConfig({
-  APP_ORIGIN: 'http://localhost:18080',
-  DISCORD_CLIENT_ID: '123456789012345678',
-  DISCORD_CLIENT_SECRET: 'test-secret',
-  DISCORD_REDIRECT_URI: 'http://localhost:18080/api/auth/discord/callback',
-  JWT_SIGNING_SECRET: 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA',
-})
+const config = parseAuthConfig({ APP_ORIGIN: 'http://localhost:18080', DISCORD_CLIENT_ID: '123456789012345678', DISCORD_CLIENT_SECRET: 'test-secret', DISCORD_REDIRECT_URI: 'http://localhost:18080/api/auth/discord/callback', JWT_SIGNING_SECRET: 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' })
 const now = new Date()
 
 async function createTestApp() {
@@ -29,7 +24,7 @@ async function createTestApp() {
   const repository = createInMemoryDashboardRepository({ populated: true, userId: owner.id, ownerId: owner.id })
   const app = new Hono<DashboardRouteEnv>()
   app.use('*', async (c, next) => { c.set('requestId', 'test-request'); await next() })
-  registerDashboardRoutes(app, { authConfig: config, authRepository, repository, now: () => now })
+  registerDashboardRoutes(app, { authConfig: config, authRepository, repository, notificationsRepository: createInMemoryNotificationsRepository(), now: () => now })
   return { app, owner: credentials[0]!, player: credentials[1]!, repository }
 }
 
@@ -40,7 +35,7 @@ describe('dashboard API routes', () => {
     const response = await app.request('/dashboard?userId=another-user', { headers: { cookie: owner.cookie } })
     const payload = await response.json()
     expect(response.status).toBe(200)
-    expect(payload).toMatchObject({ data: { user: { id: owner.user.id }, activeGames: { status: 'READY' } }, meta: { requestId: 'test-request' } })
+    expect(payload).toMatchObject({ data: { user: { id: owner.user.id }, activeGames: { status: 'READY' }, notifications: { status: 'EMPTY', data: null } }, meta: { requestId: 'test-request' } })
   })
 
   it('exposes management only to the owner and does not trust a query user id', async () => {
@@ -64,5 +59,20 @@ describe('dashboard API routes', () => {
     expect(response.status).toBe(500)
     expect(payload).toMatchObject({ error: { message: expect.stringContaining('Réessayez') }, meta: { requestId: 'test-request' } })
     expect(JSON.stringify(payload)).not.toContain('password')
+  })
+
+  it('ignores a forged userId query parameter and uses the authenticated session', async () => {
+    const { app, owner } = await createTestApp()
+    const response = await app.request('/dashboard?userId=other-user', { headers: { cookie: owner.cookie } })
+    expect(response.status).toBe(200)
+    expect((await response.json()).data.user.id).toBe(owner.user.id)
+  })
+
+  it('does not expose recipientId, actorId, Discord identifiers or delivery data', async () => {
+    const { app, owner } = await createTestApp()
+    const body = await (await app.request('/dashboard', { headers: { cookie: owner.cookie } })).json()
+    expect(JSON.stringify(body)).not.toContain('recipientId')
+    expect(JSON.stringify(body)).not.toContain('actorId')
+    expect(JSON.stringify(body)).not.toContain('discord')
   })
 })

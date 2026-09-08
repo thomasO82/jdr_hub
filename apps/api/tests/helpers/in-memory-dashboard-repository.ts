@@ -3,8 +3,10 @@ import type {
   DashboardApplication,
   DashboardApplicationSummary,
   DashboardGame,
+  DashboardGameSummary,
   DashboardInvitationSummary,
   DashboardSession,
+  DashboardSessionSummary,
   DashboardUser,
   GameManagementView,
   SchedulingAction,
@@ -15,7 +17,7 @@ const userId = '00000000-0000-4000-8000-000000000001'
 const gameId = '00000000-0000-4000-8000-000000000010'
 const now = new Date('2026-09-06T12:00:00.000Z')
 
-export function createInMemoryDashboardRepository(input: { populated?: boolean; userId?: string; ownerId?: string; fail?: Array<'nextSession' | 'activeGames' | 'applications' | 'invitations' | 'scheduling' | 'attendance' | 'management'> } = {}): DashboardRepository {
+export function createInMemoryDashboardRepository(input: { populated?: boolean; userId?: string; ownerId?: string; nextSession?: DashboardSessionSummary | null; activeGames?: DashboardGameSummary[]; fail?: Array<'nextSession' | 'activeGames' | 'applications' | 'invitations' | 'scheduling' | 'attendance' | 'management'> } = {}): DashboardRepository {
   const shouldFail = (source: string) => input.fail?.includes(source as never)
   const primaryUserId = input.userId ?? userId
   const managementOwnerId = input.ownerId ?? primaryUserId
@@ -27,9 +29,22 @@ export function createInMemoryDashboardRepository(input: { populated?: boolean; 
   const emptyOr = <T>(value: T, empty: T): T => input.populated ? value : empty
 
   return {
+    async findNextSession() {
+      if (input.nextSession !== undefined) return input.nextSession
+      if (!input.populated) return null
+      return { id: session.id, gameId: session.gameId, gameTitle: session.gameTitle, startsAt: session.startsAt, endsAt: session.endsAt, status: session.status, role: 'GM', canReportAbsence: false }
+    },
     async getUser(requestedUserId) { return { ...user, id: requestedUserId, username: requestedUserId === primaryUserId ? 'MJ' : 'Joueur' } },
-    async getNextSession() { if (shouldFail('nextSession')) throw new Error('database next session'); return emptyOr(session, null) },
-    async listActiveGames() { if (shouldFail('activeGames')) throw new Error('database active games'); return emptyOr([game], []) },
+    async getNextSession() {
+      if (shouldFail('nextSession')) throw new Error('database next session')
+      if (input.nextSession !== undefined) return input.nextSession ? { ...session, ...input.nextSession, notes: null } : null
+      return emptyOr(session, null)
+    },
+    async listActiveGames() {
+      if (shouldFail('activeGames')) throw new Error('database active games')
+      if (input.activeGames !== undefined) return input.activeGames.map((item) => ({ ...game, ...item, slug: item.id, maxPlayers: 4, activePlayers: 1 }))
+      return emptyOr([game], [])
+    },
     async listApplicationSummary(): Promise<DashboardApplicationSummary> { if (shouldFail('applications')) throw new Error('database applications'); return emptyOr({ pending: 1, accepted: 2, rejected: 0 }, { pending: 0, accepted: 0, rejected: 0 }) },
     async listInvitationSummary(): Promise<DashboardInvitationSummary> { if (shouldFail('invitations')) throw new Error('database invitations'); return emptyOr({ receivedPending: 1, sentPending: 2 }, { receivedPending: 0, sentPending: 0 }) },
     async listSchedulingActions(): Promise<SchedulingAction[]> { if (shouldFail('scheduling')) throw new Error('database scheduling'); return emptyOr([{ kind: 'VOTE', gameId, gameTitle: 'La crypte', proposalId: 'proposal-1', sessionId: null, startsAt: session.startsAt }], []) },

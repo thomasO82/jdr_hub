@@ -1,14 +1,73 @@
 import { z } from 'zod'
-import type { GameStatus, GameType } from './games.js'
+import { gameStatusSchema, gameTypeSchema } from './games.js'
+import { notificationTypeSchema } from './attendance.js'
+import { sessionStatusSchema } from './scheduling.js'
 import type { Invitation } from './invitations.js'
+
+const dashboardRoleSchema = z.enum(['GM', 'PLAYER'])
 
 export const dashboardBlockStateSchema = z.enum(['READY', 'EMPTY', 'ERROR'])
 
-export type DashboardBlock<T> = {
-  status: z.infer<typeof dashboardBlockStateSchema>
-  data: T | null
-  error: { code: string; message: string } | null
-}
+export const dashboardSessionSchema = z.object({
+  id: z.string().trim().min(1).max(128),
+  gameId: z.string().trim().min(1).max(128),
+  gameTitle: z.string().trim().min(1).max(160),
+  startsAt: z.iso.datetime({ offset: true }),
+  endsAt: z.iso.datetime({ offset: true }),
+  status: sessionStatusSchema,
+  role: dashboardRoleSchema,
+  canReportAbsence: z.boolean(),
+}).strict()
+
+export const dashboardGameSchema = z.object({
+  id: z.string().trim().min(1).max(128),
+  title: z.string().trim().min(1).max(160),
+  system: z.string().trim().min(1).max(100),
+  type: gameTypeSchema,
+  status: gameStatusSchema,
+  role: dashboardRoleSchema,
+}).strict()
+
+export const dashboardNotificationSchema = z.object({
+  id: z.string().trim().min(1).max(128),
+  type: notificationTypeSchema,
+  gameId: z.string().trim().min(1).max(128),
+  sessionId: z.string().trim().min(1).max(128),
+  title: z.string().trim().min(1).max(160),
+  body: z.string().trim().min(1).max(2_000),
+  readAt: z.null(),
+  createdAt: z.iso.datetime({ offset: true }),
+}).strict()
+
+export const dashboardBlockSchema = <T extends z.ZodType>(data: T) => z.discriminatedUnion('status', [
+  z.object({ status: z.literal('READY'), data }).strict(),
+  z.object({ status: z.literal('EMPTY'), data: z.null() }).strict(),
+  z.object({ status: z.literal('ERROR'), data: z.null(), code: z.literal('DASHBOARD_BLOCK_UNAVAILABLE') }).strict(),
+])
+
+export const dashboardNotificationSummarySchema = z.object({
+  unreadCount: z.number().int().min(1).max(10_000),
+  items: z.array(dashboardNotificationSchema).max(3),
+}).strict()
+
+export const dashboardDataSchema = z.object({
+  nextSession: dashboardBlockSchema(dashboardSessionSchema),
+  activeGames: dashboardBlockSchema(z.array(dashboardGameSchema).max(12)),
+  notifications: dashboardBlockSchema(dashboardNotificationSummarySchema),
+}).strict()
+
+export type DashboardRole = z.infer<typeof dashboardRoleSchema>
+export type DashboardSessionSummary = z.infer<typeof dashboardSessionSchema>
+export type DashboardGameSummary = z.infer<typeof dashboardGameSchema>
+export type DashboardNotification = z.infer<typeof dashboardNotificationSchema>
+export type DashboardNotificationSummary = z.infer<typeof dashboardNotificationSummarySchema>
+
+export type DashboardBlock<T> =
+  | { status: 'READY'; data: T; error?: null }
+  | { status: 'EMPTY'; data: null; error?: null }
+  | { status: 'ERROR'; data: null; code?: 'DASHBOARD_BLOCK_UNAVAILABLE'; error?: { code: string; message: string } }
+
+export type DashboardData = z.infer<typeof dashboardDataSchema>
 
 export type DashboardUser = {
   id: string
@@ -21,11 +80,11 @@ export type DashboardGame = {
   slug: string
   title: string
   system: string
-  type: GameType
-  status: GameStatus
+  type: z.infer<typeof gameTypeSchema>
+  status: z.infer<typeof gameStatusSchema>
   maxPlayers: number
   activePlayers: number
-  role: 'GM' | 'PLAYER'
+  role: DashboardRole
 }
 
 export type DashboardSession = {
@@ -34,7 +93,7 @@ export type DashboardSession = {
   gameTitle: string
   startsAt: string
   endsAt: string
-  status: 'PROPOSED' | 'SCHEDULED' | 'COMPLETED' | 'CANCELLED'
+  status: z.infer<typeof sessionStatusSchema>
   notes: string | null
 }
 
@@ -102,6 +161,7 @@ export type DashboardView = {
   schedulingActions: DashboardBlock<SchedulingAction[]>
   attendanceActions: DashboardBlock<AttendanceAction[]>
   progression: DashboardBlock<DashboardProgression>
+  notifications: DashboardBlock<DashboardNotificationSummary>
 }
 
 export type GameManagementView = {

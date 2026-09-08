@@ -1,6 +1,6 @@
-import type { DashboardView, GameManagementView } from '@jdr-hub/shared'
+import type { DashboardData, DashboardView, GameManagementView } from '@jdr-hub/shared'
 
-type ApiEnvelope<T> = { data: T | null }
+type ApiEnvelope<T> = { data: T | null; error?: unknown }
 type DashboardApiOptions = { baseUrl?: string; fetcher?: typeof fetch }
 
 function apiUrl(baseUrl: string, path: string): string {
@@ -23,6 +23,7 @@ export function createDashboardApi(options: DashboardApiOptions = {}) {
   }
 
   return {
+    get(): Promise<DashboardData | null> { return request<DashboardData>('/dashboard') },
     getDashboard(): Promise<DashboardView | null> { return request<DashboardView>('/dashboard') },
     getManagement(gameId: string): Promise<GameManagementView | null> { return request<GameManagementView>(`/games/${encodeURIComponent(gameId)}/manage`) },
   }

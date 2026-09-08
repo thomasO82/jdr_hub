@@ -42,7 +42,7 @@ async function startApi(): Promise<void> {
       notifications: { authConfig, authRepository, repository: notificationRepository },
       invitations: { authConfig, authRepository, repository: invitationRepository },
       members: { authConfig, authRepository, repository: memberRepository },
-      dashboard: { authConfig, authRepository, repository: dashboardRepository },
+      dashboard: { authConfig, authRepository, repository: dashboardRepository, notificationsRepository: notificationRepository },
     }).fetch,
     port,
   })

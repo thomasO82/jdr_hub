@@ -8,7 +8,7 @@ Il ne remplace ni les spécifications, ni les décisions d'architecture, ni les 
 
 ## Dernière mise à jour
 
-2026-09-06
+2026-09-08
 
 ## Signification des statuts
 
@@ -30,15 +30,16 @@ Seuls les statuts suivants sont autorisés :
 | F12 | Durcissement JWT des sessions | `IN_PROGRESS` | `fix/jwt-session-security` | Création bloquée : intégration GitHub sans permission | 77/77 tests verts ; lint, typecheck et builds verts | JWT d’accès, rotation, révocation serveur et CSRF | [Fiche F12](features/003-jwt-session-security.md) |
 | F02 | Parties, tags et cycle de vie | `MERGED` | `feat/games-and-tags` | [PR #7](https://github.com/thomasO82/jdr_hub/pull/7) | 89 tests monorepo verts au moment de la fusion | Contrôles d’autorisation, validation stricte et invariants métier | [Fiche F02](features/004-games-and-tags.md) |
 | REF-001 | Migration frontend Tailwind-only | `IN_PROGRESS` | `refactor/tailwind-only-frontend` | Non créée | 106 tests monorepo verts ; lint, typecheck et build verts | Aucun changement de contrat ; contrôle architectural CSS et focus accessibles | [Fiche REF-001](features/005-tailwind-only-frontend.md) |
-| F03 | Catalogue public, détail et SEO | `IN_PROGRESS` | `feat/public-games-and-seo` | Non créée | 120 tests monorepo verts ; lint, typecheck et build verts | Projection sans identifiants, visibilité publique, validation stricte, filtres AND et slugs sitemap | [Fiche F03](features/006-public-games-and-seo.md) |
+| F03 | Catalogue public, détail et SEO | `IN_PROGRESS` | `feat/public-games-and-seo` | Non créée | 120 tests monorepo verts ; lint, typecheck et build verts | Projection sans données privées, UUID public, visibilité publique, validation stricte, filtres AND et slugs sitemap | [Fiche F03](features/006-public-games-and-seo.md) |
 | F04 | Candidatures et roster | `IN_PROGRESS` | `feat/applications` | Création bloquée : intégration GitHub sans permission | 135 tests monorepo verts ; lint, typecheck, build et Docker web verts | Autorisation par ressource, anti-doublon, transaction de capacité, origine et validation stricte | [Fiche F04](features/007-applications.md) |
+| FIX-001 | Identifiant UUID des routes de participation | `IN_PROGRESS` | `fix/applications-id-only` | Non créée | 98 fichiers, 250 tests verts ; lint, typecheck et builds API/web verts | Rejet des slugs avant requête UUID, projection publique sans données privées | [Fiche F04 — correctif UUID](features/007-applications.md) |
 | DEV-001 | Données de développement | `IN_PROGRESS` | `feat/development-seeds` | Non créée | 59 fichiers, 141 tests verts ; lint, typecheck et build verts | Données fictives uniquement, pas de suppression ni de secret | [Fiche DEV-001](features/008-development-seeds.md) |
 | DEV-002 | Commandes de développement | `IN_PROGRESS` | `chore/developer-commands` | Non créée | 60 fichiers, 142 tests verts ; lint et typecheck verts | Alias Docker Compose sans modification de sécurité | [Fiche DEV-002](features/009-developer-commands.md) |
 | DEV-003 | Drizzle Studio local | `IN_PROGRESS` | `chore/drizzle-studio` | Non créée | 61 fichiers, 146 tests verts ; lint, typecheck, build et image Studio vérifiés | Port local uniquement, réseau PostgreSQL privé, conteneur non-root | [Fiche DEV-003](features/010-drizzle-studio.md) |
 | F05 | Disponibilités et recherche de joueurs | `MERGED` | `feat/availability-and-player-search` | Fusion confirmée par le propriétaire dans `develop` | 72 fichiers, 173 tests monorepo verts ; lint, typecheck et builds verts | Session obligatoire, origine stricte, rate limit d’écriture, horaires privés, projection agrégée et validation bornée | [Fiche F05](features/011-availability-and-player-search.md) |
 | F06 | Séances, créneaux, votes et planning | `IN_PROGRESS` | `feat/sessions-scheduling` | Non créée | 84 fichiers, 203 tests monorepo verts ; lint, typecheck et build web verts | Appartenance/MJ, origine stricte, votes uniques, transaction de sélection, dates bornées | [Fiche F06](features/012-sessions-scheduling.md) |
 | F07 | Présences, absences et notifications Discord | `IN_PROGRESS` | `feat/attendance-notifications` | Création bloquée par GitHub (`403`) ; [ouverture manuelle](https://github.com/thomasO82/jdr_hub/pull/new/feat/attendance-notifications) | 98 fichiers, 248 tests monorepo verts + 3 intégration PostgreSQL ; lint, typecheck, builds API/web et Compose healthy | Session/origine/rate limit, autorisation par membre/MJ, transaction idempotente, bail outbox, bot serveur, mentions désactivées, retries bornés | [Fiche F07](features/013-attendance-notifications.md) |
-| F08 | Dashboard et gestion MJ | `IN_PROGRESS` | `feat/dashboard-and-gm-management` | Non créée | 113 fichiers, 291 tests monorepo verts + 5 tests d'intégration PostgreSQL ; lint, typecheck et build verts | Session/origine/rate limit, autorisation par ressource, projection minimale, validation stricte, contrainte d'invitation et transactions | [Fiche F08](features/014-dashboard-and-gm-management.md) |
+| F08 | Dashboard et gestion MJ | `IN_PROGRESS` | `feat/dashboard-and-gm-management` | Non créée | 115 fichiers, 308 tests monorepo verts + 8 tests d'intégration PostgreSQL ; lint, typecheck et build verts | Session/origine/rate limit, autorisation par ressource, projection minimale, notifications destinataire-scopées, validation stricte, contrainte d'invitation et transactions | [Fiche F08](features/014-dashboard-and-gm-management.md) |
 
 ## Blocages
 

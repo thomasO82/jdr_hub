@@ -47,6 +47,7 @@ export function createPostgresGamesRepository(database: Database): GamesReposito
     inArray(games.status, ['OPEN', 'ACTIVE']),
   )
   const toPublicGame = async (game: { slug: string; title: string; system: string; description: string; type: string; status: string; maxPlayers: number; ownerName: string; id: string }): Promise<PublicGame> => ({
+    id: game.id,
     slug: game.slug,
     title: game.title,
     system: game.system,

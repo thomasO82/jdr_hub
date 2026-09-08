@@ -1,6 +1,7 @@
-import { and, count, desc, eq, or } from 'drizzle-orm'
+import { and, count, desc, eq } from 'drizzle-orm'
 import { authSchema, gameSchema, type createDatabase } from '@jdr-hub/database'
 import type { Application, ApplicationStatus } from '@jdr-hub/shared'
+import { z } from 'zod'
 
 export type ApplicationGame = {
   id: string
@@ -20,6 +21,7 @@ export interface ApplicationRepository {
 }
 
 type Database = ReturnType<typeof createDatabase>['db']
+const uuidSchema = z.uuid()
 
 export function createPostgresApplicationRepository(database: Database): ApplicationRepository {
   const { users } = authSchema
@@ -42,7 +44,8 @@ export function createPostgresApplicationRepository(database: Database): Applica
 
   return {
     async findEligibleGame(gameId) {
-      const [game] = await database.select({ id: games.id, ownerId: games.ownerId, visibility: games.visibility, status: games.status, maxPlayers: games.maxPlayers }).from(games).where(or(eq(games.id, gameId), eq(games.slug, gameId))).limit(1)
+      if (!uuidSchema.safeParse(gameId).success) return null
+      const [game] = await database.select({ id: games.id, ownerId: games.ownerId, visibility: games.visibility, status: games.status, maxPlayers: games.maxPlayers }).from(games).where(eq(games.id, gameId)).limit(1)
       return game ?? null
     },
     async findByGameAndUser(gameId, userId) {
@@ -76,6 +79,7 @@ export function createPostgresApplicationRepository(database: Database): Applica
       return rows.map((row) => ({ ...row, status: row.status as ApplicationStatus }))
     },
     async findForGameOwner(gameId, ownerId) {
+      if (!uuidSchema.safeParse(gameId).success) return null
       const [game] = await database.select({ ownerId: games.ownerId }).from(games).where(eq(games.id, gameId)).limit(1)
       if (!game || game.ownerId !== ownerId) return null
       const rows = await database.select({

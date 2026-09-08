@@ -113,6 +113,8 @@ existent déjà pour préserver le contrat serveur.
 - clients frontend credentialed pour dashboard, invitations et membres ;
 - dashboard d'accueil et écran `/gestion/parties/[id]` responsive, accessible
   au clavier et en Tailwind-only ;
+- résumé des notifications non lues affiché dans la colonne secondaire du
+  dashboard, avec marquage unitaire comme lu et cloche globale dans le header ;
 - intégration des mutations de candidatures avec l'origine applicative stricte.
 
 ## Parcours utilisateur
@@ -285,8 +287,8 @@ Aucune route obligatoire F08 restante.
 
 | Commande | Résultat | Date |
 | --- | --- | --- |
-| `pnpm test -- --reporter=dot` | 113 fichiers, 291 tests verts ; les intégrations PostgreSQL sont exécutées séparément et les packages workspace sont construits automatiquement | 2026-09-08 |
-| `DATABASE_URL=postgresql://… pnpm test:integration` | 2 fichiers, 5 tests PostgreSQL verts avec base locale dédiée | 2026-09-08 |
+| `pnpm test` | 115 fichiers, 308 tests verts ; les intégrations PostgreSQL sont exécutées séparément et les packages workspace sont construits automatiquement | 2026-09-08 |
+| `DATABASE_URL=postgresql://… pnpm test:integration` | 3 fichiers, 8 tests PostgreSQL verts avec base locale dédiée | 2026-09-08 |
 | `pnpm lint` | Tous les packages lintés sans erreur | 2026-09-08 |
 | `pnpm typecheck` | Shared, web, database et API sans erreur TypeScript | 2026-09-08 |
 | `pnpm build` | API, packages et Next.js construits avec succès ; 12 pages statiques et routes dynamiques générées | 2026-09-08 |
@@ -372,6 +374,7 @@ Aucune route obligatoire F08 restante.
 - `apps/api/src/modules/invitations/` — workflow d'invitation ;
 - `apps/api/src/modules/members/` — roster protégé ;
 - `apps/web/features/dashboard/` — dashboard ;
+- `apps/web/features/notifications/` — résumé conditionnel des notifications non lues ;
 - `apps/web/features/gm-management/` — gestion MJ ;
 - `apps/web/lib/*-api.ts` — clients frontend credentialed ;
 - `package.json` — préparation des packages workspace avant la suite Vitest ;
@@ -383,6 +386,7 @@ Aucune route obligatoire F08 restante.
 - progression XP vide jusqu'à F09 ;
 - pas de chat, SSE, Redis Streams ou notification Discord d'invitation ;
 - pas d'E2E navigateur réel dans cette branche ;
+- vérification visuelle manuelle du placement final du header encore à faire ;
 - aucune mesure de couverture dédiée n'a été exécutée.
 
 ## Travaux reportés
@@ -433,3 +437,4 @@ refus.
 | Date | Évolution | Impact | Référence |
 | --- | --- | --- | --- |
 | 2026-09-06 | Ajout du workflow complet d'invitation et de la gestion MJ | Dashboard, roster et invitations sont livrés dans une seule PR | branche `feat/dashboard-and-gm-management` |
+| 2026-09-08 | Fusion du dashboard notifications dans F08 | Le résumé n’apparaît qu’en présence de notifications non lues ; la cloche reste dans la barre supérieure sticky | `origin/develop`, commit de fusion |

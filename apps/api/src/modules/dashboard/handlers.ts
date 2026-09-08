@@ -3,6 +3,7 @@ import { readAccessToken } from '../auth/cookies.js'
 import type { AuthConfig } from '../auth/config.js'
 import type { AuthRepository } from '../auth/repository.js'
 import { authenticateUser } from '../auth/services/authenticate-user.js'
+import type { NotificationRepository } from '../notifications/repository.js'
 import type { DashboardRepository } from './repository.js'
 import { getDashboard } from './services/get-dashboard.js'
 import { getGameManagement } from './services/get-game-management.js'
@@ -11,6 +12,7 @@ export type DashboardDependencies = {
   authConfig: AuthConfig
   authRepository: AuthRepository
   repository: DashboardRepository
+  notificationsRepository: NotificationRepository
   now?: () => Date
 }
 
@@ -44,7 +46,7 @@ export function createDashboardHandlers(dependencies: DashboardDependencies) {
       const user = await currentUser(c)
       if (!user) return error(c, 401)
       try {
-        const dashboard = await getDashboard({ userId: user.id, repository: dependencies.repository, now })
+        const dashboard = await getDashboard({ userId: user.id, repository: dependencies.repository, notificationsRepository: dependencies.notificationsRepository, now })
         return c.json({ data: dashboard, error: null, meta: { requestId: c.get('requestId') } })
       } catch (value) {
         return error(c, domainStatus(value))
