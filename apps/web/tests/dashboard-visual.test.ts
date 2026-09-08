@@ -24,5 +24,7 @@ describe('dashboard visual composition', () => {
     const source = readFileSync(resolve(web, 'features/layout/app-shell.tsx'), 'utf8')
 
     expect(source.match(/<NotificationBell/g)?.length).toBeGreaterThanOrEqual(2)
+    expect(source).toContain('lg:ml-64')
+    expect(source).toContain('hidden h-16')
   })
 })

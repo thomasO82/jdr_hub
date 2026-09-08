@@ -40,14 +40,15 @@ export function AppShell({ children, active = 'Games' }: { children: ReactNode; 
             </Link>
           ))}
         </nav>
-        <div className="relative mt-6 flex justify-end">
-          <NotificationBell />
-        </div>
         <Link className="mt-auto flex min-h-12 items-center justify-center gap-2 rounded-xl bg-primary font-semibold text-on-primary no-underline transition-colors hover:bg-primary-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary" href="/parties/nouvelle">
           <Plus aria-hidden="true" size={20} />
           New Game
         </Link>
       </aside>
+
+      <header className="sticky top-0 z-20 hidden h-16 items-center justify-end border-b border-outline-variant bg-surface px-8 text-primary lg:ml-64 lg:flex" aria-label="Actions globales">
+        <NotificationBell />
+      </header>
 
       <header className="fixed inset-x-0 top-0 z-20 flex h-16 items-center justify-between border-b border-outline-variant bg-surface px-5 text-primary lg:hidden">
         <Link className="flex items-center gap-2 no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary" href="/">

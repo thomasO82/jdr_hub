@@ -187,7 +187,7 @@ Aucune route supplémentaire prévue dans ce périmètre.
 - `apps/web/app/dashboard/page.tsx` ;
 - `DashboardView` et `DashboardCard` ;
 - `NotificationSummary` avec compteur, date, lien, marquage comme lue et message d'erreur ;
-- `AppShell` conserve la cloche permanente et pointe l'entrée Dashboard vers `/dashboard` ;
+- `AppShell` place la cloche dans la barre d'actions supérieure sur desktop, la conserve dans le header mobile et pointe l'entrée Dashboard vers `/dashboard` ;
 - zones tactiles minimales, focus visible, libellés et annonces accessibles.
 
 ### Restants
@@ -332,3 +332,4 @@ Non réalisée dans un navigateur réel.
 | Date | Évolution | Impact | Référence |
 | --- | --- | --- | --- |
 | 2026-09-08 | Ajout du dashboard privé et du résumé conditionnel des notifications | Les notifications non lues deviennent visibles sans ouvrir la cloche | Branche `feat/dashboard-notifications` |
+| 2026-09-08 | Déplacement de la cloche desktop dans la barre d'actions supérieure | Le contrôle de notification est visible en haut de l'écran, conformément à la maquette | Test `dashboard-visual.test.ts` |
