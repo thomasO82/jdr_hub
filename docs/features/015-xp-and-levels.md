@@ -14,7 +14,7 @@ IN_PROGRESS
 
 ## Lien ou numéro de Pull Request
 
-Non créée
+Création automatique refusée par GitHub (`403 Resource not accessible by integration`) ; [ouverture manuelle](https://github.com/thomasO82/jdr_hub/pull/new/feat/xp-and-levels)
 
 ## Dates de début et de fin
 
