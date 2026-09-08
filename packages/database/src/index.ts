@@ -8,8 +8,9 @@ import * as attendanceSchema from './schema/attendance.js'
 import * as gameSchema from './schema/games.js'
 import * as invitationsSchema from './schema/invitations.js'
 import * as schedulingSchema from './schema/scheduling.js'
+import * as gamificationSchema from './schema/gamification.js'
 
-export { authSchema, availabilitySchema, attendanceSchema, gameSchema, invitationsSchema, schedulingSchema }
+export { authSchema, availabilitySchema, attendanceSchema, gameSchema, invitationsSchema, schedulingSchema, gamificationSchema }
 /** Parse and validate the server-only PostgreSQL connection URL. */
 export function parseDatabaseUrl(rawUrl: string | undefined): URL {
   if (!rawUrl) {
@@ -41,7 +42,7 @@ export function createDatabase(rawUrl: string | undefined) {
 
   return {
     client,
-    db: drizzle(client, { schema: { ...authSchema, ...availabilitySchema, ...attendanceSchema, ...gameSchema, ...invitationsSchema, ...schedulingSchema } }),
+    db: drizzle(client, { schema: { ...authSchema, ...availabilitySchema, ...attendanceSchema, ...gameSchema, ...invitationsSchema, ...schedulingSchema, ...gamificationSchema } }),
   }
 }
 
