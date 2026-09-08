@@ -8,7 +8,7 @@ Il ne remplace ni les spécifications, ni les décisions d'architecture, ni les 
 
 ## Dernière mise à jour
 
-2026-09-06
+2026-09-08
 
 ## Signification des statuts
 
@@ -39,6 +39,7 @@ Seuls les statuts suivants sont autorisés :
 | F05 | Disponibilités et recherche de joueurs | `MERGED` | `feat/availability-and-player-search` | Fusion confirmée par le propriétaire dans `develop` | 72 fichiers, 173 tests monorepo verts ; lint, typecheck et builds verts | Session obligatoire, origine stricte, rate limit d’écriture, horaires privés, projection agrégée et validation bornée | [Fiche F05](features/011-availability-and-player-search.md) |
 | F06 | Séances, créneaux, votes et planning | `IN_PROGRESS` | `feat/sessions-scheduling` | Non créée | 84 fichiers, 203 tests monorepo verts ; lint, typecheck et build web verts | Appartenance/MJ, origine stricte, votes uniques, transaction de sélection, dates bornées | [Fiche F06](features/012-sessions-scheduling.md) |
 | F07 | Présences, absences et notifications Discord | `IN_PROGRESS` | `feat/attendance-notifications` | Création bloquée par GitHub (`403`) ; [ouverture manuelle](https://github.com/thomasO82/jdr_hub/pull/new/feat/attendance-notifications) | 98 fichiers, 248 tests monorepo verts + 3 intégration PostgreSQL ; lint, typecheck, builds API/web et Compose healthy | Session/origine/rate limit, autorisation par membre/MJ, transaction idempotente, bail outbox, bot serveur, mentions désactivées, retries bornés | [Fiche F07](features/013-attendance-notifications.md) |
+| F08 | Tableau de bord et notifications visibles | `IN_PROGRESS` | `feat/dashboard-notifications` | Création bloquée par GitHub (`403`) ; [ouverture manuelle](https://github.com/thomasO82/jdr_hub/pull/new/feat/dashboard-notifications) | 104 fichiers, 266 tests monorepo verts + 6 intégration PostgreSQL ; lint, typecheck et builds API/web verts | Session obligatoire, projection privée, filtrage destinataire, erreurs génériques, résumé limité et marquage autorisé | [Fiche F08](features/014-dashboard-notifications.md) |
 
 ## Blocages
 
@@ -59,10 +60,10 @@ Seuls les statuts suivants sont autorisés :
 - 2026-09-06 — F06 : la branche `feat/sessions-scheduling` est poussée et
   vérifiée ; l'ouverture automatique est indisponible car `gh` n'est pas
   installé. La PR doit être ouverte manuellement et F06 reste `IN_PROGRESS`.
-- 2026-09-06 — FIX-001 : la branche `fix/applications-id-only` est poussée et
-  vérifiée, mais l'intégration GitHub a refusé la création de PR vers
-  `develop` (`403 Resource not accessible by integration`). Le correctif reste
-  `IN_PROGRESS` jusqu'à l'ouverture manuelle de la PR.
+- 2026-09-08 — F08 : la branche `feat/dashboard-notifications` est poussée et
+  vérifiée ; l'intégration GitHub a refusé l'ouverture automatique de la PR
+  (`403 Resource not accessible by integration`). La PR doit être ouverte
+  manuellement et F08 reste `IN_PROGRESS`.
 
 ## Mise à jour architecture — 2026-09-05
 

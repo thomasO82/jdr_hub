@@ -41,6 +41,7 @@ export type DiscordDelivery = {
 
 export interface NotificationRepository {
   listForUser(input: { userId: string; cursor: string | null; limit: number }): Promise<NotificationPageRecord>
+  listUnreadForUser(input: { userId: string; limit: number }): Promise<{ items: NotificationRecord[]; unreadCount: number }>
   markRead(input: { notificationId: string; userId: string; now: Date }): Promise<boolean>
   claimPendingDeliveries(input: { now: Date; limit: number }): Promise<DiscordDelivery[]>
   markSent(input: { deliveryId: string; providerMessageId: string; now: Date }): Promise<void>
@@ -102,6 +103,15 @@ export function createPostgresNotificationRepository(database: Database): Notifi
       const items = rows.slice(0, limit).map(toNotification)
       const [unread] = await database.select({ count: sql<number>`count(*)` }).from(notifications).where(and(eq(notifications.recipientId, userId), isNull(notifications.readAt)))
       return { items, nextCursor: rows.length > limit && items.at(-1) ? encodeCursor(items.at(-1) as NotificationRecord) : null, unreadCount: Number(unread?.count ?? 0) }
+    },
+
+    async listUnreadForUser({ userId, limit }) {
+      const rows = await database.select().from(notifications)
+        .where(and(eq(notifications.recipientId, userId), isNull(notifications.readAt)))
+        .orderBy(desc(notifications.createdAt), desc(notifications.id))
+        .limit(limit)
+      const [unread] = await database.select({ count: sql<number>`count(*)` }).from(notifications).where(and(eq(notifications.recipientId, userId), isNull(notifications.readAt)))
+      return { items: rows.map(toNotification), unreadCount: Number(unread?.count ?? 0) }
     },
 
     async markRead({ notificationId, userId, now }) {

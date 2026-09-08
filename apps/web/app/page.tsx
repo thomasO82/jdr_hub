@@ -1,5 +1,5 @@
-import { HomeView } from '../features/home/home-view'
+import { redirect } from 'next/navigation'
 
 export default function HomePage() {
-  return <HomeView />
+  redirect('/dashboard')
 }
