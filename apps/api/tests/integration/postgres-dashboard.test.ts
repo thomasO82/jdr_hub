@@ -38,7 +38,7 @@ async function seedDashboard(): Promise<Seed> {
     otherUserNotificationId: randomUUID(),
   }
   await database.db.insert(users).values([
-    { id: seed.ownerId, discordId: seed.ownerId.replaceAll('-', '').slice(0, 32), username: 'Dashboard owner' },
+    { id: seed.ownerId, discordId: seed.ownerId.replaceAll('-', '').slice(0, 32), username: 'Dashboard owner', xp: 300, level: 2 },
     { id: seed.memberId, discordId: seed.memberId.replaceAll('-', '').slice(0, 32), username: 'Dashboard member' },
     { id: seed.outsiderId, discordId: seed.outsiderId.replaceAll('-', '').slice(0, 32), username: 'Dashboard outsider' },
   ])
@@ -93,6 +93,7 @@ describe('PostgreSQL dashboard projections', () => {
       const dashboard = await getDashboard({ userId: seed.ownerId, now: new Date('2026-09-08T12:00:00.000Z'), repository, notificationsRepository })
 
       expect(dashboard.nextSession).toMatchObject({ status: 'READY', data: { id: seed.upcomingSessionId } })
+      expect(dashboard.progression).toEqual({ status: 'READY', data: { totalXp: 300, level: 2, nextLevelXp: 600 }, error: null })
       expect(dashboard.notifications).toMatchObject({ status: 'READY', data: { unreadCount: 1 } })
       expect(JSON.stringify(dashboard)).not.toContain(seed.otherUserNotificationId)
     } finally {

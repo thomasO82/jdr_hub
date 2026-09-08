@@ -22,13 +22,14 @@ export async function getDashboard(input: { userId: string; repository: Dashboar
   const now = typeof input.now === 'function' ? input.now() : input.now ?? new Date()
   const user = await input.repository.getUser(input.userId)
   if (!user) throw new Error('DASHBOARD_NOT_FOUND')
-  const [nextSession, activeGames, applications, invitations, schedulingActions, attendanceActions, notifications] = await Promise.allSettled([
+  const [nextSession, activeGames, applications, invitations, schedulingActions, attendanceActions, progression, notifications] = await Promise.allSettled([
     input.repository.getNextSession(input.userId, now),
     input.repository.listActiveGames(input.userId),
     input.repository.listApplicationSummary(input.userId),
     input.repository.listInvitationSummary(input.userId, now),
     input.repository.listSchedulingActions(input.userId, now),
     input.repository.listAttendanceActions(input.userId, now),
+    input.repository.getProgression(input.userId),
     listUnreadNotifications({ userId: input.userId, limit: 3, repository: input.notificationsRepository }),
   ])
   const notificationBlock: DashboardView['notifications'] = notifications.status === 'rejected'
@@ -44,7 +45,7 @@ export async function getDashboard(input: { userId: string; repository: Dashboar
     invitations: block<DashboardInvitationSummary>(invitations),
     schedulingActions: block(schedulingActions),
     attendanceActions: block(attendanceActions),
-    progression: { status: 'EMPTY', data: null, error: null },
+    progression: block(progression),
     notifications: notificationBlock,
   }
 }
