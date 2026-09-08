@@ -11,7 +11,7 @@ import type { ReactNode } from 'react'
 import { NotificationBell } from '../notifications/notification-bell'
 
 const navigation = [
-  { href: '/', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/parties', label: 'Games', icon: Dices },
   { href: '/joueurs', label: 'Players', icon: UsersRound },
   { href: '/planning', label: 'Schedule', icon: CalendarDays },
