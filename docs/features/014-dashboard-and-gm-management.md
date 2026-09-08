@@ -25,7 +25,7 @@ https://github.com/thomasO82/jdr_hub/pull/new/feat/dashboard-and-gm-management
 ## Dates de début et de fin
 
 - Début : 2026-09-06
-- Fin : 2026-09-06
+- Fin : Non terminée
 
 ## Dépendances
 
@@ -285,11 +285,11 @@ Aucune route obligatoire F08 restante.
 
 | Commande | Résultat | Date |
 | --- | --- | --- |
-| `pnpm test -- --reporter=dot` | 113 fichiers, 291 tests verts ; les intégrations PostgreSQL sont exécutées séparément | 2026-09-06 |
-| `DATABASE_URL=postgresql://… pnpm test:integration` | 2 fichiers, 5 tests PostgreSQL verts avec base locale dédiée | 2026-09-06 |
-| `pnpm lint` | Tous les packages lintés sans erreur | 2026-09-06 |
-| `pnpm typecheck` | Shared, web, database et API sans erreur TypeScript | 2026-09-06 |
-| `pnpm build` | API, packages et Next.js construits avec succès ; 12 pages statiques et routes dynamiques générées | 2026-09-06 |
+| `pnpm test -- --reporter=dot` | 113 fichiers, 291 tests verts ; les intégrations PostgreSQL sont exécutées séparément et les packages workspace sont construits automatiquement | 2026-09-08 |
+| `DATABASE_URL=postgresql://… pnpm test:integration` | 2 fichiers, 5 tests PostgreSQL verts avec base locale dédiée | 2026-09-08 |
+| `pnpm lint` | Tous les packages lintés sans erreur | 2026-09-08 |
+| `pnpm typecheck` | Shared, web, database et API sans erreur TypeScript | 2026-09-08 |
+| `pnpm build` | API, packages et Next.js construits avec succès ; 12 pages statiques et routes dynamiques générées | 2026-09-08 |
 
 ### Restants
 
@@ -374,6 +374,7 @@ Aucune route obligatoire F08 restante.
 - `apps/web/features/dashboard/` — dashboard ;
 - `apps/web/features/gm-management/` — gestion MJ ;
 - `apps/web/lib/*-api.ts` — clients frontend credentialed ;
+- `package.json` — préparation des packages workspace avant la suite Vitest ;
 - `apps/api/tests/` et `apps/web/tests/` — preuves unitaires, API, intégration
   et composants.
 
