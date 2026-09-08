@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 export const gameTypeSchema = z.enum(['ONE_SHOT', 'CAMPAIGN'])
+export const gameFormatSchema = z.enum(['ONLINE', 'TABLE'])
 export const gameStatusSchema = z.enum(['DRAFT', 'OPEN', 'ACTIVE', 'CLOSED', 'COMPLETED'])
 export const gameVisibilitySchema = z.enum(['PUBLIC', 'PRIVATE'])
 
@@ -11,6 +12,7 @@ export const createGameSchema = z.object({
   system: z.string().trim().min(1).max(100),
   description: z.string().trim().min(1).max(10_000),
   type: gameTypeSchema,
+  format: gameFormatSchema.default('ONLINE'),
   maxPlayers: z.number().int().min(1).max(12),
   visibility: gameVisibilitySchema,
   tags: z.array(tagSlugSchema).max(20).refine((values) => new Set(values).size === values.length, 'Tags must be unique').default([]),
@@ -21,6 +23,7 @@ export const updateGameSchema = z.object({
   system: z.string().trim().min(1).max(100).optional(),
   description: z.string().trim().min(1).max(10_000).optional(),
   type: gameTypeSchema.optional(),
+  format: gameFormatSchema.optional(),
   maxPlayers: z.number().int().min(1).max(12).optional(),
   visibility: gameVisibilitySchema.optional(),
   status: gameStatusSchema.optional(),

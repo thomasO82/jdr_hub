@@ -9,6 +9,7 @@ export const games = pgTable('games', {
   system: varchar('system', { length: 100 }).notNull(),
   description: text('description').notNull(),
   type: varchar('type', { length: 16 }).notNull(),
+  format: varchar('format', { length: 8 }).notNull().default('ONLINE'),
   status: varchar('status', { length: 16 }).notNull().default('DRAFT'),
   visibility: varchar('visibility', { length: 16 }).notNull().default('PUBLIC'),
   maxPlayers: integer('max_players').notNull(),
@@ -17,6 +18,7 @@ export const games = pgTable('games', {
 }, (table) => [
   index('games_owner_id_index').on(table.ownerId),
   index('games_title_index').on(table.title),
+  index('games_format_index').on(table.format),
   index('games_status_visibility_index').on(table.status, table.visibility),
 ])
 

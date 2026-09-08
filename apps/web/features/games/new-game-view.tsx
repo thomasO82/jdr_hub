@@ -21,6 +21,7 @@ export function NewGameView() {
         system: form.get('system'),
         description: form.get('description'),
         type: form.get('type'),
+        format: form.get('format'),
         maxPlayers: Number(form.get('maxPlayers')),
         visibility: form.get('visibility'),
         tags: String(form.get('tags') ?? '').split(',').map((tag) => tag.trim()).filter(Boolean),
@@ -45,6 +46,7 @@ export function NewGameView() {
             <label className="grid gap-2 font-body text-sm font-semibold">Système<input className="min-h-11 rounded-lg border border-outline-variant bg-surface px-3.5 font-body font-normal outline-none transition focus:border-primary focus:outline-2 focus:outline-primary/30" name="system" required maxLength={100} /></label>
             <label className="grid gap-2 font-body text-sm font-semibold">Description<textarea className="min-h-32 rounded-lg border border-outline-variant bg-surface p-3.5 font-body font-normal outline-none transition focus:border-primary focus:outline-2 focus:outline-primary/30" name="description" required maxLength={10000} rows={6} /></label>
             <label className="grid gap-2 font-body text-sm font-semibold">Type<select className="min-h-11 rounded-lg border border-outline-variant bg-surface px-3.5 font-body font-normal outline-none transition focus:border-primary focus:outline-2 focus:outline-primary/30" name="type" defaultValue="ONE_SHOT"><option value="ONE_SHOT">One-shot</option><option value="CAMPAIGN">Campagne</option></select></label>
+            <label className="grid gap-2 font-body text-sm font-semibold">Format<select className="min-h-11 rounded-lg border border-outline-variant bg-surface px-3.5 font-body font-normal outline-none focus:border-primary focus:outline-2 focus:outline-primary/30" name="format" defaultValue="ONLINE"><option value="ONLINE">En ligne</option><option value="TABLE">Sur table</option></select></label>
             <label className="grid gap-2 font-body text-sm font-semibold">Nombre maximum de joueurs<input className="min-h-11 rounded-lg border border-outline-variant bg-surface px-3.5 font-body font-normal outline-none transition focus:border-primary focus:outline-2 focus:outline-primary/30" name="maxPlayers" type="number" min="1" max="12" defaultValue="4" required /></label>
             <label className="grid gap-2 font-body text-sm font-semibold">Visibilité<select className="min-h-11 rounded-lg border border-outline-variant bg-surface px-3.5 font-body font-normal outline-none transition focus:border-primary focus:outline-2 focus:outline-primary/30" name="visibility" defaultValue="PUBLIC"><option value="PUBLIC">Publique</option><option value="PRIVATE">Privée</option></select></label>
             <label className="grid gap-2 font-body text-sm font-semibold">Tags séparés par des virgules<input className="min-h-11 rounded-lg border border-outline-variant bg-surface px-3.5 font-body font-normal outline-none transition focus:border-primary focus:outline-2 focus:outline-primary/30" name="tags" placeholder="fantasy, débutant" /></label>

@@ -1,5 +1,5 @@
-import { and, desc, eq, ilike, inArray, sql } from 'drizzle-orm'
-import { authSchema, gameSchema, type createDatabase } from '@jdr-hub/database'
+import { and, desc, eq, exists, gte, ilike, inArray, lte, sql } from 'drizzle-orm'
+import { authSchema, gameSchema, schedulingSchema, type createDatabase } from '@jdr-hub/database'
 import type { CreateGameInput, GameQuery, PublicCollection, PublicGame, PublicGamesPage, PublicGamesQuery, PublicSlugs, UpdateGameInput } from '@jdr-hub/shared'
 import { slugifyPublicLabel } from './policy.js'
 
@@ -11,6 +11,7 @@ export type GameRecord = {
   system: string
   description: string
   type: CreateGameInput['type']
+  format?: CreateGameInput['format']
   status: 'DRAFT' | 'OPEN' | 'ACTIVE' | 'CLOSED' | 'COMPLETED'
   visibility: CreateGameInput['visibility']
   maxPlayers: number
@@ -37,7 +38,8 @@ export interface GamesRepository {
 type Database = ReturnType<typeof createDatabase>['db']
 
 export function createPostgresGamesRepository(database: Database): GamesRepository & PublicGamesRepository {
-  const { games, gameTags, tags } = gameSchema
+  const { games, gameMembers, gameTags, tags } = gameSchema
+  const { gameSessions } = schedulingSchema
   const { users } = authSchema
   const readTagSlugs = async (gameId: string) => (await database.select({ slug: tags.slug }).from(gameTags).innerJoin(tags, eq(gameTags.tagId, tags.id)).where(eq(gameTags.gameId, gameId))).map((tag) => tag.slug)
   const readTags = async (gameId: string) => (await database.select({ name: tags.name, slug: tags.slug }).from(gameTags).innerJoin(tags, eq(gameTags.tagId, tags.id)).where(and(eq(gameTags.gameId, gameId), eq(tags.isActive, true)))).map((tag) => tag)
@@ -46,15 +48,20 @@ export function createPostgresGamesRepository(database: Database): GamesReposito
     eq(games.visibility, 'PUBLIC'),
     inArray(games.status, ['OPEN', 'ACTIVE']),
   )
-  const toPublicGame = async (game: { slug: string; title: string; system: string; description: string; type: string; status: string; maxPlayers: number; ownerName: string; id: string }): Promise<PublicGame> => ({
+  const availablePlacesExpression = sql<number>`greatest(${games.maxPlayers} - (select count(*)::int from ${gameMembers} where ${gameMembers.gameId} = ${games.id} and ${gameMembers.status} = 'ACTIVE'), 0)`
+  const nextSessionStartsAtExpression = sql<Date | null>`(select min(${gameSessions.startsAt}) from ${gameSessions} where ${gameSessions.gameId} = ${games.id} and ${gameSessions.status} = 'SCHEDULED' and ${gameSessions.startsAt} >= now())`
+  const toPublicGame = async (game: { slug: string; title: string; system: string; description: string; type: string; format: string; status: string; maxPlayers: number; availablePlaces: number; nextSessionStartsAt: Date | string | null; ownerName: string; id: string }): Promise<PublicGame> => ({
     id: game.id,
     slug: game.slug,
     title: game.title,
     system: game.system,
     description: game.description,
     type: game.type as PublicGame['type'],
+    format: game.format as PublicGame['format'],
     status: game.status as PublicGame['status'],
     maxPlayers: game.maxPlayers,
+    availablePlaces: Number(game.availablePlaces),
+    nextSessionStartsAt: game.nextSessionStartsAt ? new Date(game.nextSessionStartsAt).toISOString() : null,
     tags: await readTags(game.id),
     gameMaster: { name: game.ownerName, slug: slugifyPublicLabel(game.ownerName) },
   })
@@ -70,12 +77,12 @@ export function createPostgresGamesRepository(database: Database): GamesReposito
       if (tagSlugs.length > 0) {
         await database.insert(gameTags).values(tagRows.map((tag) => ({ gameId: game.id, tagId: tag.id })))
       }
-      return { ...game, type: game.type as GameRecord['type'], status: game.status as GameRecord['status'], visibility: game.visibility as GameRecord['visibility'], tags: tagSlugs }
+      return { ...game, type: game.type as GameRecord['type'], format: (game.format ?? 'ONLINE') as NonNullable<GameRecord['format']>, status: game.status as GameRecord['status'], visibility: game.visibility as GameRecord['visibility'], tags: tagSlugs }
     },
     async findById(id) {
       const [game] = await database.select().from(games).where(eq(games.id, id)).limit(1)
       if (!game) return null
-      return { ...game, type: game.type as GameRecord['type'], status: game.status as GameRecord['status'], visibility: game.visibility as GameRecord['visibility'], tags: await readTagSlugs(id) }
+      return { ...game, type: game.type as GameRecord['type'], format: (game.format ?? 'ONLINE') as NonNullable<GameRecord['format']>, status: game.status as GameRecord['status'], visibility: game.visibility as GameRecord['visibility'], tags: await readTagSlugs(id) }
     },
     async findPublicBySlug(slug) {
       const [game] = await database.select({
@@ -85,8 +92,11 @@ export function createPostgresGamesRepository(database: Database): GamesReposito
         system: games.system,
         description: games.description,
         type: games.type,
+        format: games.format,
         status: games.status,
         maxPlayers: games.maxPlayers,
+        availablePlaces: availablePlacesExpression,
+        nextSessionStartsAt: nextSessionStartsAtExpression,
         ownerName: users.username,
       }).from(games).innerJoin(users, eq(games.ownerId, users.id)).where(publicCondition(slug)).limit(1)
       if (!game) return null
@@ -97,6 +107,19 @@ export function createPostgresGamesRepository(database: Database): GamesReposito
       if (query.q) conditions.push(ilike(games.title, `%${query.q}%`))
       if (query.gmId) conditions.push(eq(games.ownerId, query.gmId))
       if (query.gmName) conditions.push(ilike(users.username, `%${query.gmName}%`))
+      if (query.type) conditions.push(eq(games.type, query.type))
+      if (query.format) conditions.push(eq(games.format, query.format))
+      if (query.system) conditions.push(sql`lower(${games.system}) = lower(${query.system})`)
+      if (query.minAvailablePlaces !== undefined) conditions.push(sql`${availablePlacesExpression} >= ${query.minAvailablePlaces}`)
+      if (query.dateFrom || query.dateTo) {
+        const sessionConditions = [
+          eq(gameSessions.gameId, games.id),
+          eq(gameSessions.status, 'SCHEDULED'),
+          gte(gameSessions.startsAt, query.dateFrom ? new Date(`${query.dateFrom}T00:00:00.000Z`) : new Date()),
+        ]
+        if (query.dateTo) sessionConditions.push(lte(gameSessions.startsAt, new Date(`${query.dateTo}T23:59:59.999Z`)))
+        conditions.push(exists(database.select({ id: gameSessions.id }).from(gameSessions).where(and(...sessionConditions))))
+      }
       if (query.tagSlugs.length > 0) {
         const matching = await database.select({ gameId: gameTags.gameId }).from(gameTags)
           .innerJoin(tags, eq(gameTags.tagId, tags.id))
@@ -113,8 +136,11 @@ export function createPostgresGamesRepository(database: Database): GamesReposito
         system: games.system,
         description: games.description,
         type: games.type,
+        format: games.format,
         status: games.status,
         maxPlayers: games.maxPlayers,
+        availablePlaces: availablePlacesExpression,
+        nextSessionStartsAt: nextSessionStartsAtExpression,
         ownerName: users.username,
       }).from(games).innerJoin(users, eq(games.ownerId, users.id)).where(and(...conditions)).orderBy(desc(games.createdAt)).limit(query.pageSize).offset((query.page - 1) * query.pageSize)
       return { page: query.page, pageSize: query.pageSize, items: await Promise.all(rows.map(toPublicGame)) }
@@ -127,8 +153,8 @@ export function createPostgresGamesRepository(database: Database): GamesReposito
         if (matching.length === 0) return null
         const rows = await database.select({
           id: games.id, slug: games.slug, title: games.title, system: games.system,
-          description: games.description, type: games.type, status: games.status,
-          maxPlayers: games.maxPlayers, ownerName: users.username,
+          description: games.description, type: games.type, format: games.format, status: games.status,
+          maxPlayers: games.maxPlayers, availablePlaces: availablePlacesExpression, nextSessionStartsAt: nextSessionStartsAtExpression, ownerName: users.username,
         }).from(games).innerJoin(users, eq(games.ownerId, users.id)).where(and(eligible, inArray(games.ownerId, matching.map((owner) => owner.id))))
         return { slug, name: matching[0]?.name ?? slug, games: await Promise.all(rows.map(toPublicGame)) }
       }
@@ -138,8 +164,8 @@ export function createPostgresGamesRepository(database: Database): GamesReposito
         const [tagId] = await database.select({ id: tags.id }).from(tags).where(eq(tags.slug, slug)).limit(1)
         const rows = await database.select({
           id: games.id, slug: games.slug, title: games.title, system: games.system,
-          description: games.description, type: games.type, status: games.status,
-          maxPlayers: games.maxPlayers, ownerName: users.username,
+          description: games.description, type: games.type, format: games.format, status: games.status,
+          maxPlayers: games.maxPlayers, availablePlaces: availablePlacesExpression, nextSessionStartsAt: nextSessionStartsAtExpression, ownerName: users.username,
         }).from(games).innerJoin(users, eq(games.ownerId, users.id)).innerJoin(gameTags, eq(gameTags.gameId, games.id)).where(and(eligible, eq(gameTags.tagId, tagId?.id ?? '')))
         return { slug: tag.slug, name: tag.name, games: await Promise.all(rows.map(toPublicGame)) }
       }
@@ -147,9 +173,9 @@ export function createPostgresGamesRepository(database: Database): GamesReposito
       const names = systems.map((row) => row.system).filter((name) => slugifyPublicLabel(name) === slug)
       if (names.length === 0) return null
       const rows = await database.select({
-        id: games.id, slug: games.slug, title: games.title, system: games.system,
-        description: games.description, type: games.type, status: games.status,
-        maxPlayers: games.maxPlayers, ownerName: users.username,
+          id: games.id, slug: games.slug, title: games.title, system: games.system,
+          description: games.description, type: games.type, format: games.format, status: games.status,
+        maxPlayers: games.maxPlayers, availablePlaces: availablePlacesExpression, nextSessionStartsAt: nextSessionStartsAtExpression, ownerName: users.username,
       }).from(games).innerJoin(users, eq(games.ownerId, users.id)).where(and(eligible, inArray(games.system, names)))
       return { slug, name: names[0] ?? slug, games: await Promise.all(rows.map(toPublicGame)) }
     },
@@ -176,7 +202,7 @@ export function createPostgresGamesRepository(database: Database): GamesReposito
         const tagRows = await database.select({ id: tags.id }).from(tags).where(and(eq(tags.isActive, true), inArray(tags.slug, input.tags)))
         if (tagRows.length > 0) await database.insert(gameTags).values(tagRows.map((tag) => ({ gameId: id, tagId: tag.id })))
       }
-      return { ...game, type: game.type as GameRecord['type'], status: game.status as GameRecord['status'], visibility: game.visibility as GameRecord['visibility'], tags: await readTagSlugs(id) }
+      return { ...game, type: game.type as GameRecord['type'], format: (game.format ?? 'ONLINE') as NonNullable<GameRecord['format']>, status: game.status as GameRecord['status'], visibility: game.visibility as GameRecord['visibility'], tags: await readTagSlugs(id) }
     },
     async archive(id, ownerId) {
       const result = await database.update(games).set({ status: 'CLOSED', updatedAt: new Date() }).where(and(eq(games.id, id), eq(games.ownerId, ownerId))).returning({ id: games.id })
@@ -201,7 +227,7 @@ export function createPostgresGamesRepository(database: Database): GamesReposito
         conditions.push(inArray(games.id, matching.map((row) => row.gameId)))
       }
       const rows = await database.select().from(games).where(and(...conditions)).orderBy(desc(games.createdAt)).limit(query.pageSize).offset((query.page - 1) * query.pageSize)
-      const items = await Promise.all(rows.map(async (game) => ({ ...game, type: game.type as GameRecord['type'], status: game.status as GameRecord['status'], visibility: game.visibility as GameRecord['visibility'], tags: await readTagSlugs(game.id) })))
+      const items = await Promise.all(rows.map(async (game) => ({ ...game, type: game.type as GameRecord['type'], format: (game.format ?? 'ONLINE') as NonNullable<GameRecord['format']>, status: game.status as GameRecord['status'], visibility: game.visibility as GameRecord['visibility'], tags: await readTagSlugs(game.id) })))
       return { page: query.page, pageSize: query.pageSize, items }
     },
     async listActiveTags() {

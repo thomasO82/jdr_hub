@@ -1,19 +1,13 @@
 import type { Metadata } from 'next'
 import { GamesListView } from '../../features/games/games-list-view'
+import { buildCatalogueQuery } from '../../features/games/catalogue-filter-query'
 import { isIndexableGamesQuery } from '../../lib/public-seo'
 
 type SearchParams = Record<string, string | string[] | undefined>
 
 export async function generateMetadata({ searchParams }: { searchParams: Promise<SearchParams> }): Promise<Metadata> {
   const params = await searchParams
-  const tagSlugs = params.tagSlugs
-  const query = {
-    ...(typeof params.q === 'string' ? { q: params.q } : {}),
-    ...(typeof params.gmId === 'string' ? { gmId: params.gmId } : {}),
-    ...(typeof params.gmName === 'string' ? { gmName: params.gmName } : {}),
-    tagSlugs: Array.isArray(tagSlugs) ? tagSlugs : tagSlugs ? [tagSlugs] : [],
-    ...(typeof params.page === 'string' ? { page: Number(params.page) } : {}),
-  }
+  const query = buildCatalogueQuery(params)
   const indexable = isIndexableGamesQuery(query)
   return {
     title: 'Parties | JDR Hub',

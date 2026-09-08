@@ -13,10 +13,11 @@ function apiUrl(baseUrl: string, path: string): string {
 
 function queryString(query: Partial<PublicGamesQuery>): string {
   const params = new URLSearchParams()
-  for (const key of ['q', 'gmId', 'gmName'] as const) {
+  for (const key of ['q', 'gmId', 'gmName', 'type', 'format', 'system', 'dateFrom', 'dateTo'] as const) {
     const value = query[key]
     if (typeof value === 'string' && value.length > 0) params.set(key, value)
   }
+  if (query.minAvailablePlaces !== undefined) params.set('minAvailablePlaces', String(query.minAvailablePlaces))
   for (const tag of query.tagSlugs ?? []) params.append('tagSlugs', tag)
   if (query.page !== undefined) params.set('page', String(query.page))
   if (query.pageSize !== undefined) params.set('pageSize', String(query.pageSize))

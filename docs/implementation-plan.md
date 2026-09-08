@@ -32,6 +32,7 @@ Les tests fusionnés deviennent immuables. Ils ne peuvent être modifiés, affai
 | F01 | Discord OAuth2 et sessions | `feat/discord-auth` | F00 |
 | F02 | Parties, tags et cycle de vie | `feat/games-and-tags` | F00, F01 |
 | F03 | Catalogue public, détail et SEO | `feat/public-games-and-seo` | F01, F02 |
+| F17 | Filtres avancés du catalogue public | `feat/advanced-catalog-filters` | F03, F04, F06 |
 | F04 | Candidatures, membres et invitations | `feat/applications-and-invitations` | F02, F01 |
 | F05 | Disponibilités et recherche de joueurs | `feat/availability-and-player-search` | F01, F02 |
 | F06 | Séances, créneaux, votes et planning | `feat/scheduling-and-planning` | F02, F04, F05 |
@@ -259,6 +260,31 @@ D01, D02, D05, M06, M02, plus les pages non maquettées MJ/tag/jeu à concevoir 
 
 - PR : lecture publique, routes SSR, métadonnées, sitemap/robots et projection publique.
 - Migration : slugs uniques pour parties, MJ, tags et systèmes si absents ; index de recherche. Aucune migration destructive.
+
+## F17 — Filtres avancés du catalogue public
+
+### Objectif
+
+Relier tous les filtres du catalogue public à l’URL, au contrat partagé, à l’API et aux requêtes PostgreSQL : nom, MJ, tags `AND`, type, format, système, période de séance et places disponibles. Le filtre de niveau est explicitement hors périmètre.
+
+### Règles métier
+
+- Le format est un champ dédié `ONLINE` ou `TABLE` avec défaut `ONLINE` pour les données existantes.
+- La période porte sur les séances futures au statut `SCHEDULED`.
+- Les places disponibles sont la capacité moins les membres `ACTIVE`.
+- Les parties publiques restent limitées à `PUBLIC` et `OPEN`/`ACTIVE`.
+- Les filtres sont validés par Zod, combinés en `AND`, conservés dans l’URL et appliqués avant pagination.
+
+### Tests nécessaires
+
+- Contrats partagés : bornes, dates, énumérations et propriétés inconnues.
+- Client/composants : sérialisation, restauration des contrôles et format de création.
+- API : filtres unitaires, combinaisons, projection publique et visibilité.
+- Intégration PostgreSQL : migration, séances, membres actifs, places et pagination.
+
+### Contrôles de sécurité
+
+Requêtes Drizzle paramétrées, bornes de pagination/capacité, projection publique minimale, absence de membres et propriétaires techniques, et suites PostgreSQL exécutées séquentiellement.
 
 ## F04 — Candidatures, membres et invitations
 

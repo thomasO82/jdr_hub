@@ -4,8 +4,13 @@ import type { GameRecord, GamesRepository, PublicGamesRepository } from '../../s
 import { slugifyPublicLabel } from '../../src/modules/games/policy.js'
 
 type InMemoryRepository = GamesRepository & PublicGamesRepository
+type SeedGame = GameRecord & { activePlayers?: number; scheduledSessionStartsAt?: string[] }
 
-function publicGame(game: GameRecord): PublicGame {
+function publicGame(game: SeedGame): PublicGame {
+  const now = Date.now()
+  const nextSessionStartsAt = (game.scheduledSessionStartsAt ?? [])
+    .filter((startsAt) => new Date(startsAt).getTime() >= now)
+    .sort()[0] ?? null
   return {
     id: game.id,
     slug: game.slug,
@@ -13,14 +18,17 @@ function publicGame(game: GameRecord): PublicGame {
     system: game.system,
     description: game.description,
     type: game.type,
+    format: game.format ?? 'ONLINE',
     status: game.status as PublicGame['status'],
     maxPlayers: game.maxPlayers,
+    availablePlaces: Math.max(0, game.maxPlayers - (game.activePlayers ?? 0)),
+    nextSessionStartsAt,
     tags: game.tags.map((slug) => ({ name: slug, slug })),
     gameMaster: { name: game.ownerId, slug: slugifyPublicLabel(game.ownerId) },
   }
 }
 
-export function createInMemoryGamesRepository(seed: GameRecord[] = []): InMemoryRepository {
+export function createInMemoryGamesRepository(seed: SeedGame[] = []): InMemoryRepository {
   const games = new Map(seed.map((game) => [game.id, game]))
   return {
     async create(input) {
@@ -40,6 +48,19 @@ export function createInMemoryGamesRepository(seed: GameRecord[] = []): InMemory
         .filter((game) => !query.gmId || game.ownerId === query.gmId)
         .filter((game) => !query.gmName || game.ownerId.toLowerCase().includes(query.gmName.toLowerCase()))
         .filter((game) => query.tagSlugs.every((tag) => game.tags.includes(tag)))
+        .filter((game) => !query.type || game.type === query.type)
+        .filter((game) => !query.format || (game.format ?? 'ONLINE') === query.format)
+        .filter((game) => !query.system || game.system.toLowerCase() === query.system.toLowerCase())
+        .filter((game) => (query.minAvailablePlaces === undefined || Math.max(0, game.maxPlayers - (game.activePlayers ?? 0)) >= query.minAvailablePlaces))
+        .filter((game) => {
+          if (!query.dateFrom && !query.dateTo) return true
+          const from = query.dateFrom ? new Date(`${query.dateFrom}T00:00:00.000Z`).getTime() : Date.now()
+          const to = query.dateTo ? new Date(`${query.dateTo}T23:59:59.999Z`).getTime() : Number.POSITIVE_INFINITY
+          return (game.scheduledSessionStartsAt ?? []).some((startsAt) => {
+            const time = new Date(startsAt).getTime()
+            return time >= from && time <= to
+          })
+        })
         .map(publicGame)
       const start = (query.page - 1) * query.pageSize
       return { items: items.slice(start, start + query.pageSize), page: query.page, pageSize: query.pageSize }

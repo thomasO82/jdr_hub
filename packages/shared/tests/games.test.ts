@@ -16,6 +16,11 @@ describe('game contracts', () => {
     expect(createGameSchema.parse({ ...valid, tags: ['Horror', 'beginner'] }).tags).toEqual(['horror', 'beginner'])
   })
 
+  it('defaults the game format to online and accepts table games', () => {
+    expect(createGameSchema.parse(valid).format).toBe('ONLINE')
+    expect(createGameSchema.parse({ ...valid, format: 'TABLE' }).format).toBe('TABLE')
+  })
+
   it('rejects unknown properties and invalid player limits', () => {
     expect(() => createGameSchema.parse({ ...valid, ownerId: 'forbidden' })).toThrow()
     expect(() => createGameSchema.parse({ ...valid, maxPlayers: 0 })).toThrow()

@@ -5,20 +5,15 @@ import { createGamesApi } from './games-api'
 import type { PublicGamesPage } from '@jdr-hub/shared'
 import { FiltersToggle } from './filters-toggle'
 import { AppShell } from '../layout/app-shell'
+import { buildCatalogueQuery, type CatalogueSearchParams } from './catalogue-filter-query'
 
-type SearchParams = Record<string, string | string[] | undefined>
+function selectedValue(searchParams: CatalogueSearchParams, key: string): string {
+  const value = searchParams[key]
+  return typeof value === 'string' ? value : ''
+}
 
-function buildQuery(searchParams: SearchParams): string {
-  const query = new URLSearchParams()
-
-  for (const key of ['q', 'gmId', 'gmName', 'page', 'pageSize']) {
-    const value = searchParams[key]
-    if (typeof value === 'string' && value.length > 0) query.set(key, value)
-  }
-
-  const tags = searchParams.tagSlugs
-  for (const tag of Array.isArray(tags) ? tags : tags ? [tags] : []) query.append('tagSlugs', tag)
-  return query.toString()
+function sessionLabel(startsAt: string | null): string {
+  return startsAt ? `Séance le ${new Date(startsAt).toLocaleDateString('fr-FR')}` : 'Prochaine séance à définir'
 }
 
 function GameCard({ game }: { game: PublicGamesPage['items'][number] }) {
@@ -30,7 +25,7 @@ function GameCard({ game }: { game: PublicGamesPage['items'][number] }) {
     <article className="overflow-hidden rounded-2xl border border-surface-container-highest bg-surface shadow-sm transition-transform hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/10">
       <Link className="block text-on-surface no-underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-primary" href={`/parties/${game.slug}`}>
         <div className={`relative flex min-h-48 items-end justify-between overflow-hidden px-3.5 py-3.5 text-white ${cover}`}>
-          <span className="relative inline-flex items-center gap-1 rounded-md bg-black/40 px-2 py-1.5 font-label text-xs font-semibold"><UsersRound aria-hidden="true" size={14} />{game.maxPlayers} places</span>
+          <span className="relative inline-flex items-center gap-1 rounded-md bg-black/40 px-2 py-1.5 font-label text-xs font-semibold"><UsersRound aria-hidden="true" size={14} />{game.availablePlaces} places disponibles</span>
           <span className="relative rounded-md bg-primary px-2 py-1.5 font-label text-xs font-semibold uppercase">{game.system}</span>
         </div>
         <div className="grid gap-2.5 p-4">
@@ -38,8 +33,8 @@ function GameCard({ game }: { game: PublicGamesPage['items'][number] }) {
           <h2 className="m-0 truncate font-display text-xl font-semibold tracking-tight">{game.title}</h2>
           <p className="m-0 line-clamp-2 font-body text-sm leading-relaxed text-on-surface-variant">{game.description}</p>
           <div className="flex justify-between gap-2 border-t border-surface-container pt-3 font-label text-xs font-semibold text-on-surface-variant">
-            <span className="inline-flex items-center gap-1"><CalendarDays aria-hidden="true" size={14} />Prochaine séance à définir</span>
-            <span className="inline-flex items-center gap-1"><Globe2 aria-hidden="true" size={14} />En ligne</span>
+            <span className="inline-flex items-center gap-1"><CalendarDays aria-hidden="true" size={14} />{sessionLabel(game.nextSessionStartsAt)}</span>
+            <span className="inline-flex items-center gap-1"><Globe2 aria-hidden="true" size={14} />{game.format === 'TABLE' ? 'Sur table' : 'En ligne'}</span>
           </div>
           <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
             {game.tags.map((tag) => <li className="rounded-full bg-primary-fixed px-2 py-1 font-body text-xs font-semibold text-on-primary-fixed" key={tag.slug}>#{tag.name}</li>)}
@@ -50,20 +45,14 @@ function GameCard({ game }: { game: PublicGamesPage['items'][number] }) {
   )
 }
 
-export async function GamesListView({ searchParams = {} }: { searchParams?: SearchParams }) {
+export async function GamesListView({ searchParams = {} }: { searchParams?: CatalogueSearchParams }) {
   const api = createPublicGamesApi()
-  const query = new URLSearchParams(buildQuery(searchParams))
-  const queryInput = {
-    ...(query.get('q') ? { q: query.get('q')! } : {}),
-    ...(query.get('gmId') ? { gmId: query.get('gmId')! } : {}),
-    ...(query.get('gmName') ? { gmName: query.get('gmName')! } : {}),
-    tagSlugs: query.getAll('tagSlugs'),
-    ...(query.get('page') ? { page: Number(query.get('page')) } : {}),
-    ...(query.get('pageSize') ? { pageSize: Number(query.get('pageSize')) } : {}),
-  }
+  const queryInput = buildCatalogueQuery(searchParams)
   const [result, tags] = await Promise.all([api.list(queryInput), createGamesApi().tags()])
   const selectedTags = searchParams.tagSlugs
   const selectedTagValues = Array.isArray(selectedTags) ? selectedTags : selectedTags ? [selectedTags] : []
+  const selectedType = selectedValue(searchParams, 'type')
+  const selectedFormat = selectedValue(searchParams, 'format')
 
   return (
     <AppShell>
@@ -77,8 +66,11 @@ export async function GamesListView({ searchParams = {} }: { searchParams?: Sear
             {selectedTagValues.length > 0 && <div className="flex flex-wrap gap-1.5 py-3" aria-label="Filtres actifs">{selectedTagValues.map((slug) => <span className="rounded-full bg-primary-fixed px-2 py-1 font-body text-xs font-semibold text-on-primary-fixed" key={slug}>{slug} ×</span>)}</div>}
             <FiltersToggle>
               <fieldset className="grid gap-2.5 border-0 p-0"><legend className="mb-1 font-label text-xs font-bold uppercase tracking-wider text-on-surface-variant">Tags</legend>{(tags ?? []).map((tag) => <label className="flex items-center gap-2 font-body text-sm text-on-surface-variant" key={tag.slug}><input className="h-4 w-4 accent-primary" type="checkbox" name="tagSlugs" value={tag.slug} defaultChecked={selectedTagValues.includes(tag.slug)} /><span>{tag.name}</span></label>)}</fieldset>
-              <fieldset className="grid gap-2.5 border-0 p-0"><legend className="mb-1 font-label text-xs font-bold uppercase tracking-wider text-on-surface-variant">Type</legend><label className="flex items-center gap-2 font-body text-sm text-on-surface-variant"><input className="h-4 w-4 accent-primary" type="radio" name="visualType" value="ONE_SHOT" defaultChecked /><span>One-shot</span></label><label className="flex items-center gap-2 font-body text-sm text-on-surface-variant"><input className="h-4 w-4 accent-primary" type="radio" name="visualType" value="CAMPAIGN" /><span>Campagne</span></label></fieldset>
-              <fieldset className="grid gap-2.5 border-0 p-0"><legend className="mb-1 font-label text-xs font-bold uppercase tracking-wider text-on-surface-variant">Format</legend><div className="grid grid-cols-2 gap-2"><label className="grid min-h-8 cursor-pointer place-items-center rounded-lg border border-primary-fixed-dim font-body text-xs text-on-surface-variant"><input className="peer sr-only" type="radio" name="visualFormat" value="ONLINE" defaultChecked /><span className="rounded-lg px-2 py-1 peer-checked:bg-primary-fixed peer-checked:font-semibold peer-checked:text-primary">En ligne</span></label><label className="grid min-h-8 cursor-pointer place-items-center rounded-lg border border-surface-container-highest font-body text-xs text-on-surface-variant"><input className="peer sr-only" type="radio" name="visualFormat" value="TABLE" /><span className="rounded-lg px-2 py-1 peer-checked:bg-primary-fixed peer-checked:font-semibold peer-checked:text-primary">Sur table</span></label></div></fieldset>
+              <fieldset className="grid gap-2.5 border-0 p-0"><legend className="mb-1 font-label text-xs font-bold uppercase tracking-wider text-on-surface-variant">Type</legend><label className="flex items-center gap-2 font-body text-sm text-on-surface-variant"><input className="h-4 w-4 accent-primary" type="radio" name="type" value="" defaultChecked={!selectedType} /><span>Tous les types</span></label><label className="flex items-center gap-2 font-body text-sm text-on-surface-variant"><input className="h-4 w-4 accent-primary" type="radio" name="type" value="ONE_SHOT" defaultChecked={selectedType === 'ONE_SHOT'} /><span>One-shot</span></label><label className="flex items-center gap-2 font-body text-sm text-on-surface-variant"><input className="h-4 w-4 accent-primary" type="radio" name="type" value="CAMPAIGN" defaultChecked={selectedType === 'CAMPAIGN'} /><span>Campagne</span></label></fieldset>
+              <fieldset className="grid gap-2.5 border-0 p-0"><legend className="mb-1 font-label text-xs font-bold uppercase tracking-wider text-on-surface-variant">Format</legend><div className="grid grid-cols-3 gap-2"><label className="grid min-h-8 cursor-pointer place-items-center rounded-lg border border-surface-container-highest font-body text-xs text-on-surface-variant"><input className="peer sr-only" type="radio" name="format" value="" defaultChecked={!selectedFormat} /><span className="rounded-lg px-2 py-1 peer-checked:bg-primary-fixed peer-checked:font-semibold peer-checked:text-primary">Tous</span></label><label className="grid min-h-8 cursor-pointer place-items-center rounded-lg border border-primary-fixed-dim font-body text-xs text-on-surface-variant"><input className="peer sr-only" type="radio" name="format" value="ONLINE" defaultChecked={selectedFormat === 'ONLINE'} /><span className="rounded-lg px-2 py-1 peer-checked:bg-primary-fixed peer-checked:font-semibold peer-checked:text-primary">En ligne</span></label><label className="grid min-h-8 cursor-pointer place-items-center rounded-lg border border-surface-container-highest font-body text-xs text-on-surface-variant"><input className="peer sr-only" type="radio" name="format" value="TABLE" defaultChecked={selectedFormat === 'TABLE'} /><span className="rounded-lg px-2 py-1 peer-checked:bg-primary-fixed peer-checked:font-semibold peer-checked:text-primary">Sur table</span></label></div></fieldset>
+              <label className="grid gap-1.5 font-body text-sm text-on-surface-variant">Système / jeu<input className="min-h-10 rounded-lg border border-outline-variant bg-surface px-3 font-body text-sm text-on-surface outline-none focus:border-primary focus:outline-2 focus:outline-primary/30" name="system" placeholder="D&D 5e" defaultValue={selectedValue(searchParams, 'system')} /></label>
+              <div className="grid gap-2"><span className="font-label text-xs font-bold uppercase tracking-wider text-on-surface-variant">Date d’une séance</span><div className="grid grid-cols-2 gap-2"><label className="grid gap-1 font-body text-xs text-on-surface-variant">Du<input className="min-h-10 rounded-lg border border-outline-variant bg-surface px-2 font-body text-sm text-on-surface outline-none focus:border-primary focus:outline-2 focus:outline-primary/30" name="dateFrom" type="date" defaultValue={selectedValue(searchParams, 'dateFrom')} /></label><label className="grid gap-1 font-body text-xs text-on-surface-variant">Au<input className="min-h-10 rounded-lg border border-outline-variant bg-surface px-2 font-body text-sm text-on-surface outline-none focus:border-primary focus:outline-2 focus:outline-primary/30" name="dateTo" type="date" defaultValue={selectedValue(searchParams, 'dateTo')} /></label></div></div>
+              <label className="grid gap-1.5 font-body text-sm text-on-surface-variant">Places disponibles minimum<input className="min-h-10 rounded-lg border border-outline-variant bg-surface px-3 font-body text-sm text-on-surface outline-none focus:border-primary focus:outline-2 focus:outline-primary/30" name="minAvailablePlaces" type="number" min="0" max="12" defaultValue={selectedValue(searchParams, 'minAvailablePlaces')} /></label>
               <button className="min-h-10 rounded-lg border-0 bg-primary font-body text-sm font-semibold text-on-primary transition-colors hover:bg-primary-container focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary" type="submit">Appliquer les filtres</button>
               <p className="m-0 font-body text-xs leading-relaxed text-on-surface-variant">Tous les tags doivent correspondre à la partie.</p>
             </FiltersToggle>

@@ -17,10 +17,12 @@ function createApp() {
     authConfig: config,
     authRepository: createInMemoryAuthRepository(),
     repository: createInMemoryGamesRepository([
-      { id: 'game-1', ownerId: 'owner', slug: 'crypte', title: 'La Crypte', system: 'D&D', description: '<script>alert(1)</script>', type: 'ONE_SHOT', status: 'OPEN', visibility: 'PUBLIC', maxPlayers: 4, tags: ['horror', 'online'] },
+      { id: 'game-1', ownerId: 'owner', slug: 'crypte', title: 'La Crypte', system: 'D&D', description: '<script>alert(1)</script>', type: 'ONE_SHOT', format: 'ONLINE', status: 'OPEN', visibility: 'PUBLIC', maxPlayers: 4, tags: ['horror', 'online'] },
       { id: 'game-2', ownerId: 'owner', slug: 'privee', title: 'Privée', system: 'D&D', description: 'Privée', type: 'CAMPAIGN', status: 'OPEN', visibility: 'PRIVATE', maxPlayers: 4, tags: [] },
       { id: 'game-3', ownerId: 'owner', slug: 'fermee', title: 'Fermée', system: 'D&D', description: 'Fermée', type: 'CAMPAIGN', status: 'CLOSED', visibility: 'PUBLIC', maxPlayers: 4, tags: [] },
       { id: 'game-4', ownerId: 'owner', slug: 'horreur-seule', title: 'Horreur seule', system: 'D&D', description: 'Horreur', type: 'ONE_SHOT', status: 'OPEN', visibility: 'PUBLIC', maxPlayers: 4, tags: ['horror'] },
+      { id: 'game-5', ownerId: 'owner', slug: 'campagne-publique', title: 'Campagne publique', system: 'D&D', description: 'Campagne', type: 'CAMPAIGN', format: 'TABLE', status: 'OPEN', visibility: 'PUBLIC', maxPlayers: 4, tags: [] },
+      { id: 'game-6', ownerId: 'owner', slug: 'session-octobre', title: 'Session octobre', system: 'D&D', description: 'Session', type: 'CAMPAIGN', format: 'TABLE', status: 'OPEN', visibility: 'PUBLIC', maxPlayers: 5, activePlayers: 1, scheduledSessionStartsAt: ['2026-10-15T18:00:00.000Z'], tags: [] },
     ]),
   })
   return app
@@ -45,7 +47,7 @@ describe('public games API routes', () => {
     const response = await createApp().request('/public/slugs')
     expect(response.status).toBe(200)
     expect((await response.json()).data).toEqual({
-      games: ['crypte', 'horreur-seule'],
+      games: ['crypte', 'horreur-seule', 'campagne-publique', 'session-octobre'],
       gms: ['owner'],
       tags: ['horror', 'online'],
       systems: ['d-d'],
@@ -55,5 +57,23 @@ describe('public games API routes', () => {
   it('combines repeated tag filters with AND semantics', async () => {
     const response = await createApp().request('/public/games?tagSlugs=horror&tagSlugs=online')
     expect((await response.json()).data.items.map((game: { slug: string }) => game.slug)).toEqual(['crypte'])
+  })
+
+  it('filters public games by type', async () => {
+    const response = await createApp().request('/public/games?type=CAMPAIGN')
+    expect(response.status).toBe(200)
+    expect((await response.json()).data.items.map((game: { slug: string }) => game.slug)).toEqual(['campagne-publique', 'session-octobre'])
+  })
+
+  it('combines type, format and system filters', async () => {
+    const response = await createApp().request('/public/games?type=CAMPAIGN&format=TABLE&system=d%26d')
+    expect(response.status).toBe(200)
+    expect((await response.json()).data.items.map((game: { slug: string }) => game.slug)).toEqual(['campagne-publique', 'session-octobre'])
+  })
+
+  it('filters by a scheduled date range and available places', async () => {
+    const response = await createApp().request('/public/games?dateFrom=2026-10-01&dateTo=2026-10-31&minAvailablePlaces=3')
+    expect(response.status).toBe(200)
+    expect((await response.json()).data.items.map((game: { slug: string }) => game.slug)).toEqual(['session-octobre'])
   })
 })

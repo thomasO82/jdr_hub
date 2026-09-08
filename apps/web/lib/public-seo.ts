@@ -12,7 +12,7 @@ export function slugifyPublicLabel(label: string): string {
 }
 
 export function isIndexableGamesQuery(query: Partial<PublicGamesQuery>): boolean {
-  return !query.q && !query.gmId && !query.gmName && (!query.tagSlugs || query.tagSlugs.length === 0) && (!query.page || query.page === 1)
+  return !query.q && !query.gmId && !query.gmName && !query.type && !query.format && !query.system && !query.dateFrom && !query.dateTo && query.minAvailablePlaces === undefined && (!query.tagSlugs || query.tagSlugs.length === 0) && (!query.page || query.page === 1)
 }
 
 export function canonicalForPublicPath(pathname: string): string {

@@ -9,6 +9,8 @@ export default defineConfig({
       'apps/api/tests/integration/postgres-attendance-notifications.test.ts',
       'apps/api/tests/integration/postgres-dashboard-gm-management.test.ts',
       'apps/api/tests/integration/postgres-dashboard.test.ts',
+      'apps/api/tests/integration/postgres-public-games-filters.test.ts',
+      'apps/api/tests/integration/postgres-xp.test.ts',
     ],
   },
 })
