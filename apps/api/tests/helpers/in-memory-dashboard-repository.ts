@@ -5,6 +5,7 @@ import type {
   DashboardGame,
   DashboardGameSummary,
   DashboardInvitationSummary,
+  DashboardProgression,
   DashboardSession,
   DashboardSessionSummary,
   DashboardUser,
@@ -35,6 +36,7 @@ export function createInMemoryDashboardRepository(input: { populated?: boolean; 
       return { id: session.id, gameId: session.gameId, gameTitle: session.gameTitle, startsAt: session.startsAt, endsAt: session.endsAt, status: session.status, role: 'GM', canReportAbsence: false }
     },
     async getUser(requestedUserId) { return { ...user, id: requestedUserId, username: requestedUserId === primaryUserId ? 'MJ' : 'Joueur' } },
+    async getProgression(): Promise<DashboardProgression> { return input.populated ? { totalXp: 300, level: 2, nextLevelXp: 600 } : { totalXp: 0, level: 1, nextLevelXp: 250 } },
     async getNextSession() {
       if (shouldFail('nextSession')) throw new Error('database next session')
       if (input.nextSession !== undefined) return input.nextSession ? { ...session, ...input.nextSession, notes: null } : null

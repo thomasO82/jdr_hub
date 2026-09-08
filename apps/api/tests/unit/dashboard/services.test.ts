@@ -15,7 +15,7 @@ describe('dashboard projections', () => {
     expect(dashboard.activeGames.data?.[0]).toMatchObject({ id: gameId, role: 'GM', activePlayers: 2 })
     expect(dashboard.applications.data).toEqual({ pending: 1, accepted: 2, rejected: 0 })
     expect(dashboard.invitations.data).toEqual({ receivedPending: 1, sentPending: 2 })
-    expect(dashboard.progression.status).toBe('EMPTY')
+    expect(dashboard.progression).toEqual({ status: 'READY', data: { totalXp: 300, level: 2, nextLevelXp: 600 }, error: null })
   })
 
   it('represents an empty dashboard without fake private or progression data', async () => {
@@ -26,6 +26,7 @@ describe('dashboard projections', () => {
     expect(dashboard.invitations).toMatchObject({ status: 'EMPTY', data: null, error: null })
     expect(dashboard.schedulingActions).toMatchObject({ status: 'EMPTY', data: null, error: null })
     expect(dashboard.attendanceActions).toMatchObject({ status: 'EMPTY', data: null, error: null })
+    expect(dashboard.progression).toEqual({ status: 'READY', data: { totalXp: 0, level: 1, nextLevelXp: 250 }, error: null })
     expect(JSON.stringify(dashboard)).not.toContain('discord')
   })
 

@@ -8,6 +8,7 @@ import type {
   DashboardApplicationSummary,
   DashboardGame,
   DashboardInvitationSummary,
+  DashboardProgression,
   DashboardSession,
   DashboardSessionSummary,
   DashboardUser,
@@ -20,9 +21,11 @@ import type {
   SchedulingAction,
   SessionStatus,
 } from '@jdr-hub/shared'
+import { createXpSummary } from '@jdr-hub/shared'
 
 export interface DashboardRepository {
   getUser(userId: string): Promise<DashboardUser | null>
+  getProgression(userId: string): Promise<DashboardProgression>
   findNextSession(input: { userId: string; now: Date }): Promise<DashboardSessionSummary | null>
   getNextSession(userId: string, now: Date): Promise<DashboardSession | null>
   listActiveGames(userId: string): Promise<DashboardGame[]>
@@ -134,6 +137,12 @@ export function createPostgresDashboardRepository(database: Database): Dashboard
     async getUser(userId) {
       const [user] = await database.select({ id: users.id, username: users.username, avatarUrl: users.avatarUrl }).from(users).where(eq(users.id, userId)).limit(1)
       return user ?? null
+    },
+    async getProgression(userId): Promise<DashboardProgression> {
+      const [user] = await database.select({ xp: users.xp }).from(users).where(eq(users.id, userId)).limit(1)
+      if (!user) throw new Error('DASHBOARD_NOT_FOUND')
+      const summary = createXpSummary(user.xp)
+      return { totalXp: summary.totalXp, level: summary.level, nextLevelXp: summary.nextLevelXp }
     },
     async getNextSession(userId, now) {
       const [row] = await database.select({ id: gameSessions.id, gameId: gameSessions.gameId, gameTitle: games.title, startsAt: gameSessions.startsAt, endsAt: gameSessions.endsAt, status: gameSessions.status, notes: gameSessions.notes })
