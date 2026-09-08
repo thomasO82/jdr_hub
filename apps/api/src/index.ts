@@ -9,6 +9,7 @@ import { createPostgresApplicationRepository } from './modules/applications/repo
 import { createPostgresAvailabilityRepository } from './modules/availability/repository.js'
 import { createPostgresSchedulingRepository } from './modules/scheduling/repository.js'
 import { createPostgresAttendanceRepository } from './modules/attendance/repository.js'
+import { createPostgresGamificationRepository } from './modules/gamification/repository.js'
 import { createPostgresNotificationRepository } from './modules/notifications/repository.js'
 import { createPostgresInvitationRepository } from './modules/invitations/repository.js'
 import { createPostgresMemberRepository } from './modules/members/repository.js'
@@ -23,7 +24,8 @@ async function startApi(): Promise<void> {
   const authConfig = parseAuthConfig(process.env)
   const notificationConfig = parseNotificationConfig(process.env)
   const authRepository = createPostgresAuthRepository(database.db)
-  const attendanceRepository = createPostgresAttendanceRepository(database.db)
+  const gamificationRepository = createPostgresGamificationRepository(database.db)
+  const attendanceRepository = createPostgresAttendanceRepository(database.db, { awardSessionXp: gamificationRepository.awardSessionXp })
   const notificationRepository = createPostgresNotificationRepository(database.db)
   const invitationRepository = createPostgresInvitationRepository(database.db)
   const memberRepository = createPostgresMemberRepository(database.db)
