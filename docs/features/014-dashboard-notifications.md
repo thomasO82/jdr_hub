@@ -6,7 +6,7 @@ F08
 
 ## Statut
 
-IN_PROGRESS
+MERGED
 
 ## Branche
 
@@ -14,12 +14,12 @@ IN_PROGRESS
 
 ## Lien ou numéro de Pull Request
 
-Création automatique bloquée par GitHub (`403 Resource not accessible by integration`) ; [ouverture manuelle](https://github.com/thomasO82/jdr_hub/pull/new/feat/dashboard-notifications)
+[PR #19](https://github.com/thomasO82/jdr_hub/pull/19), fusion confirmée par le propriétaire dans `develop`
 
 ## Dates de début et de fin
 
 - Début : 2026-09-08
-- Fin : Non terminée
+- Fin : 2026-09-08
 
 ## Dépendances
 
