@@ -18,6 +18,8 @@ un contrôle d'autorisation.
 | Accepter/refuser une invitation reçue | Non | Oui, uniquement les siennes | Oui, uniquement les siennes | Oui, uniquement les siennes | Non pour une invitation reçue par autrui | Selon politique support |
 | Lire la gestion d'une partie | Non | Non | Non | Non | Oui, uniquement ses parties | Selon politique support |
 | Retirer un joueur du roster | Non | Non | Non | Non | Oui, uniquement ses parties ; jamais le MJ | Selon politique support |
+| Lire son historique XP et sa progression | Non | Oui, uniquement les siennes | Oui, uniquement les siennes | Oui, uniquement les siennes | Oui, uniquement les siennes | Selon politique support |
+| Attribuer l'XP d'une séance validée | Non | Non | Non | Non | Oui, uniquement ses parties et après validation | Selon politique support |
 
 Règles F04 : toutes les mutations exigent une session active et l'origine
 exacte configurée ; `userId`, `ownerId`, `role` et `status` protégés sont
@@ -33,3 +35,10 @@ leur acceptation réserve la place dans une transaction. Les mutations exigent
 également l'origine applicative exacte, un payload Zod strict et le rate
 limiting prévu ; les projections excluent les identifiants Discord et les
 informations de disponibilité privées.
+
+Règles F09 : `GET /profile/xp` dérive exclusivement l'utilisateur de la session
+active et ignore tout identifiant fourni par le client. Les événements XP sont
+créés côté serveur uniquement pour les présences `PRESENT`, avec une clé
+d'idempotence unique et une transaction partagée avec la validation de séance.
+Le montant, le niveau et le motif ne sont jamais des champs d'autorité du
+navigateur ; la réponse n'expose ni clé d'idempotence ni identifiant Discord.
