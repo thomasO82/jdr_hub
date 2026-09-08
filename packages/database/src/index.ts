@@ -11,6 +11,9 @@ import * as schedulingSchema from './schema/scheduling.js'
 import * as gamificationSchema from './schema/gamification.js'
 
 export { authSchema, availabilitySchema, attendanceSchema, gameSchema, invitationsSchema, schedulingSchema, gamificationSchema }
+
+export type DatabaseHandle = ReturnType<typeof createDatabase>['db']
+export type DatabaseTransaction = Parameters<DatabaseHandle['transaction']>[0] extends (transaction: infer Transaction) => Promise<unknown> ? Transaction : never
 /** Parse and validate the server-only PostgreSQL connection URL. */
 export function parseDatabaseUrl(rawUrl: string | undefined): URL {
   if (!rawUrl) {
