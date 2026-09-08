@@ -45,6 +45,7 @@ async function startApi(): Promise<void> {
       invitations: { authConfig, authRepository, repository: invitationRepository },
       members: { authConfig, authRepository, repository: memberRepository },
       dashboard: { authConfig, authRepository, repository: dashboardRepository, notificationsRepository: notificationRepository },
+      gamification: { authConfig, authRepository, repository: gamificationRepository },
     }).fetch,
     port,
   })

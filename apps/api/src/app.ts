@@ -20,6 +20,8 @@ import { registerMemberRoutes } from './modules/members/routes.js'
 import type { MembersDependencies } from './modules/members/handlers.js'
 import { registerDashboardRoutes } from './modules/dashboard/routes.js'
 import type { DashboardDependencies } from './modules/dashboard/handlers.js'
+import { registerGamificationRoutes } from './modules/gamification/routes.js'
+import type { GamificationDependencies } from './modules/gamification/handlers.js'
 
 type ApiVariables = {
   requestId: string
@@ -38,7 +40,7 @@ const SECURITY_HEADERS = {
   'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
 } as const
 
-export function createApiApp(options?: { auth: { config: AuthConfig; repository: AuthRepository }; games?: GamesDependencies; applications?: ApplicationsDependencies; availability?: AvailabilityDependencies; scheduling?: SchedulingDependencies; attendance?: AttendanceDependencies; notifications?: NotificationsDependencies; invitations?: InvitationsDependencies; members?: MembersDependencies; dashboard?: DashboardDependencies }): ApiApp {
+export function createApiApp(options?: { auth: { config: AuthConfig; repository: AuthRepository }; games?: GamesDependencies; applications?: ApplicationsDependencies; availability?: AvailabilityDependencies; scheduling?: SchedulingDependencies; attendance?: AttendanceDependencies; notifications?: NotificationsDependencies; invitations?: InvitationsDependencies; members?: MembersDependencies; dashboard?: DashboardDependencies; gamification?: GamificationDependencies }): ApiApp {
   const app = new Hono<{ Variables: ApiVariables }>()
 
   app.use('*', async (c, next) => {
@@ -118,6 +120,9 @@ export function createApiApp(options?: { auth: { config: AuthConfig; repository:
   }
   if (options?.dashboard) {
     registerDashboardRoutes(app, options.dashboard)
+  }
+  if (options?.gamification) {
+    registerGamificationRoutes(app, options.gamification)
   }
 
   app.notFound((c) =>
