@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { listNotifications } from '../../../src/modules/notifications/services/list-notifications.js'
+import { listUnreadNotifications } from '../../../src/modules/notifications/services/list-unread-notifications.js'
 import { markNotificationRead } from '../../../src/modules/notifications/services/mark-notification-read.js'
 import { createInMemoryNotificationsRepository } from '../../helpers/in-memory-notifications-repository.js'
 
@@ -35,5 +36,25 @@ describe('notification services', () => {
     await expect(markNotificationRead({ notificationId: 'notification-1', userId: 'gm-1', repository, now: () => now })).resolves.toBe(true)
     await expect(markNotificationRead({ notificationId: 'notification-1', userId: 'gm-1', repository, now: () => now })).resolves.toBe(true)
     expect(repository.notifications[0]?.readAt).toEqual(now)
+  })
+
+  it('returns only unread notifications and the total unread count', async () => {
+    const repository = createInMemoryNotificationsRepository({ notifications: [
+      { ...notification, id: 'notification-1' },
+      { ...notification, id: 'notification-2', createdAt: new Date('2026-09-06T13:00:00.000Z') },
+      { ...notification, id: 'notification-3', readAt: new Date('2026-09-06T14:00:00.000Z') },
+    ] })
+
+    const result = await listUnreadNotifications({ userId: 'gm-1', limit: 3, repository })
+
+    expect(result.unreadCount).toBe(2)
+    expect(result.items).toHaveLength(2)
+    expect(result.items.every((item) => item.readAt === null)).toBe(true)
+  })
+
+  it('does not expose unread notifications belonging to another user', async () => {
+    const repository = createInMemoryNotificationsRepository({ notifications: [{ ...notification, recipientId: 'other-user' }] })
+
+    await expect(listUnreadNotifications({ userId: 'gm-1', limit: 3, repository })).resolves.toEqual({ unreadCount: 0, items: [] })
   })
 })
