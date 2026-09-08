@@ -14,7 +14,7 @@ describe('dashboard page composition', () => {
   })
 
   it('points the shared shell dashboard navigation to the private route', () => {
-    const shell = readFileSync(resolve(web, 'features/layout/app-shell.tsx'), 'utf8')
+    const shell = readFileSync(resolve(web, 'features/layout/navigation.ts'), 'utf8')
     expect(shell).toContain("href: '/dashboard'")
   })
 })

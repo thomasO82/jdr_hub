@@ -9,16 +9,20 @@ describe('dashboard visual structure', () => {
   it('matches the authenticated shell hierarchy and responsive dashboard states', () => {
     const view = read('../features/dashboard/dashboard-view.tsx')
     const block = read('../features/dashboard/dashboard-block.tsx')
+    const states = read('../features/ui/async-state.tsx')
     expect(view).toContain('<AppShell')
     expect(view).toContain('Prochaine séance')
     expect(view).toContain('Parties actives')
     expect(view).toContain('lg:grid-cols')
     expect(view).toContain('md:grid-cols')
     expect(view).toContain('font-display')
-    expect(block).toContain('Réessayer')
-    expect(block).toContain('role="alert"')
-    expect(block).toContain('role="status"')
-    expect(`${view}\n${block}`).toContain('focus-visible:')
+    expect(view).toContain('min-h-12')
+    expect(`${view}\n${block}\n${states}`).toContain('motion-reduce:transition-none')
+    expect(view).toContain('aria-labelledby')
+    expect(states).toContain('Réessayer')
+    expect(states).toContain('role="alert"')
+    expect(states).toContain('role="status"')
+    expect(`${view}\n${block}\n${states}`).toContain('focus-visible:')
     expect(`${view}\n${block}`).not.toContain('style={{')
   })
 
@@ -32,7 +36,10 @@ describe('dashboard visual structure', () => {
   })
 
   it('keeps the shell bell as the global history entry point above the content', () => {
-    const source = readFileSync(resolve(web, 'features/layout/app-shell.tsx'), 'utf8')
+    const shell = readFileSync(resolve(web, 'features/layout/app-shell.tsx'), 'utf8')
+    const header = readFileSync(resolve(web, 'features/layout/app-header.tsx'), 'utf8')
+    const mobileHeader = readFileSync(resolve(web, 'features/layout/mobile-header.tsx'), 'utf8')
+    const source = `${shell}\n${header}\n${mobileHeader}`
     expect(source.match(/<NotificationBell/g)?.length).toBeGreaterThanOrEqual(2)
     expect(source).toContain('lg:ml-64')
     expect(source).toContain('hidden h-16')

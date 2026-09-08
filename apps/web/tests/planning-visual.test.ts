@@ -10,4 +10,18 @@ describe('planning visual shell', () => {
     expect(source).toContain('Prochaines Séances')
     expect(source).toContain('aria-label')
   })
+
+  it('exposes keyboard-friendly planning controls and reduced-motion states', () => {
+    const view = readFileSync(resolve(import.meta.dirname, '../features/planning/planning-view.tsx'), 'utf8')
+    const card = readFileSync(resolve(import.meta.dirname, '../features/planning/session-card.tsx'), 'utf8')
+    const page = readFileSync(resolve(import.meta.dirname, '../app/planning/page.tsx'), 'utf8')
+
+    expect(`${view}\n${page}`).toContain('active="Planning"')
+    expect(`${view}\n${card}`).toContain('min-h-12')
+    expect(`${view}\n${card}`).toContain('motion-reduce:transition-none')
+    expect(view).toContain('aria-selected')
+    expect(view).toContain('aria-describedby')
+    expect(page).toContain('role="alert"')
+    expect(page).toContain('role="status"')
+  })
 })

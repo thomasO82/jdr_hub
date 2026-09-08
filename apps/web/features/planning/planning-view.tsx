@@ -18,5 +18,56 @@ export function PlanningView({ initial }: { initial: PlanningPage }) {
   const sessions = useMemo(() => initial.items, [initial.items])
   const upcoming = sessions.filter((session) => session.status === 'SCHEDULED').slice().sort((left, right) => left.startsAt.localeCompare(right.startsAt)).slice(0, 3)
   const openAbsence = (session: PlanningPage['items'][number]) => setAbsenceSession(session)
-  return <AppShell active="Schedule"><main className="min-h-screen bg-background px-5 pb-28 pt-24 font-body text-on-surface md:px-8 md:pb-12 md:pt-10 lg:px-10"><section className="mx-auto max-w-7xl" aria-labelledby="planning-title"><div className="flex flex-wrap items-center justify-between gap-4"><div><p className="m-0 font-label text-xs font-bold uppercase tracking-wider text-primary">JDR Hub</p><h1 className="m-0 mt-2 font-display text-4xl font-semibold capitalize tracking-tight" id="planning-title">Planning</h1></div><label className="hidden items-center gap-2 rounded-full border border-outline-variant bg-surface px-4 py-2 text-sm text-on-surface-variant lg:flex"><Search aria-hidden="true" size={17} /><span className="sr-only">Rechercher dans le planning</span><input className="w-40 bg-transparent outline-none placeholder:text-on-surface-variant" placeholder="Rechercher…" /></label></div><div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]"><div><div className="mb-4 flex flex-wrap items-center justify-between gap-3"><div className="flex items-center gap-2"><button aria-label="Mois précédent" className="rounded-lg p-2 text-on-surface-variant hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-primary" onClick={() => setMonth((current) => new Date(current.getFullYear(), current.getMonth() - 1, 1))} type="button"><ChevronLeft size={20} /></button><h2 className="m-0 min-w-44 text-center font-display text-2xl font-semibold capitalize">{monthLabel(month)}</h2><button aria-label="Mois suivant" className="rounded-lg p-2 text-on-surface-variant hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-primary" onClick={() => setMonth((current) => new Date(current.getFullYear(), current.getMonth() + 1, 1))} type="button"><ChevronRight size={20} /></button><button className="ml-2 rounded-lg border border-outline-variant px-3 py-2 text-sm hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-primary" onClick={() => setMonth(new Date())} type="button">Aujourd'hui</button></div><div className="hidden rounded-lg bg-surface-container p-1 text-sm lg:flex"><button className="rounded-md bg-surface px-4 py-2 font-semibold shadow-sm" type="button">Mois</button><button className="rounded-md px-4 py-2 text-on-surface-variant" type="button">Semaine</button><button className="rounded-md px-4 py-2 text-on-surface-variant" type="button">Jour</button></div></div><MonthCalendar month={month} sessions={sessions} /><div className="grid gap-4 lg:hidden">{sessions.length > 0 ? sessions.map((session) => <SessionCard key={session.id} onReportAbsence={() => openAbsence(session)} session={session} />) : <p className="rounded-xl border border-dashed border-outline-variant p-8 text-center text-sm text-on-surface-variant">Aucune séance planifiée.</p>}</div></div><aside className="grid content-start gap-5"><button className="flex min-h-16 items-center justify-center gap-2 rounded-xl border-2 border-dashed border-primary/30 bg-surface px-4 font-semibold text-primary hover:border-primary hover:bg-primary-fixed/40 focus-visible:outline-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-50" disabled={upcoming.length === 0} onClick={() => { if (upcoming[0]) openAbsence(upcoming[0]) }} type="button"><Plus aria-hidden="true" size={20} />Signaler une absence</button><section className="rounded-xl border border-outline-variant/40 bg-surface p-5 shadow-sm"><h2 className="m-0 font-display text-xl font-semibold">Prochaines Séances</h2><div className="mt-4 grid gap-3">{upcoming.length > 0 ? upcoming.map((session) => <SessionCard key={session.id} onReportAbsence={() => openAbsence(session)} session={session} />) : <p className="m-0 text-sm text-on-surface-variant">Aucune séance à venir.</p>}</div></section><section className="rounded-xl border border-outline-variant/40 bg-surface p-5 shadow-sm"><h2 className="m-0 font-label text-xs font-bold uppercase tracking-wider text-on-surface-variant">Légende</h2><ul className="mt-4 grid gap-3 text-sm"><li className="flex items-center gap-2"><span className="h-3 w-3 rounded-full bg-primary" />Séance confirmée</li><li className="flex items-center gap-2"><span className="h-3 w-3 rounded-full bg-secondary" />En attente</li><li className="flex items-center gap-2"><span className="h-3 w-3 rounded-full bg-error" />Annulée / reportée</li></ul></section></aside></div></section></main><AbsenceDialog onClose={() => setAbsenceSession(null)} open={absenceSession !== null} session={absenceSession} /></AppShell>
+
+  return <AppShell active="Planning">
+    <main className="min-h-screen bg-background px-5 pb-28 pt-24 font-body text-on-surface md:px-8 md:pb-12 md:pt-10 lg:px-10">
+      <section className="mx-auto max-w-7xl" aria-labelledby="planning-title">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <p className="m-0 font-label text-xs font-bold uppercase tracking-wider text-primary">JDR Hub</p>
+            <h1 className="m-0 mt-2 font-display text-4xl font-semibold capitalize tracking-tight" id="planning-title">Planning</h1>
+          </div>
+          <label className="hidden items-center gap-2 rounded-full border border-outline-variant bg-surface px-4 py-2 text-sm text-on-surface-variant lg:flex">
+            <Search aria-hidden="true" size={17} />
+            <span className="sr-only">Rechercher dans le planning</span>
+            <input className="w-40 bg-transparent outline-none placeholder:text-on-surface-variant" placeholder="Rechercher…" />
+          </label>
+        </div>
+        <div className="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
+          <div>
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-2" aria-label="Navigation du mois">
+                <button aria-label="Mois précédent" className="grid min-h-12 min-w-12 place-items-center rounded-lg text-on-surface-variant transition-colors hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-primary motion-reduce:transition-none" onClick={() => setMonth((current) => new Date(current.getFullYear(), current.getMonth() - 1, 1))} type="button"><ChevronLeft aria-hidden="true" size={20} /></button>
+                <h2 aria-live="polite" className="m-0 min-w-44 text-center font-display text-2xl font-semibold capitalize">{monthLabel(month)}</h2>
+                <button aria-label="Mois suivant" className="grid min-h-12 min-w-12 place-items-center rounded-lg text-on-surface-variant transition-colors hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-primary motion-reduce:transition-none" onClick={() => setMonth((current) => new Date(current.getFullYear(), current.getMonth() + 1, 1))} type="button"><ChevronRight aria-hidden="true" size={20} /></button>
+                <button className="ml-2 min-h-12 rounded-lg border border-outline-variant px-3 py-2 text-sm transition-colors hover:bg-surface-container focus-visible:outline-2 focus-visible:outline-primary motion-reduce:transition-none" onClick={() => setMonth(new Date())} type="button">Aujourd'hui</button>
+              </div>
+              <div aria-label="Modes d’affichage" className="hidden rounded-lg bg-surface-container p-1 text-sm lg:flex" role="tablist">
+                <button aria-selected="true" className="min-h-12 rounded-md bg-surface px-4 py-2 font-semibold shadow-sm" role="tab" type="button">Mois</button>
+                <button aria-selected="false" className="min-h-12 rounded-md px-4 py-2 text-on-surface-variant" role="tab" type="button">Semaine</button>
+                <button aria-selected="false" className="min-h-12 rounded-md px-4 py-2 text-on-surface-variant" role="tab" type="button">Jour</button>
+              </div>
+            </div>
+            <MonthCalendar month={month} sessions={sessions} />
+            <div aria-describedby="planning-empty" className="grid gap-4 lg:hidden">
+              {sessions.length > 0 ? sessions.map((session) => <SessionCard key={session.id} onReportAbsence={() => openAbsence(session)} session={session} />) : null}
+              <p className={sessions.length > 0 ? 'sr-only' : 'rounded-xl border border-dashed border-outline-variant p-8 text-center text-sm text-on-surface-variant'} id="planning-empty">Aucune séance planifiée.</p>
+            </div>
+          </div>
+          <aside className="grid content-start gap-5">
+            <button aria-label="Signaler une absence pour la prochaine séance" className="flex min-h-16 items-center justify-center gap-2 rounded-xl border-2 border-dashed border-primary/30 bg-surface px-4 font-semibold text-primary transition-colors hover:border-primary hover:bg-primary-fixed/40 focus-visible:outline-2 focus-visible:outline-primary motion-reduce:transition-none disabled:cursor-not-allowed disabled:opacity-50" disabled={upcoming.length === 0} onClick={() => { if (upcoming[0]) openAbsence(upcoming[0]) }} type="button"><Plus aria-hidden="true" size={20} />Signaler une absence</button>
+            <section className="rounded-xl border border-outline-variant/40 bg-surface p-5 shadow-sm">
+              <h2 className="m-0 font-display text-xl font-semibold">Prochaines Séances</h2>
+              <div className="mt-4 grid gap-3">{upcoming.length > 0 ? upcoming.map((session) => <SessionCard key={session.id} onReportAbsence={() => openAbsence(session)} session={session} />) : <p className="m-0 text-sm text-on-surface-variant">Aucune séance à venir.</p>}</div>
+            </section>
+            <section className="rounded-xl border border-outline-variant/40 bg-surface p-5 shadow-sm" aria-labelledby="planning-legend">
+              <h2 className="m-0 font-label text-xs font-bold uppercase tracking-wider text-on-surface-variant" id="planning-legend">Légende</h2>
+              <ul className="mt-4 grid gap-3 text-sm"><li className="flex items-center gap-2"><span aria-hidden="true" className="h-3 w-3 rounded-full bg-primary" />Séance confirmée</li><li className="flex items-center gap-2"><span aria-hidden="true" className="h-3 w-3 rounded-full bg-secondary" />En attente</li><li className="flex items-center gap-2"><span aria-hidden="true" className="h-3 w-3 rounded-full bg-error" />Annulée / reportée</li></ul>
+            </section>
+          </aside>
+        </div>
+      </section>
+    </main>
+    <AbsenceDialog onClose={() => setAbsenceSession(null)} open={absenceSession !== null} session={absenceSession} />
+  </AppShell>
 }
