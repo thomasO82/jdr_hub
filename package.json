@@ -6,7 +6,7 @@
   "scripts": {
     "lint": "pnpm --filter @jdr-hub/api --filter @jdr-hub/web --filter @jdr-hub/shared --filter @jdr-hub/database -r run lint",
     "typecheck": "pnpm --filter @jdr-hub/api --filter @jdr-hub/web --filter @jdr-hub/shared --filter @jdr-hub/database -r run typecheck",
-    "test": "vitest run",
+    "test": "pnpm --filter @jdr-hub/shared build && pnpm --filter @jdr-hub/database build && vitest run",
     "test:integration": "vitest run --config vitest.integration.config.ts",
     "build": "pnpm --filter @jdr-hub/api build && pnpm --filter @jdr-hub/web build",
     "dev:up": "docker compose -f docker-compose.yml up -d --wait",
