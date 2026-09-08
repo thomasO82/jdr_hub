@@ -8,6 +8,8 @@ describe('application pages', () => {
     const detail = read('../features/games/game-detail-view.tsx')
     expect(detail).toContain('ApplicationForm')
     expect(detail).toContain("Postuler pour rejoindre")
+    expect(detail).toContain('<ApplicationForm gameId={game.id} />')
+    expect(detail).not.toContain('<ApplicationForm gameId={game.slug} />')
     const page = read('../app/candidatures/page.tsx')
     expect(page).toContain('ApplicationsListView')
     expect(page).toContain('createApplicationsApi')
