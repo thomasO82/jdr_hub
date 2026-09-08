@@ -22,6 +22,7 @@ describe('games pages', () => {
     expect(list).toContain('name="dateTo"')
     expect(list).toContain('name="minAvailablePlaces"')
     expect(list).toContain('buildCatalogueQuery')
+    expect(list).toContain('grid-cols-1 gap-2 2xl:grid-cols-2')
     expect(list).toContain('/parties/${game.slug}')
     expect(create).toContain('Créer une partie')
     expect(create).toContain('ONE_SHOT')

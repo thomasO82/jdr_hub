@@ -76,6 +76,7 @@ Les filtres recherche, MJ, tags, type, format, système, période de séance et 
 - Tags conservés en logique `AND`.
 - Paramètres conservés dans l’URL et restaurés par le formulaire.
 - Projection publique enrichie avec format, places disponibles et prochaine séance.
+- Champs de dates empilés jusqu’à `2xl` pour éviter leur chevauchement dans la sidebar aux largeurs intermédiaires.
 
 ## Règles métier implémentées
 
@@ -100,6 +101,7 @@ Les filtres recherche, MJ, tags, type, format, système, période de séance et 
 - API : échec car `type` était rejeté puis ignoré.
 - Schéma : échec car `games.format` et sa migration n’existaient pas.
 - UI : échec car les contrôles utilisaient `visualType`/`visualFormat` et les autres champs n’existaient pas.
+- Responsive : échec car les deux champs date restaient côte à côte dans une sidebar trop étroite.
 
 ### Green / non-régression
 
@@ -111,6 +113,7 @@ Les filtres recherche, MJ, tags, type, format, système, période de séance et 
 | `pnpm typecheck` | Vert | 2026-09-08 |
 | `pnpm build` | API et Next.js compilés | 2026-09-08 |
 | `git diff --check` | Vert | 2026-09-08 |
+| `pnpm vitest run apps/web/tests/games-pages.test.ts` | 4 tests verts après le correctif responsive | 2026-09-08 |
 
 ## Sécurité
 
