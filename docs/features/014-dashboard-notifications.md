@@ -14,7 +14,7 @@ IN_PROGRESS
 
 ## Lien ou numéro de Pull Request
 
-Non créée
+Création automatique bloquée par GitHub (`403 Resource not accessible by integration`) ; [ouverture manuelle](https://github.com/thomasO82/jdr_hub/pull/new/feat/dashboard-notifications)
 
 ## Dates de début et de fin
 
@@ -320,7 +320,8 @@ Non réalisée dans un navigateur réel.
 - `4f26e3f` — résumé des notifications non lues ;
 - `07d6df1` — projection API dashboard ;
 - `597b46e` — route privée dashboard ;
-- `94a3cdc` — placement visuel des notifications.
+- `94a3cdc` — placement visuel des notifications ;
+- `a2a95d1` — traçabilité, intégration PostgreSQL et vérifications finales.
 
 ## Décisions associées
 
