@@ -6,7 +6,7 @@ F09
 
 ## Statut
 
-IN_PROGRESS
+MERGED
 
 ## Branche
 
@@ -14,12 +14,12 @@ IN_PROGRESS
 
 ## Lien ou numéro de Pull Request
 
-Création automatique refusée par GitHub (`403 Resource not accessible by integration`) ; [ouverture manuelle](https://github.com/thomasO82/jdr_hub/pull/new/feat/xp-and-levels)
+[PR #22](https://github.com/thomasO82/jdr_hub/pull/22), fusion confirmée par le propriétaire dans `develop`
 
 ## Dates de début et de fin
 
 - Début : 2026-09-08
-- Fin : Non terminée
+- Fin : 2026-09-08
 
 ## Dépendances
 
@@ -37,7 +37,7 @@ Création automatique refusée par GitHub (`403 Resource not accessible by integ
 
 ### Restantes
 
-- Revue et fusion humaines de la Pull Request.
+- Aucune dépendance non résolue.
 
 ## Contexte
 
@@ -174,7 +174,7 @@ La migration Drizzle `0009_lethal_mattie_franklin.sql` ajoute `users.xp`, `users
 
 ### Restants
 
-- Aucun contrôle automatisé restant ; revue et vérification manuelle avant fusion.
+- Aucun contrôle automatisé restant ; vérification manuelle navigateur à conserver comme contrôle de non-régression.
 
 ## Preuve TDD Red, Green, Refactor
 
