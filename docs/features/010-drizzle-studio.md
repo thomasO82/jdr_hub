@@ -36,7 +36,7 @@ Studio sans publier PostgreSQL sur la machine ni demander une commande longue.
 - Image dédiée construite depuis le workspace, avec utilisateur non-root et
   version de Node déjà utilisée par les images du projet.
 - Configuration Drizzle Kit alimentée par `DATABASE_URL`.
-- Commande racine courte `pnpm db:studio`.
+- Commande racine courte `make studio`.
 - Documentation de l’URL et de l’arrêt du service dans le README.
 
 ## Compatibilité et modèle de données

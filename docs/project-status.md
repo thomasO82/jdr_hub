@@ -8,7 +8,7 @@ Il ne remplace ni les spécifications, ni les décisions d'architecture, ni les 
 
 ## Dernière mise à jour
 
-2026-09-08
+2026-09-24
 
 ## Signification des statuts
 
@@ -34,7 +34,7 @@ Seuls les statuts suivants sont autorisés :
 | F04 | Candidatures et roster | `IN_PROGRESS` | `feat/applications` | Création bloquée : intégration GitHub sans permission | 135 tests monorepo verts ; lint, typecheck, build et Docker web verts | Autorisation par ressource, anti-doublon, transaction de capacité, origine et validation stricte | [Fiche F04](features/007-applications.md) |
 | FIX-001 | Identifiant UUID des routes de participation | `IN_PROGRESS` | `fix/applications-id-only` | Non créée | 98 fichiers, 250 tests verts ; lint, typecheck et builds API/web verts | Rejet des slugs avant requête UUID, projection publique sans données privées | [Fiche F04 — correctif UUID](features/007-applications.md) |
 | DEV-001 | Données de développement | `IN_PROGRESS` | `feat/development-seeds` | Non créée | 59 fichiers, 141 tests verts ; lint, typecheck et build verts | Données fictives uniquement, pas de suppression ni de secret | [Fiche DEV-001](features/008-development-seeds.md) |
-| DEV-002 | Commandes de développement | `IN_PROGRESS` | `chore/developer-commands` | Non créée | 60 fichiers, 142 tests verts ; lint et typecheck verts | Alias Docker Compose sans modification de sécurité | [Fiche DEV-002](features/009-developer-commands.md) |
+| DEV-002 | Commandes de développement | `IN_PROGRESS` | `chore/make-container-commands` | Non créée | 124 fichiers, 331 tests applicables verts ; lint, typecheck et build verts | Makefile centralisé, aucun changement de port, réseau ou secret | [Fiche DEV-002](features/009-developer-commands.md) |
 | DEV-003 | Drizzle Studio local | `IN_PROGRESS` | `chore/drizzle-studio` | Non créée | 61 fichiers, 146 tests verts ; lint, typecheck, build et image Studio vérifiés | Port local uniquement, réseau PostgreSQL privé, conteneur non-root | [Fiche DEV-003](features/010-drizzle-studio.md) |
 | F05 | Disponibilités et recherche de joueurs | `MERGED` | `feat/availability-and-player-search` | Fusion confirmée par le propriétaire dans `develop` | 72 fichiers, 173 tests monorepo verts ; lint, typecheck et builds verts | Session obligatoire, origine stricte, rate limit d’écriture, horaires privés, projection agrégée et validation bornée | [Fiche F05](features/011-availability-and-player-search.md) |
 | F06 | Séances, créneaux, votes et planning | `IN_PROGRESS` | `feat/sessions-scheduling` | Non créée | 84 fichiers, 203 tests monorepo verts ; lint, typecheck et build web verts | Appartenance/MJ, origine stricte, votes uniques, transaction de sélection, dates bornées | [Fiche F06](features/012-sessions-scheduling.md) |

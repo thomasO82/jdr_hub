@@ -6,12 +6,10 @@ const root = resolve(import.meta.dirname, '../..')
 
 describe('Drizzle Studio development service', () => {
   it('declares the short Studio command', () => {
-    const packageJson = JSON.parse(
-      readFileSync(resolve(root, 'package.json'), 'utf8'),
-    ) as { scripts?: Record<string, string> }
+    const makefile = readFileSync(resolve(root, 'Makefile'), 'utf8')
 
-    expect(packageJson.scripts?.['db:studio']).toBe(
-      'docker compose --profile tools up --build db-studio',
+    expect(makefile).toContain(
+      'studio:\n\t$(COMPOSE) --profile tools up --build db-studio',
     )
   })
 

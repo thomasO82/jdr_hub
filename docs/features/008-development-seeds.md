@@ -37,7 +37,7 @@ les filtres, les détails de parties et les écrans de candidatures en local.
   migrations existantes.
 - Entrée CLI dédiée `seed-cli.ts`, compatible avec les chemins relatifs utilisés
   par Docker.
-- Commandes `pnpm db:seed` et
+- Commande racine `make seed` et commande package
   `pnpm --filter @jdr-hub/database db:seed`, avec chargement automatique du
   `.env` racine.
 
