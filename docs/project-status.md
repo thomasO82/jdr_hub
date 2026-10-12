@@ -8,7 +8,7 @@ Il ne remplace ni les spécifications, ni les décisions d'architecture, ni les 
 
 ## Dernière mise à jour
 
-2026-09-08
+2026-10-12
 
 ## Signification des statuts
 
@@ -42,6 +42,7 @@ Seuls les statuts suivants sont autorisés :
 | F08 | Dashboard et gestion MJ | `IN_PROGRESS` | `feat/dashboard-and-gm-management` | Non créée | 115 fichiers, 308 tests monorepo verts + 8 tests d'intégration PostgreSQL ; lint, typecheck et build verts | Session/origine/rate limit, autorisation par ressource, projection minimale, notifications destinataire-scopées, validation stricte, contrainte d'invitation et transactions | [Fiche F08](features/014-dashboard-and-gm-management.md) |
 | F09 | XP, niveaux et historique de progression | `MERGED` | `feat/xp-and-levels` | Fusion confirmée par le propriétaire dans `develop` | 122 fichiers et 326 tests verts ; 11 tests d'intégration PostgreSQL ; lint, typecheck et builds verts | Session authentifiée, historique privé, limites Zod, idempotence DB, transaction présence/XP, absence de champs internes | [Fiche F09](features/015-xp-and-levels.md) |
 | F10 | Responsive, accessibilité et états UI | `IN_PROGRESS` | `feat/responsive-accessibility` | Non créée | 125 fichiers et 333 tests verts ; lint, typecheck et build verts | Aucun changement API/auth ; erreurs traduites, focus clavier, cibles tactiles et réduction des animations | [Fiche F10](features/016-responsive-accessibility.md) |
+| FIX-SEC-001 | Mise à jour des dépendances vulnérables | `IN_REVIEW` | `fix/security-dependency-updates` | En cours de création | 124 fichiers, 330 tests unitaires/composants/API verts ; 11 tests PostgreSQL ; lint, typecheck, build et Compose verts | Plus aucune vulnérabilité critique/haute à l'audit pnpm ; une modérée transitive reste à traiter | [Fiche FIX-SEC-001](features/018-security-dependency-updates.md) |
 
 ## Blocages
 
