@@ -6,7 +6,7 @@ FIX-SEC-001
 
 ## Statut
 
-IN_PROGRESS
+MERGED
 
 ## Branche
 
@@ -14,12 +14,12 @@ IN_PROGRESS
 
 ## Lien ou numéro de Pull Request
 
-Non créée.
+[PR #24](https://github.com/thomasO82/jdr_hub/pull/24) — fusion confirmée par le propriétaire le 2026-10-12.
 
 ## Dates de début et de fin
 
 - Début : 2026-10-12
-- Fin : Non terminée
+- Fin : 2026-10-12
 
 ## Contexte et besoin utilisateur
 
@@ -81,7 +81,14 @@ Cette intervention porte uniquement sur les versions de dépendances et le lockf
 ## Limites connues et travaux reportés
 
 - Mettre à jour ou remplacer en sécurité la chaîne drizzle-kit/esbuild pour éliminer l'avis modéré restant, dans une intervention dédiée si nécessaire.
-- Consulter le résultat Docker Scout en CI avant fusion.
+- Consulter le résultat Docker Scout en CI ; aucun scan local n'a été exécuté.
+
+## Mise à jour après fusion — 2026-10-12
+
+Le propriétaire a confirmé la fusion de cette fiche dans la
+[PR #24](https://github.com/thomasO82/jdr_hub/pull/24). Le statut `MERGED`
+reflète cette confirmation. L'avis modéré d'esbuild et la vérification Docker
+Scout restent des éléments de suivi, sans être présentés comme résolus.
 
 ## Commandes finales
 
