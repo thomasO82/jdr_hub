@@ -46,6 +46,12 @@ Seuls les statuts suivants sont autorisés :
 
 ## Blocages
 
+- 2026-10-12 — FIX-SEC-001 : la branche `fix/security-dependency-updates` est
+  poussée et vérifiée, mais l'intégration GitHub a refusé la création de PR
+  (`403 Resource not accessible by integration`). La PR doit être ouverte
+  manuellement :
+  [créer la PR vers develop](https://github.com/thomasO82/jdr_hub/compare/develop...fix/security-dependency-updates?expand=1).
+
 - 2026-09-04 — F12 : la branche `fix/jwt-session-security` est poussée,
   mais l'intégration GitHub a refusé la création de PR vers `develop`
   (`403 Resource not accessible by integration`). La fonctionnalité reste
