@@ -6,7 +6,7 @@ FIX-SEC-001
 
 ## Statut
 
-IN_REVIEW
+IN_PROGRESS
 
 ## Branche
 
@@ -14,7 +14,7 @@ IN_REVIEW
 
 ## Lien ou numéro de Pull Request
 
-En cours de création.
+Non créée.
 
 ## Dates de début et de fin
 
