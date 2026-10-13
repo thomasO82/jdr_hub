@@ -142,6 +142,9 @@ export function createMessageHandlers(dependencies: MessagesDependencies) {
             gameId: access.gameId,
             afterStreamId: lastEventId,
             signal: controller.signal,
+            onReady: async () => {
+              if (!controller.signal.aborted) await stream.writeSSE({ event: 'ready', data: '{}' })
+            },
             onEvent: async (event) => {
               if (!(await revalidate()) || event.gameId !== access.gameId) return
               const message = await dependencies.repository.findById({ gameId: access.gameId, messageId: event.messageId })

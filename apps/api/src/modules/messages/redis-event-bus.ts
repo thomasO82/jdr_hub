@@ -32,14 +32,19 @@ export function createRedisGameMessageEventBus(redisUrl: string): GameMessageEve
       })
     },
 
-    async subscribe({ gameId, afterStreamId, signal, onEvent }) {
+    async subscribe({ gameId, afterStreamId, signal, onReady, onEvent }) {
       if (afterStreamId) assertStreamId(afterStreamId)
       if (signal.aborted) return
       const reader = (await ensurePublisher()).duplicate()
       reader.on('error', () => undefined)
       await reader.connect()
-      let cursor = afterStreamId ?? '$'
       try {
+        let cursor = afterStreamId
+        if (!cursor) {
+          const latest = await reader.xRevRange(streamKey(gameId), '+', '-', { COUNT: 1 })
+          cursor = latest[0]?.id ?? '0-0'
+        }
+        await onReady()
         while (!signal.aborted) {
           const response = await reader.withAbortSignal(signal).xRead(
             [{ key: streamKey(gameId), id: cursor }],

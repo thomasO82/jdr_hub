@@ -7,7 +7,19 @@ type ApiEnvelope<T> = { data: T | null }
 type EventSourceLike = {
   onmessage: ((event: MessageEvent<string>) => void) | null
   onerror: (() => void) | null
+  addEventListener: (type: string, listener: EventListener) => void
+  removeEventListener: (type: string, listener: EventListener) => void
   close: () => void
+}
+
+export function mergeGameMessages(current: GameMessageView[], incoming: GameMessageView[]): GameMessageView[] {
+  const byId = new Map<string, GameMessageView>()
+  for (const message of [...current, ...incoming]) byId.set(message.id, message)
+  return [...byId.values()].sort((left, right) => {
+    const timeDifference = Date.parse(right.createdAt) - Date.parse(left.createdAt)
+    if (timeDifference !== 0) return timeDifference
+    return right.id < left.id ? -1 : right.id > left.id ? 1 : 0
+  })
 }
 
 type GameMessagesApiOptions = {
@@ -77,9 +89,11 @@ export function createGameMessagesApi(options: GameMessagesApiOptions = {}) {
       }
     },
 
-    subscribe(gameId: string, input: { lastEventId?: string; onMessage: (message: GameMessageView) => void; onError: () => void }): () => void {
+    subscribe(gameId: string, input: { lastEventId?: string; onReady: () => void; onMessage: (message: GameMessageView) => void; onError: () => void }): () => void {
       // Native EventSource sends Last-Event-ID automatically on reconnect; it cannot set a custom header on the first connection.
       const source = eventSourceFactory(apiUrl(baseUrl, `/games/${encodeURIComponent(gameId)}/messages/stream`), { withCredentials: true })
+      const onReady: EventListener = () => input.onReady()
+      source.addEventListener('ready', onReady)
       source.onmessage = (event: MessageEvent<string>) => {
         try {
           input.onMessage(JSON.parse(event.data) as GameMessageView)
@@ -89,6 +103,7 @@ export function createGameMessagesApi(options: GameMessagesApiOptions = {}) {
       }
       source.onerror = () => input.onError()
       return () => {
+        source.removeEventListener('ready', onReady)
         source.onmessage = null
         source.onerror = null
         source.close()

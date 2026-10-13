@@ -13,6 +13,7 @@ export interface GameMessageEventBus {
     gameId: string
     afterStreamId: string | null
     signal: AbortSignal
+    onReady: () => Promise<void>
     onEvent: (event: StreamMessageEvent) => Promise<void>
   }): Promise<void>
   close?(): Promise<void>

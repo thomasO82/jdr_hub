@@ -1,9 +1,9 @@
 'use client'
 
 import { MessageCircle, RefreshCw, Send } from 'lucide-react'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { GameMessageView } from '@jdr-hub/shared'
-import { createGameMessagesApi, GAME_MESSAGES_ERROR } from '../../lib/game-messages-api'
+import { createGameMessagesApi, GAME_MESSAGES_ERROR, mergeGameMessages } from '../../lib/game-messages-api'
 
 type ChatStatus = 'loading' | 'ready' | 'error'
 
@@ -21,11 +21,12 @@ export function GameChatView({ gameId }: { gameId: string }) {
   const [streamError, setStreamError] = useState(false)
   const [draft, setDraft] = useState('')
   const [sending, setSending] = useState(false)
+  const initialHistoryLoaded = useRef(false)
 
   const loadMessages = useCallback(async (cursor?: string) => {
     try {
       const page = await api.getMessages(gameId, cursor ? { cursor } : undefined)
-      setMessages((current) => cursor ? [...current, ...page.items.filter((item) => !current.some((existing) => existing.id === item.id))] : page.items)
+      setMessages((current) => mergeGameMessages(current, page.items))
       setNextCursor(page.nextCursor)
       setCanWrite(page.canWrite)
       setError(null)
@@ -36,25 +37,33 @@ export function GameChatView({ gameId }: { gameId: string }) {
     }
   }, [api, gameId])
 
-  useEffect(() => { void loadMessages() }, [loadMessages])
-
   useEffect(() => {
-    if (status !== 'ready') return
     return api.subscribe(gameId, {
+      onReady: () => {
+        initialHistoryLoaded.current = true
+        setStreamError(false)
+        void loadMessages()
+      },
       onMessage: (message) => {
-        setMessages((current) => current.some((existing) => existing.id === message.id) ? current : [message, ...current])
+        setMessages((current) => mergeGameMessages(current, [message]))
         setStreamError(false)
       },
-      onError: () => setStreamError(true),
+      onError: () => {
+        setStreamError(true)
+        if (!initialHistoryLoaded.current) {
+          initialHistoryLoaded.current = true
+          void loadMessages()
+        }
+      },
     })
-  }, [api, gameId, status])
+  }, [api, gameId, loadMessages])
 
   const send = async () => {
     if (!canWrite || sending || draft.trim().length === 0) return
     setSending(true)
     try {
       const message = await api.sendMessage(gameId, draft)
-      setMessages((current) => current.some((existing) => existing.id === message.id) ? current : [message, ...current])
+      setMessages((current) => mergeGameMessages(current, [message]))
       setDraft('')
       setError(null)
     } catch {

@@ -71,6 +71,14 @@ describe('game messaging API routes', () => {
     expect(write.status).toBe(403)
   })
 
+  it('rejects a malformed history cursor with a safe client error', async () => {
+    const { app, member } = await createTestApp()
+    const response = await app.request('/games/brumes/messages?cursor=not-a-valid-cursor', { headers: { cookie: member.cookie } })
+
+    expect(response.status).toBe(400)
+    expect(JSON.stringify(await response.json())).not.toContain('MESSAGE_INVALID_CURSOR')
+  })
+
   it('returns 201 after durable persistence when event publication fails', async () => {
     const eventBus: GameMessageEventBus = {
       async publish() { throw new Error('redis unavailable') },
@@ -106,13 +114,30 @@ describe('game messaging API routes', () => {
     expect(response.headers.get('content-type')).toContain('text/event-stream')
     expect(response.headers.get('cache-control')).toContain('no-cache')
     const reader = response.body!.getReader()
-    const chunkPromise = reader.read()
+    const readyChunk = await reader.read()
+    expect(new TextDecoder().decode(readyChunk.value)).toContain('event: ready')
     await new Promise((resolve) => setTimeout(resolve, 0))
     await eventBus.publish({ gameId: 'game-1', messageId: message.id })
-    const chunk = await chunkPromise
+    const chunk = await reader.read()
     expect(new TextDecoder().decode(chunk.value)).toContain('event: message')
     expect(new TextDecoder().decode(chunk.value)).toContain('Temps réel')
     expect(new TextDecoder().decode(chunk.value)).not.toContain('discord')
+    await reader.cancel()
+  })
+
+  it('signals SSE readiness after the authorized stream subscription is established', async () => {
+    const eventBus: GameMessageEventBus = {
+      async publish() {},
+      async subscribe({ onReady, signal }) {
+        await onReady()
+        await new Promise<void>((resolve) => signal.addEventListener('abort', () => resolve(), { once: true }))
+      },
+    }
+    const { app, member } = await createTestApp({ eventBus })
+    const response = await app.request('/games/brumes/messages/stream', { headers: { cookie: member.cookie } })
+    const reader = response.body!.getReader()
+    const firstChunk = await reader.read()
+    expect(new TextDecoder().decode(firstChunk.value)).toContain('event: ready')
     await reader.cancel()
   })
 })

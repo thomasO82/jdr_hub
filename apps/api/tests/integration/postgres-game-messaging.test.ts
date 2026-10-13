@@ -79,6 +79,24 @@ describe('PostgreSQL game message repository', () => {
       await clean(seed)
     }
   })
+
+  it('paginates equal timestamps without skipping rows and rejects malformed cursors', async () => {
+    await migrateDatabase(database)
+    const seed = await seedGame()
+    try {
+      const repository = createPostgresGameMessageRepository(database.db)
+      const timestamp = new Date('2026-10-13T12:00:00.000Z')
+      const messages = await Promise.all(['Un', 'Deux', 'Trois'].map((content) => repository.create({ gameIdOrSlug: seed.gameId, authorId: seed.memberId, content, now: timestamp })))
+      const idsDescending = messages.map((message) => message.id).sort((left, right) => right.localeCompare(left))
+      const firstPage = await repository.list({ gameId: seed.gameId, userId: seed.memberId, cursor: null, limit: 2 })
+      const secondPage = await repository.list({ gameId: seed.gameId, userId: seed.memberId, cursor: firstPage.nextCursor, limit: 2 })
+
+      expect([...firstPage.items, ...secondPage.items].map((message) => message.id)).toEqual(idsDescending)
+      await expect(repository.list({ gameId: seed.gameId, userId: seed.memberId, cursor: 'not-a-valid-cursor', limit: 2 })).rejects.toThrow('MESSAGE_INVALID_CURSOR')
+    } finally {
+      await clean(seed)
+    }
+  })
 })
 
 afterAll(async () => {

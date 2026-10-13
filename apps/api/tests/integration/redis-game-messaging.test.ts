@@ -16,6 +16,7 @@ describe('Redis game message event bus', () => {
       gameId,
       afterStreamId: '0-0',
       signal: controller.signal,
+      onReady: async () => undefined,
       onEvent: async (event) => {
         events.push({ gameId: event.gameId, messageId: event.messageId })
         controller.abort()
@@ -28,6 +29,28 @@ describe('Redis game message event bus', () => {
     await bus.publish({ gameId, messageId: 'message-2' })
 
     expect(events).toEqual([{ gameId, messageId: 'message-1' }])
+  })
+
+  it('does not miss an event published after the initial subscription becomes ready', async () => {
+    const gameId = `readiness-${randomUUID()}`
+    const controller = new AbortController()
+    const events: string[] = []
+    let ready = false
+    const subscription = bus.subscribe({
+      gameId,
+      afterStreamId: null,
+      signal: controller.signal,
+      onReady: async () => { ready = true },
+      onEvent: async (event) => {
+        events.push(event.messageId)
+        controller.abort()
+      },
+    })
+    while (!ready) await new Promise((resolve) => setTimeout(resolve, 0))
+    await bus.publish({ gameId, messageId: 'after-ready' })
+    await subscription
+
+    expect(events).toEqual(['after-ready'])
   })
 })
 
