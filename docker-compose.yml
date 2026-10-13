@@ -37,6 +37,8 @@ services:
     init: true
     expose:
       - "3000"
+    environment:
+      API_INTERNAL_URL: ${API_INTERNAL_URL:-http://api-hono:8787}
     networks:
       - application
     healthcheck:

@@ -11,6 +11,7 @@ export function registerGamesRoutes(app: Hono<GamesRouteEnv>, dependencies: Game
   const handlers = createGameHandlers(dependencies)
   app.get('/games', handlers.list)
   app.get('/tags', handlers.tags)
+  app.get('/public/games/:slug', handlers.publicGet)
   app.get('/games/:id', handlers.get)
   app.post('/games', handlers.create)
   app.patch('/games/:id', handlers.update)

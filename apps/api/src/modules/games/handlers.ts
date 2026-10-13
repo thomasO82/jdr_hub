@@ -8,6 +8,7 @@ import type { GamesRepository } from './repository.js'
 import { archiveGame } from './services/archive-game.js'
 import { createGame } from './services/create-game.js'
 import { getGame } from './services/get-game.js'
+import { getPublicGame } from './services/get-public-game.js'
 import { listGames } from './services/list-games.js'
 import { updateGame } from './services/update-game.js'
 
@@ -40,6 +41,12 @@ export function createGameHandlers(dependencies: Dependencies) {
       const id = requiredId(c)
       if (!id) return fail(c, 400)
       const game = await getGame({ id, repository: dependencies.repository })
+      return game ? c.json({ data: game, error: null, meta: { requestId: c.get('requestId') } }) : fail(c, 404)
+    },
+    publicGet: async (c: Context<GameEnv>) => {
+      const slug = c.req.param('slug')
+      if (!slug) return fail(c, 400)
+      const game = await getPublicGame({ slug, repository: dependencies.repository })
       return game ? c.json({ data: game, error: null, meta: { requestId: c.get('requestId') } }) : fail(c, 404)
     },
     create: async (c: Context<GameEnv>) => {

@@ -11,6 +11,9 @@ export function createInMemoryGamesRepository(seed: GameRecord[] = []): GamesRep
       return game
     },
     async findById(id) { return games.get(id) ?? null },
+    async findPublicBySlug(slug) {
+      return [...games.values()].find((game) => game.slug === slug && game.visibility === 'PUBLIC' && ['OPEN', 'ACTIVE'].includes(game.status)) ?? null
+    },
     async update(id, ownerId, input: UpdateGameInput) {
       const current = games.get(id)
       if (!current || current.ownerId !== ownerId) return null

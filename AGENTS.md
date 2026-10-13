@@ -108,6 +108,43 @@ Créer des composants réutilisables : boutons, champs, sélecteurs, filtres, ta
 
 shadcn/ui peut servir de base, mais doit être adapté au design JDR Hub. Ne pas remplacer les maquettes par une interface shadcn générique.
 
+### Typographie obligatoire
+
+La typographie de référence est commune à toutes les pages applicatives :
+
+- `Hanken Grotesk` pour les titres, le nom de la marque et les éléments de
+  hiérarchie (`h1`, `h2`, `h3`) ;
+- `Inter` pour le texte courant, les champs, les boutons et la navigation ;
+- `Geist` pour les labels, catégories, métadonnées et données compactes.
+
+Les fontes doivent être chargées au niveau du layout global et non remplacées
+par une pile de polices système seule. Si elles sont chargées depuis un CDN,
+les domaines doivent être déclarés explicitement dans la CSP ; une solution
+auto-hébergée est préférable lorsque les contraintes de build le permettent.
+Toute nouvelle page ou composant doit reprendre ces rôles et conserver les
+tailles, poids et interlignes documentés dans `docs/design-system.md`.
+
+### Tailwind-only
+
+Le frontend utilise exclusivement Tailwind CSS v4 :
+
+- un seul point d’entrée est autorisé : `apps/web/app/globals.css` ;
+- ce fichier contient uniquement l’import Tailwind, les tokens `@theme` et les
+  directives globales de reset/accessibilité nécessaires ;
+- les composants utilisent des classes Tailwind directement dans leurs fichiers
+  TSX ;
+- les fichiers `.css` et `.module.css`, les balises `<style>`, les styles inline
+  et le CSS-in-JS sont interdits dans `apps/web` ;
+- les couleurs, fontes, espacements, rayons et ombres utilisent les tokens du
+  design system, sans valeurs répétées dans les composants ;
+- les classes sont ordonnées `layout → spacing → sizing → typography → color →
+  border → interaction → responsive` ;
+- les variantes Tailwind gèrent le responsive et les états `hover`,
+  `focus-visible`, `disabled` et `motion-reduce` ;
+- les valeurs arbitraires sont interdites sauf nécessité visuelle documentée ;
+- aucune migration Tailwind ne doit modifier les routes, contrats HTTP,
+  validations, textes métier ou parcours utilisateur.
+
 ## 8. Architecture technique
 
 Utiliser un monorepo pnpm :
@@ -340,6 +377,16 @@ Utiliser un journal d'événements, pas uniquement un compteur. L'attribution do
 Avant chaque fonctionnalité : relire la spécification, consulter `docs/implementation-plan.md` et les maquettes, extraire les règles métier et critères d'acceptation, puis appliquer le cycle TDD.
 
 Ne pas mettre les règles métier dans React, exposer Drizzle au navigateur, dupliquer inutilement les contrats, utiliser `any` sans justification, masquer une erreur TypeScript, ajouter une dépendance sans justification ou modifier des fichiers sans rapport avec la tâche. Utiliser pnpm.
+
+### Messages d'erreur utilisateur
+
+Toute erreur visible dans l'interface doit être traduite en français clair et
+indiquer, lorsque c'est possible, l'action à effectuer. Le frontend ne doit
+jamais afficher directement une exception, une stack trace, le texte brut d'une
+réponse API ou un détail interne. Les composants utilisent le traducteur partagé
+des erreurs et conservent uniquement le `requestId` pour le diagnostic interne.
+Les messages ne doivent révéler ni secret, ni donnée personnelle, ni existence
+d'une ressource privée.
 
 ## Autonomie d'exécution
 
