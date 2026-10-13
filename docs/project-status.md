@@ -8,7 +8,7 @@ Il ne remplace ni les spécifications, ni les décisions d'architecture, ni les 
 
 ## Dernière mise à jour
 
-2026-10-12
+2026-10-13
 
 ## Signification des statuts
 
@@ -42,7 +42,8 @@ Seuls les statuts suivants sont autorisés :
 | F08 | Dashboard et gestion MJ | `IN_PROGRESS` | `feat/dashboard-and-gm-management` | Non créée | 115 fichiers, 308 tests monorepo verts + 8 tests d'intégration PostgreSQL ; lint, typecheck et build verts | Session/origine/rate limit, autorisation par ressource, projection minimale, notifications destinataire-scopées, validation stricte, contrainte d'invitation et transactions | [Fiche F08](features/014-dashboard-and-gm-management.md) |
 | F09 | XP, niveaux et historique de progression | `MERGED` | `feat/xp-and-levels` | Fusion confirmée par le propriétaire dans `develop` | 122 fichiers et 326 tests verts ; 11 tests d'intégration PostgreSQL ; lint, typecheck et builds verts | Session authentifiée, historique privé, limites Zod, idempotence DB, transaction présence/XP, absence de champs internes | [Fiche F09](features/015-xp-and-levels.md) |
 | F10 | Responsive, accessibilité et états UI | `IN_PROGRESS` | `feat/responsive-accessibility` | Non créée | 125 fichiers et 333 tests verts ; lint, typecheck et build verts | Aucun changement API/auth ; erreurs traduites, focus clavier, cibles tactiles et réduction des animations | [Fiche F10](features/016-responsive-accessibility.md) |
-| FIX-SEC-001 | Mise à jour des dépendances vulnérables | `MERGED` | `fix/security-dependency-updates` | [PR #24](https://github.com/thomasO82/jdr_hub/pull/24) | 124 fichiers, 330 tests unitaires/composants/API verts ; 11 tests PostgreSQL ; lint, typecheck, build et Compose verts | Plus aucune vulnérabilité critique/haute à l'audit pnpm ; une modérée transitive reste à traiter | [Fiche FIX-SEC-001](features/018-security-dependency-updates.md) |
+| FIX-SEC-001 | Mise à jour des dépendances vulnérables | `MERGED` | `fix/security-dependency-updates` | [PR #24](https://github.com/thomasO82/jdr_hub/pull/24) | 124 fichiers, 330 tests unitaires/composants/API verts ; 11 tests PostgreSQL ; lint, typecheck, build et Compose verts | Plus aucune vulnérabilité critique/haute à l'audit pnpm ; la vulnérabilité modérée transitive a été traitée dans FIX-SEC-002 | [Fiche FIX-SEC-001](features/018-security-dependency-updates.md) |
+| FIX-SEC-002 | Remédiation esbuild et correction du scan Docker Scout CI | `IN_PROGRESS` | `fix/esbuild-moderate-remediation` | Création auto refusée (`403`) ; [ouverture manuelle](https://github.com/thomasO82/jdr_hub/pull/new/fix/esbuild-moderate-remediation) | Lint/typecheck, builds, audit et 333 tests réussis avec PostgreSQL temporaire ; scan Scout à confirmer dans la CI | Override esbuild vers 0.25.12 ; action Docker Scout épinglée à un SHA, commentaires PR désactivés et seuil high/critical conservé | [Fiche FIX-SEC-002](features/019-esbuild-moderate-remediation.md) |
 
 ## Blocages
 
@@ -67,14 +68,17 @@ Seuls les statuts suivants sont autorisés :
   poussée et vérifiée, mais l'intégration GitHub a refusé la création de PR
   (`403 Resource not accessible by integration`) et `gh` n'est pas installé.
   La PR doit être ouverte manuellement et F08 reste `IN_PROGRESS`.
+- 2026-10-13 — FIX-SEC-002 : la branche `fix/esbuild-moderate-remediation` est
+  poussée après les vérifications ; le connecteur GitHub a refusé la création
+  de PR (`403 Resource not accessible by integration`). [Ouvrir la PR vers
+  `develop`](https://github.com/thomasO82/jdr_hub/pull/new/fix/esbuild-moderate-remediation).
 
 ## Mise à jour après fusion — 2026-10-12
 
 Le propriétaire a confirmé la fusion de FIX-SEC-001 dans la
-[PR #24](https://github.com/thomasO82/jdr_hub/pull/24). La vulnérabilité
-modérée transitive d'esbuild et la vérification Docker Scout restent des
-éléments de suivi documentés dans la fiche ; cette fusion ne les déclare pas
-résolus.
+[PR #24](https://github.com/thomasO82/jdr_hub/pull/24). La remédiation de la
+vulnérabilité modérée d'esbuild et le remplacement de l'appel Docker Scout
+manquant dans le workflow sont suivis séparément dans FIX-SEC-002.
 
 ## Mise à jour architecture — 2026-09-05
 

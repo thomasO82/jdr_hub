@@ -24,8 +24,12 @@ describe('continuous integration security gates', () => {
     expect(workflow).toContain('pnpm build')
     expect(workflow).toContain('pnpm audit --audit-level=high')
     expect(workflow.toLowerCase()).toContain('secret')
-    expect(workflow).toContain('docker scout cves')
-    expect(workflow).toContain('--only-severity high,critical')
+    expect(workflow.match(/uses: docker\/scout-action@[0-9a-f]{40}/g)).toHaveLength(2)
+    expect(workflow).toContain('image: local://jdr_hub-web-next:latest')
+    expect(workflow).toContain('image: local://jdr_hub-api-hono:latest')
+    expect(workflow).toContain('only-severities: critical,high')
+    expect(workflow).toContain('exit-code: true')
+    expect(workflow.match(/write-comment: false/g)).toHaveLength(2)
     expect(workflow).not.toContain('--only-fixed')
 
     for (const useLine of workflow.match(/^\s*- uses: .*$/gm) ?? []) {
