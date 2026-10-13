@@ -1,6 +1,6 @@
 import { getTableColumns, getTableName } from 'drizzle-orm'
 import { describe, expect, it } from 'vitest'
-import { oauthLoginAttempts, sessions, users } from '../src/schema/auth.js'
+import { discordGuildJoinAttempts, oauthLoginAttempts, sessions, users } from '../src/schema/auth.js'
 
 describe('authentication database schema', () => {
   it('keeps Discord identities unique and requires a timezone', () => {
@@ -24,5 +24,20 @@ describe('authentication database schema', () => {
     expect(attemptColumns.stateDigest.isUnique).toBe(true)
     expect(attemptColumns.expiresAt.notNull).toBe(true)
     expect(attemptColumns.consumedAt.notNull).toBe(false)
+  })
+
+  it('stores optional server membership timestamps and one-use user-bound join attempts only', () => {
+    const userColumns = getTableColumns(users)
+    const attemptColumns = getTableColumns(discordGuildJoinAttempts)
+
+    expect(userColumns.discordServerJoinedAt.notNull).toBe(false)
+    expect(userColumns.discordServerPromptDismissedAt.notNull).toBe(false)
+    expect(attemptColumns.userId.notNull).toBe(true)
+    expect(attemptColumns.sessionId.notNull).toBe(true)
+    expect(attemptColumns.stateDigest.isUnique).toBe(true)
+    expect(attemptColumns.expiresAt.notNull).toBe(true)
+    expect(attemptColumns.consumedAt.notNull).toBe(false)
+    expect(Object.keys(attemptColumns)).not.toContain('accessToken')
+    expect(Object.keys(attemptColumns)).not.toContain('refreshToken')
   })
 })

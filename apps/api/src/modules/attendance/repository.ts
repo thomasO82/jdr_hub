@@ -1,5 +1,5 @@
-import { and, eq, isNull, inArray } from 'drizzle-orm'
-import { authSchema, attendanceSchema, gameSchema, schedulingSchema, type createDatabase } from '@jdr-hub/database'
+import { and, eq, inArray } from 'drizzle-orm'
+import { attendanceSchema, authSchema, gameSchema, schedulingSchema, type createDatabase } from '@jdr-hub/database'
 import type { AttendanceEntry, AttendanceRecord, SessionContext } from '@jdr-hub/shared'
 import type { GamificationRepository } from '../gamification/repository.js'
 import type { DiscordDelivery, NotificationRecord } from '../notifications/repository.js'
@@ -8,7 +8,7 @@ import { createAbsenceDiscordContent } from '../notifications/discord-content.js
 export type AbsenceEvent = {
   attendance: AttendanceRecord
   notification: NotificationRecord
-  delivery: DiscordDelivery
+  delivery: DiscordDelivery | null
 }
 
 export interface AttendanceRepository {
@@ -29,8 +29,6 @@ type SessionContextRow = {
   gameStatus: string
   sessionStatus: string
   memberStatus: string
-  memberDiscordId: string | null
-  ownerDiscordId: string | null
 }
 
 const toContext = (row: SessionContextRow): SessionContext => ({
@@ -47,20 +45,6 @@ const toAttendance = (row: { id: string; sessionId: string; userId: string; stat
 const toNotification = (row: { id: string; type: string; recipientId: string; gameId: string; sessionId: string; actorId: string; title: string; body: string; readAt: Date | null; createdAt: Date }): NotificationRecord => ({
   ...row,
   type: row.type as NotificationRecord['type'],
-})
-
-const toDelivery = (row: { id: string; notificationId: string; recipientDiscordId: string; content: string; channel: string; status: string; attempts: number; processingAt: Date | null; nextAttemptAt: Date | null; providerMessageId: string | null; lastErrorCode: string | null }): DiscordDelivery => ({
-  id: row.id,
-  notificationId: row.notificationId,
-  recipientDiscordId: row.recipientDiscordId,
-  content: row.content,
-  channel: row.channel as DiscordDelivery['channel'],
-  status: row.status as DiscordDelivery['status'],
-  attempts: row.attempts,
-  processingAt: row.processingAt,
-  nextAttemptAt: row.nextAttemptAt,
-  providerMessageId: row.providerMessageId,
-  lastErrorCode: row.lastErrorCode,
 })
 
 /** Persists an absence and its two notification projections atomically. */
@@ -80,22 +64,16 @@ export function createPostgresAttendanceRepository(database: Database, dependenc
       gameStatus: games.status,
       sessionStatus: gameSessions.status,
       memberStatus: gameMembers.status,
-      memberDiscordId: users.discordId,
-      ownerDiscordId: users.discordId,
     }).from(gameSessions)
       .innerJoin(games, eq(gameSessions.gameId, games.id))
       .leftJoin(gameMembers, and(eq(gameMembers.gameId, games.id), eq(gameMembers.userId, userId)))
-      .leftJoin(users, eq(users.id, userId))
       .where(eq(gameSessions.id, sessionId))
       .limit(1)
 
     if (!row) return null
-    const [owner] = await db.select({ discordId: users.discordId }).from(users).where(eq(users.id, row.ownerId)).limit(1)
     return toContext({
       ...row,
       memberStatus: row.memberStatus ?? (row.ownerId === userId ? 'ACTIVE' : 'NONE'),
-      memberDiscordId: row.memberDiscordId,
-      ownerDiscordId: owner?.discordId ?? null,
     })
   }
 
@@ -128,25 +106,30 @@ export function createPostgresAttendanceRepository(database: Database, dependenc
           const logicalKey = `absence:${sessionId}:${userId}`
           const notification = await readNotificationByKey(logicalKey, tx)
           if (!notification) throw new Error('ATTENDANCE_CONFLICT')
-          const [deliveryRow] = await tx.select({
-            id: notificationDeliveries.id,
-            notificationId: notificationDeliveries.notificationId,
-            channel: notificationDeliveries.channel,
-            status: notificationDeliveries.status,
-            attempts: notificationDeliveries.attempts,
-            processingAt: notificationDeliveries.processingAt,
-            nextAttemptAt: notificationDeliveries.nextAttemptAt,
-            providerMessageId: notificationDeliveries.providerMessageId,
-            lastErrorCode: notificationDeliveries.lastErrorCode,
-          }).from(notificationDeliveries).where(and(eq(notificationDeliveries.notificationId, notification.id), eq(notificationDeliveries.channel, 'DISCORD_DM'))).limit(1)
-          if (!deliveryRow || !context.ownerDiscordId) throw new Error('ATTENDANCE_CONFLICT')
-          return { attendance: existing, notification, delivery: toDelivery({ ...deliveryRow, recipientDiscordId: context.ownerDiscordId, content: createAbsenceDiscordContent(context) }) }
+          const [owner] = await tx.select({ discordId: users.discordId, joinedAt: users.discordServerJoinedAt })
+            .from(users).where(eq(users.id, context.ownerId)).limit(1)
+          if (!owner) throw new Error('ATTENDANCE_CONFLICT')
+          const [delivery] = await tx.select().from(notificationDeliveries).where(and(eq(notificationDeliveries.notificationId, notification.id), eq(notificationDeliveries.channel, 'DISCORD_DM'))).limit(1)
+          if (!delivery) {
+            if (owner.joinedAt && owner.joinedAt <= notification.createdAt) throw new Error('ATTENDANCE_CONFLICT')
+            return { attendance: existing, notification, delivery: null }
+          }
+          return {
+            attendance: existing,
+            notification,
+            delivery: {
+              ...delivery,
+              channel: 'DISCORD_DM',
+              status: delivery.status as DiscordDelivery['status'],
+              recipientDiscordId: owner.discordId,
+              content: createAbsenceDiscordContent({ gameTitle: context.gameTitle, sessionStartsAt: context.sessionStartsAt }),
+            },
+          }
         }
         if (existing) throw new Error('ATTENDANCE_CONFLICT')
 
         const [attendanceRow] = await tx.insert(sessionAttendance).values({ sessionId, userId, status: 'EXCUSED', createdAt: now, updatedAt: now }).returning()
         if (!attendanceRow) throw new Error('ATTENDANCE_CREATE_FAILED')
-        if (!context.ownerDiscordId) throw new Error('ATTENDANCE_CREATE_FAILED')
         const logicalKey = `absence:${sessionId}:${userId}`
         const [notificationRow] = await tx.insert(notifications).values({
           type: 'ABSENCE_REPORTED',
@@ -160,12 +143,32 @@ export function createPostgresAttendanceRepository(database: Database, dependenc
           createdAt: now,
         }).returning()
         if (!notificationRow) throw new Error('ATTENDANCE_CREATE_FAILED')
-        const [deliveryRow] = await tx.insert(notificationDeliveries).values({ notificationId: notificationRow.id, channel: 'DISCORD_DM', status: 'PENDING', attempts: 0, processingAt: null, createdAt: now, updatedAt: now }).returning()
-        if (!deliveryRow) throw new Error('ATTENDANCE_CREATE_FAILED')
+        const [owner] = await tx.select({ discordId: users.discordId, joinedAt: users.discordServerJoinedAt })
+          .from(users).where(eq(users.id, context.ownerId)).limit(1)
+        let delivery: DiscordDelivery | null = null
+        if (owner?.joinedAt) {
+          const [deliveryRow] = await tx.insert(notificationDeliveries).values({
+            notificationId: notificationRow.id,
+            channel: 'DISCORD_DM',
+            status: 'PENDING',
+            attempts: 0,
+            processingAt: null,
+            createdAt: now,
+            updatedAt: now,
+          }).returning()
+          if (!deliveryRow) throw new Error('ATTENDANCE_CREATE_FAILED')
+          delivery = {
+            ...deliveryRow,
+            channel: 'DISCORD_DM',
+            status: 'PENDING',
+            recipientDiscordId: owner.discordId,
+            content: createAbsenceDiscordContent({ gameTitle: context.gameTitle, sessionStartsAt: context.sessionStartsAt }),
+          }
+        }
         return {
           attendance: toAttendance(attendanceRow),
           notification: toNotification(notificationRow),
-          delivery: toDelivery({ ...deliveryRow, recipientDiscordId: context.ownerDiscordId, content: createAbsenceDiscordContent(context) }),
+          delivery,
         }
       })
     },

@@ -1,3 +1,4 @@
+import React from 'react'
 import type { ReactNode } from 'react'
 import { AppHeader } from './app-header'
 import { DesktopSidebar } from './desktop-sidebar'

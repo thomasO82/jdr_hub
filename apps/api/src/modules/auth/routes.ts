@@ -6,8 +6,10 @@ export type AuthRouteEnv = { Variables: { requestId: string } }
 export function registerAuthRoutes(app: Hono<AuthRouteEnv>, dependencies: AuthDependencies): void {
   const handlers = createAuthHandlers(dependencies)
   app.get('/auth/discord', handlers.discordLogin)
+  app.get('/auth/discord/server', handlers.startDiscordGuildMembership)
   app.get('/auth/discord/callback', handlers.discordCallback)
   app.get('/me', handlers.getCurrentUser)
+  app.post('/auth/discord/server/dismiss', handlers.dismissDiscordGuildMembership)
   app.post('/auth/logout', handlers.logout)
   app.post('/auth/refresh', handlers.refreshSession)
 }

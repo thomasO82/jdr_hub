@@ -13,7 +13,7 @@ F07
 
 ## Branche
 
-`feat/attendance-notifications`
+`feat/game-messaging`
 
 ## Lien ou numéro de Pull Request
 
@@ -65,6 +65,26 @@ les entrées de membres actifs.
 Les notifications push natives, l’XP et la messagerie de groupe par partie ne
 font pas partie de cette branche.
 
+## Addendum du 2026-10-13 — consentement Discord facultatif
+
+La décision 006 (`docs/decisions/006-discord-absence-notifications-and-server-consent.md`)
+réactive les DMs d'absence comme complément facultatif aux notifications
+internes. Elle supersède la décision 005 uniquement sur le retrait des DMs ;
+le chat de partie reste exclusivement dans JDR Hub.
+
+- après la création du compte, l'utilisateur peut autoriser l'ajout du bot au
+  serveur Discord privé dédié ; les comptes existants peuvent activer cette
+  option depuis leur profil ;
+- l'outbox reçoit une livraison DM seulement après consentement du MJ et
+  confirmation d'adhésion ; un refus ou un échec conserve la notification
+  interne ;
+- aucun DM rétroactif n'est créé pour les absences antérieures au consentement.
+  Le bot doit être déjà membre du serveur et n'a besoin que de la permission
+  Discord `CREATE_INSTANT_INVITE` ([documentation Discord](https://docs.discord.com/developers/resources/guild#add-guild-member)) ;
+- aucun contenu de chat ni donnée privée de partie n'est envoyé à Discord ;
+- l'implémentation est en cours sur `feat/game-messaging` et n'est pas déclarée
+  fusionnée.
+
 ## Besoin utilisateur
 
 ### Prévu
@@ -109,13 +129,25 @@ conception F07/F07B.
   planning desktop/mobile avec Tailwind uniquement ;
 - configuration Compose et `.env.example` sans secret réel.
 
+### Addendum du 2026-10-13 — interface de consentement
+
+- après connexion, un panneau non bloquant explique l’adhésion facultative au
+  serveur Discord privé réservé au bot et permet de différer le choix ;
+- la page privée `/profil` permet de démarrer l’autorisation Discord plus tard
+  et présente les retours de réussite, refus ou indisponibilité ;
+- l’interface précise que les notifications restent disponibles dans JDR Hub
+  et que les messages de partie ne sont jamais envoyés à Discord ;
+- la page d’accueil conserve un lien vers les préférences du profil après le
+  masquage du panneau d’onboarding.
+
 ## Parcours utilisateur
 
 ### Prévu
 
 1. Un membre authentifié ouvre son planning.
 2. Il choisit une séance confirmée et confirme son absence.
-3. Le MJ retrouve une notification interne et reçoit un DM Discord.
+3. Le MJ retrouve une notification interne et reçoit un DM Discord uniquement
+   s'il a accepté l'adhésion au serveur privé.
 4. Le MJ valide les présences de la séance.
 
 ### Réalisé
@@ -127,8 +159,9 @@ français. Le MJ peut envoyer la liste de présences validées par la route déd
 
 ### Restant à faire
 
-La réception Discord réelle dépend d’un token bot fourni par l’environnement
-de déploiement et n’a pas été appelée pendant les tests.
+La réception Discord réelle dépend du token bot fourni par l'environnement de
+déploiement et n'a pas été appelée pendant les tests. Les flux OAuth et la file
+de livraison utilisent des clients simulés pendant les tests.
 
 ## Règles métier
 
@@ -241,7 +274,9 @@ Aucune route F07 restante. Les routes chat/SSE sont F07B.
 
 ### Restants
 
-- capture E2E avec un vrai navigateur et fournisseur Discord simulé ;
+- vérification visuelle et interaction en vrai navigateur, indisponible dans
+  cette session (aucun plugin Browser, Playwright absent et démarrage local
+  refusé par le bac à sable) ;
 - messagerie de groupe par partie dans F07B.
 
 ## Tests
@@ -272,11 +307,18 @@ Aucune route F07 restante. Les routes chat/SSE sont F07B.
 | `pnpm --filter @jdr-hub/web build` | Build Next/Turbopack vert | 2026-09-06 |
 | `docker compose -f docker-compose.yml up --build --wait --wait-timeout 120` | API, web, proxy et PostgreSQL healthy ; migration appliquée | 2026-09-06 |
 | `curl http://127.0.0.1:18080/api/health` | Réponse JSON `status: ok` | 2026-09-06 |
+| `pnpm exec vitest run apps/web/tests/discord-guild-consent.test.ts` | 11 tests UI/API/profil verts ; échecs Red observés pour le chargement et l’erreur d’onboarding | 2026-10-13 |
+| `pnpm test` | 108 fichiers, 306 tests verts | 2026-10-13 |
+| `pnpm lint` | 4 packages verts | 2026-10-13 |
+| `pnpm typecheck` | 4 packages verts | 2026-10-13 |
+| `pnpm build` | Builds API et Next.js verts ; avertissement Next.js sur plusieurs lockfiles | 2026-10-13 |
+| `pnpm test:integration` avec PostgreSQL et Redis éphémères sur `127.0.0.1:15432/16379` | 8 fichiers, 17 tests verts | 2026-10-13 |
 
 ### Restants
 
 - test E2E Discord simulé et vérification manuelle du parcours dans un
-  navigateur.
+  navigateur ; aucun plugin Browser n’est disponible et Playwright n’est pas
+  installé (`pnpm exec playwright --version` échoue).
 
 ## Preuve TDD Red, Green, Refactor
 
@@ -285,11 +327,19 @@ Aucune route F07 restante. Les routes chat/SSE sont F07B.
 - Les tests de contrats, schéma, adaptateur, services, routes et interface ont
   été écrits avant leurs modules respectifs.
 - Les commandes ciblées ont échoué avec des modules absents, comme attendu.
+- Pour l’interface de consentement, le test a échoué car le client API et le
+  composant n’existaient pas ; un test ajouté ensuite a aussi échoué car la page
+  d’accueil ne permettait pas d’accéder au profil après « Plus tard ».
+- Pour l’onboarding, les tests ont d’abord échoué car les états de chargement et
+  d’erreur étaient masqués avant leur rendu ; la condition de masquage a été
+  resserrée.
 
 ### Green
 
 - Les implémentations minimales ont fait passer les tests ciblés : 7, 3, 6,
   13, 8 puis 11 tests selon les tranches.
+- Les 11 tests du client API, du consentement et du profil passent ; la suite
+  complète compte 306 tests verts.
 - Une reconstruction des packages `shared`/`database` a été nécessaire avant
   les typechecks, car leurs déclarations `dist` étaient obsolètes.
 - La suite PostgreSQL a d’abord révélé le verrouillage interdit d’un `LEFT
@@ -302,6 +352,10 @@ Aucune route F07 restante. Les routes chat/SSE sont F07B.
 - Le worker centralise la classification sûre des erreurs et le backoff.
 - Le shell conserve une seule cloche responsive et le planning réutilise un
   dialogue unique desktop/mobile.
+- Le panneau d’onboarding et le réglage de profil réutilisent le même composant
+  de présentation ; l’état d’adhésion reste fourni par `/me`.
+- La page `/profil`, le shell et la cloche de notifications sont rendables par
+  le harness SSR de test sans exposer de configuration Discord sensible.
 
 ## Sécurité
 
@@ -321,6 +375,9 @@ Aucune route F07 restante. Les routes chat/SSE sont F07B.
   secrets de vérification manifestement fictifs ;
 - réponses et interface sans stack trace, token, `discordId` ou détail de
   fournisseur.
+- l’ajout au serveur demande un clic distinct puis réutilise le flux OAuth
+  `guilds.join` protégé par `state` ; « Plus tard » ne coupe pas les
+  notifications JDR Hub ; `/profil` est exclu de l’indexation.
 
 ## Vérifications manuelles
 
@@ -342,8 +399,8 @@ Aucune route F07 restante. Les routes chat/SSE sont F07B.
 - le DM Discord est asynchrone : une indisponibilité du fournisseur laisse la
   notification interne disponible et marque la livraison pour retry ou échec ;
 - les tests E2E Discord restent à ajouter dans un harness isolé ;
-- F07B implémentera séparément la conversation textuelle par partie, SSE et
-  Redis Streams ; aucun départ de salon Discord ne déclenche d’action.
+- F07B conserve séparément la conversation textuelle par partie, SSE et Redis
+  Streams ; aucun départ de salon Discord ne déclenche d’action.
 
 ## Documentation consultée
 
@@ -363,3 +420,30 @@ https://superdesign.dev/teams/7d4c232a-149e-4854-94a5-097beff389ba/projects/b4d5
 La récupération HTML automatique du brouillon a rencontré deux erreurs DNS
 temporaires du registre npm ; l’implémentation finale a donc été contrôlée par
 le design system local, les tests Tailwind-only et le build Next.
+
+## Addendum du 2026-10-13 — décision 006 en cours d'implémentation
+
+La décision 006 a été acceptée : chaque absence garde sa notification interne ;
+un DM Discord complémentaire est mis en file uniquement si le MJ a accepté
+l'adhésion du bot au serveur privé. Le compte reste utilisable en cas de refus,
+d'indisponibilité Discord ou de DM bloqué. Aucun texte de chat n'est transmis.
+
+### Preuve TDD de la reprise serveur
+
+- Red : le test d'intégration PostgreSQL d'un MJ ayant rejoint le serveur
+  recevait `delivery: undefined`; le callback lancé depuis une autre session
+  consommait également l'autorisation légitime.
+- Green : l'outbox est créée dans la transaction d'absence uniquement quand
+  `discord_server_joined_at` est renseigné ; la consommation OAuth vérifie
+  atomiquement compte et session avant de marquer l'état consommé.
+- Vérifications du 2026-10-13 : `pnpm test` — 108 fichiers / 306 tests verts ;
+  `pnpm run lint` et `pnpm run typecheck` verts ; build API/web vert ;
+  intégrations `pnpm test:integration` — 8 fichiers / 17 tests verts ;
+  configuration Compose avec valeurs fictives valide. Le build Next a dû être
+  relancé hors du bac à sable après un refus d'ouverture de port Turbopack.
+- L'UI de consentement/profil et la réception Discord réelle restent à faire ;
+  le statut demeure `IN_PROGRESS`.
+- Limite TDD à ne pas masquer : les tests unitaires du client Discord et du
+  worker ont été ajoutés après leur code et n'ont pas eu de phase Red observée.
+  Cette preuve manque avant toute PR ; les tests PostgreSQL de l'outbox et du
+  callback OAuth ont, eux, échoué avant leur correction.

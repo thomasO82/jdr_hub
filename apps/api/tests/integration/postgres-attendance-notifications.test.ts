@@ -10,7 +10,6 @@ import {
   schedulingSchema,
 } from '@jdr-hub/database'
 import { createPostgresAttendanceRepository } from '../../src/modules/attendance/repository.js'
-import { createPostgresNotificationRepository } from '../../src/modules/notifications/repository.js'
 
 const databaseUrl = process.env.DATABASE_URL
 if (!databaseUrl) throw new Error('DATABASE_URL is required for PostgreSQL integration tests')
@@ -23,13 +22,13 @@ const { sessionAttendance, notifications, notificationDeliveries } = attendanceS
 
 type Seed = { ownerId: string; playerId: string; gameId: string; sessionId: string }
 
-async function seedSession(): Promise<Seed> {
+async function seedSession(ownerJoinedDiscord = false): Promise<Seed> {
   const ownerId = randomUUID()
   const playerId = randomUUID()
   const gameId = randomUUID()
   const sessionId = randomUUID()
   await database.db.insert(users).values([
-    { id: ownerId, discordId: '100000000000000001', username: 'MJ integration' },
+    { id: ownerId, discordId: '100000000000000001', username: 'MJ integration', discordServerJoinedAt: ownerJoinedDiscord ? new Date('2026-09-01T12:00:00.000Z') : null },
     { id: playerId, discordId: '200000000000000002', username: 'Joueur integration' },
   ])
   await database.db.insert(games).values({ id: gameId, ownerId, slug: `integration-${gameId}`, title: 'Partie intégration', system: 'Systeme', description: 'Données de test', type: 'CAMPAIGN', status: 'ACTIVE', visibility: 'PRIVATE', maxPlayers: 4 })
@@ -42,9 +41,6 @@ async function seedSession(): Promise<Seed> {
 }
 
 async function clean(seed: Seed): Promise<void> {
-  const notificationRows = await database.db.select({ id: notifications.id }).from(notifications).where(eq(notifications.sessionId, seed.sessionId))
-  const notificationIds = notificationRows.map((row) => row.id)
-  if (notificationIds.length > 0) await database.db.delete(notificationDeliveries).where(inArray(notificationDeliveries.notificationId, notificationIds))
   await database.db.delete(notifications).where(eq(notifications.sessionId, seed.sessionId))
   await database.db.delete(sessionAttendance).where(eq(sessionAttendance.sessionId, seed.sessionId))
   await database.db.delete(gameSessions).where(eq(gameSessions.id, seed.sessionId))
@@ -65,7 +61,42 @@ describe('PostgreSQL attendance and notification repositories', () => {
       expect(second).toEqual(first)
       expect((await database.db.select().from(sessionAttendance).where(eq(sessionAttendance.sessionId, seed.sessionId)))).toHaveLength(1)
       expect((await database.db.select().from(notifications).where(eq(notifications.sessionId, seed.sessionId)))).toHaveLength(1)
-      expect((await database.db.select().from(notificationDeliveries).where(eq(notificationDeliveries.notificationId, first.notification.id)))).toHaveLength(1)
+      expect((await database.db.select().from(notificationDeliveries).where(eq(notificationDeliveries.notificationId, first.notification.id)))).toHaveLength(0)
+    } finally {
+      await clean(seed)
+    }
+  })
+
+  it('queues one Discord delivery for an opted-in owner inside the absence transaction', async () => {
+    await migrateDatabase(database)
+    const seed = await seedSession(true)
+    try {
+      const repository = createPostgresAttendanceRepository(database.db)
+      const first = await repository.reportAbsence({ sessionId: seed.sessionId, userId: seed.playerId, now: new Date('2026-09-06T12:00:00.000Z') })
+      const second = await repository.reportAbsence({ sessionId: seed.sessionId, userId: seed.playerId, now: new Date('2026-09-06T12:01:00.000Z') })
+      const deliveries = await database.db.select().from(notificationDeliveries).where(eq(notificationDeliveries.notificationId, first.notification.id))
+
+      expect(second).toEqual(first)
+      expect(first.delivery).toMatchObject({ channel: 'DISCORD_DM', recipientDiscordId: '100000000000000001', status: 'PENDING' })
+      expect(deliveries).toHaveLength(1)
+      expect(deliveries[0]).toMatchObject({ channel: 'DISCORD_DM', status: 'PENDING', attempts: 0 })
+    } finally {
+      await clean(seed)
+    }
+  })
+
+  it('does not retroactively enqueue a Discord DM when the owner opts in after an absence', async () => {
+    await migrateDatabase(database)
+    const seed = await seedSession(false)
+    try {
+      const repository = createPostgresAttendanceRepository(database.db)
+      const first = await repository.reportAbsence({ sessionId: seed.sessionId, userId: seed.playerId, now: new Date('2026-09-06T12:00:00.000Z') })
+      await database.db.update(users).set({ discordServerJoinedAt: new Date('2026-09-06T12:05:00.000Z') }).where(eq(users.id, seed.ownerId))
+      const replay = await repository.reportAbsence({ sessionId: seed.sessionId, userId: seed.playerId, now: new Date('2026-09-06T12:06:00.000Z') })
+
+      expect(replay).toEqual(first)
+      expect(replay.delivery).toBeNull()
+      expect(await database.db.select().from(notificationDeliveries).where(eq(notificationDeliveries.notificationId, first.notification.id))).toHaveLength(0)
     } finally {
       await clean(seed)
     }
@@ -87,23 +118,6 @@ describe('PostgreSQL attendance and notification repositories', () => {
     }
   })
 
-  it('recovers a processing Discord delivery after its lease expires', async () => {
-    const seed = await seedSession()
-    try {
-      const attendanceRepository = createPostgresAttendanceRepository(database.db)
-      const event = await attendanceRepository.reportAbsence({ sessionId: seed.sessionId, userId: seed.playerId, now: new Date('2026-09-06T12:00:00.000Z') })
-      const repository = createPostgresNotificationRepository(database.db)
-      const firstClaim = await repository.claimPendingDeliveries({ now: new Date('2026-09-06T12:00:00.000Z'), limit: 1 })
-      const recoveredClaim = await repository.claimPendingDeliveries({ now: new Date('2026-09-06T12:06:00.000Z'), limit: 1 })
-
-      expect(firstClaim[0]).toMatchObject({ id: event.delivery.id, status: 'PROCESSING', attempts: 1 })
-      expect(recoveredClaim[0]).toMatchObject({ id: event.delivery.id, status: 'PROCESSING', attempts: 2 })
-      await repository.markSent({ deliveryId: event.delivery.id, providerMessageId: 'discord-message-integration', now: new Date('2026-09-06T12:07:00.000Z') })
-      expect((await database.db.select({ status: notificationDeliveries.status, processingAt: notificationDeliveries.processingAt }).from(notificationDeliveries).where(eq(notificationDeliveries.id, event.delivery.id)))[0]).toMatchObject({ status: 'SENT', processingAt: null })
-    } finally {
-      await clean(seed)
-    }
-  })
 })
 
 afterAll(async () => {

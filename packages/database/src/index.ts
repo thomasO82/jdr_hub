@@ -6,11 +6,21 @@ import * as authSchema from './schema/auth.js'
 import * as availabilitySchema from './schema/availability.js'
 import * as attendanceSchema from './schema/attendance.js'
 import * as gameSchema from './schema/games.js'
+import * as gameMessagesSchema from './schema/game-messages.js'
 import * as invitationsSchema from './schema/invitations.js'
 import * as schedulingSchema from './schema/scheduling.js'
 import * as gamificationSchema from './schema/gamification.js'
 
-export { authSchema, availabilitySchema, attendanceSchema, gameSchema, invitationsSchema, schedulingSchema, gamificationSchema }
+export {
+  authSchema,
+  availabilitySchema,
+  attendanceSchema,
+  gameMessagesSchema,
+  gameSchema,
+  invitationsSchema,
+  schedulingSchema,
+  gamificationSchema,
+}
 
 export type DatabaseHandle = ReturnType<typeof createDatabase>['db']
 export type DatabaseTransaction = Parameters<DatabaseHandle['transaction']>[0] extends (transaction: infer Transaction) => Promise<unknown> ? Transaction : never
@@ -45,7 +55,18 @@ export function createDatabase(rawUrl: string | undefined) {
 
   return {
     client,
-    db: drizzle(client, { schema: { ...authSchema, ...availabilitySchema, ...attendanceSchema, ...gameSchema, ...invitationsSchema, ...schedulingSchema, ...gamificationSchema } }),
+    db: drizzle(client, {
+      schema: {
+        ...authSchema,
+        ...availabilitySchema,
+        ...attendanceSchema,
+        ...gameMessagesSchema,
+        ...gameSchema,
+        ...invitationsSchema,
+        ...schedulingSchema,
+        ...gamificationSchema,
+      },
+    }),
   }
 }
 

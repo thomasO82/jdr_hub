@@ -1,6 +1,6 @@
 import { and, asc, desc, eq, gte, isNull, lt, or, sql } from 'drizzle-orm'
-import { authSchema, attendanceSchema, gameSchema, schedulingSchema, type createDatabase } from '@jdr-hub/database'
-import type { NotificationChannel, NotificationType } from '@jdr-hub/shared'
+import { attendanceSchema, authSchema, gameSchema, schedulingSchema, type createDatabase } from '@jdr-hub/database'
+import type { NotificationType } from '@jdr-hub/shared'
 import { createAbsenceDiscordContent } from './discord-content.js'
 
 export const MAX_NOTIFICATION_DELIVERY_ATTEMPTS = 5
@@ -30,7 +30,7 @@ export type DiscordDelivery = {
   notificationId: string
   recipientDiscordId: string
   content: string
-  channel: Extract<NotificationChannel, 'DISCORD_DM'>
+  channel: 'DISCORD_DM'
   status: 'PENDING' | 'PROCESSING' | 'SENT' | 'FAILED'
   attempts: number
   processingAt: Date | null
@@ -43,6 +43,9 @@ export interface NotificationRepository {
   listForUser(input: { userId: string; cursor: string | null; limit: number }): Promise<NotificationPageRecord>
   listUnreadForUser(input: { userId: string; limit: number }): Promise<{ items: NotificationRecord[]; unreadCount: number }>
   markRead(input: { notificationId: string; userId: string; now: Date }): Promise<boolean>
+}
+
+export interface NotificationDeliveryRepository extends NotificationRepository {
   claimPendingDeliveries(input: { now: Date; limit: number }): Promise<DiscordDelivery[]>
   markSent(input: { deliveryId: string; providerMessageId: string; now: Date }): Promise<void>
   markRetryableFailure(input: { deliveryId: string; errorCode: string; nextAttemptAt: Date; now: Date }): Promise<void>
@@ -70,25 +73,11 @@ const toNotification = (row: { id: string; type: string; recipientId: string; ga
   type: row.type as NotificationType,
 })
 
-const toDelivery = (row: { id: string; notificationId: string; recipientDiscordId: string; content: string; channel: string; status: string; attempts: number; processingAt: Date | null; nextAttemptAt: Date | null; providerMessageId: string | null; lastErrorCode: string | null }): DiscordDelivery => ({
-  id: row.id,
-  notificationId: row.notificationId,
-  recipientDiscordId: row.recipientDiscordId,
-  content: row.content,
-  channel: row.channel as DiscordDelivery['channel'],
-  status: row.status as DiscordDelivery['status'],
-  attempts: row.attempts,
-  processingAt: row.processingAt,
-  nextAttemptAt: row.nextAttemptAt,
-  providerMessageId: row.providerMessageId,
-  lastErrorCode: row.lastErrorCode,
-})
-
-export function createPostgresNotificationRepository(database: Database): NotificationRepository {
+export function createPostgresNotificationRepository(database: Database): NotificationDeliveryRepository {
+  const { notifications, notificationDeliveries } = attendanceSchema
   const { users } = authSchema
   const { games } = gameSchema
   const { gameSessions } = schedulingSchema
-  const { notifications, notificationDeliveries } = attendanceSchema
 
   return {
     async listForUser({ userId, cursor, limit }) {
@@ -124,13 +113,10 @@ export function createPostgresNotificationRepository(database: Database): Notifi
     async claimPendingDeliveries({ now, limit }) {
       return database.transaction(async (tx) => {
         const staleBefore = new Date(now.getTime() - NOTIFICATION_PROCESSING_LEASE_MS)
-        const staleProcessing = and(
-          eq(notificationDeliveries.status, 'PROCESSING'),
-          or(
-            lt(notificationDeliveries.processingAt, staleBefore),
-            and(isNull(notificationDeliveries.processingAt), lt(notificationDeliveries.updatedAt, staleBefore)),
-          ),
-        )
+        const staleProcessing = and(eq(notificationDeliveries.status, 'PROCESSING'), or(
+          lt(notificationDeliveries.processingAt, staleBefore),
+          and(isNull(notificationDeliveries.processingAt), lt(notificationDeliveries.updatedAt, staleBefore)),
+        ))
         await tx.update(notificationDeliveries).set({ status: 'PENDING', nextAttemptAt: now, processingAt: null, lastErrorCode: 'DISCORD_WORKER_TIMEOUT', updatedAt: now }).where(and(staleProcessing, lt(notificationDeliveries.attempts, MAX_NOTIFICATION_DELIVERY_ATTEMPTS)))
         await tx.update(notificationDeliveries).set({ status: 'FAILED', processingAt: null, lastErrorCode: 'DISCORD_WORKER_TIMEOUT', updatedAt: now }).where(and(staleProcessing, gte(notificationDeliveries.attempts, MAX_NOTIFICATION_DELIVERY_ATTEMPTS)))
 
@@ -159,7 +145,19 @@ export function createPostgresNotificationRepository(database: Database): Notifi
         const claimed: DiscordDelivery[] = []
         for (const candidate of candidates) {
           const [updated] = await tx.update(notificationDeliveries).set({ status: 'PROCESSING', attempts: sql`${notificationDeliveries.attempts} + 1`, processingAt: now, updatedAt: now }).where(and(eq(notificationDeliveries.id, candidate.id), eq(notificationDeliveries.status, 'PENDING'))).returning({ attempts: notificationDeliveries.attempts, processingAt: notificationDeliveries.processingAt })
-          if (updated) claimed.push(toDelivery({ ...candidate, content: createAbsenceDiscordContent({ gameTitle: candidate.gameTitle, sessionStartsAt: candidate.sessionStartsAt }), status: 'PROCESSING', attempts: updated.attempts, processingAt: updated.processingAt }))
+          if (updated) claimed.push({
+            id: candidate.id,
+            notificationId: candidate.notificationId,
+            recipientDiscordId: candidate.recipientDiscordId,
+            content: createAbsenceDiscordContent({ gameTitle: candidate.gameTitle, sessionStartsAt: candidate.sessionStartsAt }),
+            channel: candidate.channel as DiscordDelivery['channel'],
+            status: 'PROCESSING',
+            attempts: updated.attempts,
+            processingAt: updated.processingAt,
+            nextAttemptAt: candidate.nextAttemptAt,
+            providerMessageId: candidate.providerMessageId,
+            lastErrorCode: candidate.lastErrorCode,
+          })
         }
         return claimed
       })

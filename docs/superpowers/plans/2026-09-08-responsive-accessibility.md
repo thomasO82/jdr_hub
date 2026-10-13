@@ -319,4 +319,3 @@ Si une vérification échoue, appliquer `superpowers:systematic-debugging` avant
 6. `docs: track responsive accessibility feature`
 
 Des commits plus petits sont acceptés si chacun reste cohérent et que le cycle Red/Green/Refactor est traçable dans la fiche F10.
-

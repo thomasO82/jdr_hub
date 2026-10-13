@@ -33,6 +33,10 @@ la stack locale, ainsi que pour appliquer les seeds de développement.
 - `pnpm db:seed` exécute le seed dans le conteneur API et utilise la base
   PostgreSQL privée de Compose.
 - `pnpm dev:down` arrête la stack.
+- Le `Makefile` fournit des alias homogènes pour l’installation, le démarrage,
+  les tests, les vérifications, le seed, Drizzle Studio et les journaux.
+- `make help` documente les cibles disponibles ; `make check` enchaîne les
+  tests, le lint, TypeScript et les builds.
 
 ## Architecture et sécurité
 
@@ -45,16 +49,21 @@ son refus de l’environnement production.
 - **Red :** le test d’infrastructure échouait car les quatre scripts n’étaient
   pas déclarés.
 - **Green :** les alias ont été ajoutés au `package.json` racine.
-- **Refactor :** le README et le suivi projet utilisent désormais les alias
-  courts.
+- **Refactor :** le Makefile regroupe les scripts pnpm sans dupliquer leur
+  logique, et le README documente le parcours recommandé.
 
 ## Vérifications
 
 - `pnpm exec vitest run tests/infrastructure/developer-scripts.test.ts` — vert.
-- `pnpm test` — 60 fichiers, 142 tests verts.
+- `pnpm test` — 108 fichiers, 302 tests verts.
 - `pnpm lint` — vert.
 - `pnpm typecheck` — vert.
+- `pnpm build` — API et Next.js verts.
+- `pnpm audit` — échec attendu sur 17 vulnérabilités de dépendances existantes
+  (1 faible, 7 modérées, 4 élevées, 5 critiques), sans modification de
+  dépendance dans cette fonctionnalité.
 - `git diff --check` — vert.
+- `pnpm test tests/infrastructure/makefile.test.ts` — 4 tests verts.
 
 ## Limites et travaux reportés
 

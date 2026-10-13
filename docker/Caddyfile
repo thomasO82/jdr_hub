@@ -4,7 +4,9 @@
   }
 
   handle_path /api/* {
-    reverse_proxy api-hono:8787
+    reverse_proxy api-hono:8787 {
+      flush_interval -1
+    }
   }
 
   handle {

@@ -38,7 +38,8 @@ Seuls les statuts suivants sont autorisés :
 | DEV-003 | Drizzle Studio local | `IN_PROGRESS` | `chore/drizzle-studio` | Non créée | 61 fichiers, 146 tests verts ; lint, typecheck, build et image Studio vérifiés | Port local uniquement, réseau PostgreSQL privé, conteneur non-root | [Fiche DEV-003](features/010-drizzle-studio.md) |
 | F05 | Disponibilités et recherche de joueurs | `MERGED` | `feat/availability-and-player-search` | Fusion confirmée par le propriétaire dans `develop` | 72 fichiers, 173 tests monorepo verts ; lint, typecheck et builds verts | Session obligatoire, origine stricte, rate limit d’écriture, horaires privés, projection agrégée et validation bornée | [Fiche F05](features/011-availability-and-player-search.md) |
 | F06 | Séances, créneaux, votes et planning | `IN_PROGRESS` | `feat/sessions-scheduling` | Non créée | 84 fichiers, 203 tests monorepo verts ; lint, typecheck et build web verts | Appartenance/MJ, origine stricte, votes uniques, transaction de sélection, dates bornées | [Fiche F06](features/012-sessions-scheduling.md) |
-| F07 | Présences, absences et notifications Discord | `IN_PROGRESS` | `feat/attendance-notifications` | Création bloquée par GitHub (`403`) ; [ouverture manuelle](https://github.com/thomasO82/jdr_hub/pull/new/feat/attendance-notifications) | 98 fichiers, 248 tests monorepo verts + 3 intégration PostgreSQL ; lint, typecheck, builds API/web et Compose healthy | Session/origine/rate limit, autorisation par membre/MJ, transaction idempotente, bail outbox, bot serveur, mentions désactivées, retries bornés | [Fiche F07](features/013-attendance-notifications.md) |
+| F07 | Présences, absences et notifications Discord optionnelles | `IN_PROGRESS` | `feat/game-messaging` | Non créée | 108 fichiers, 306 tests verts ; lint, typecheck, builds et intégrations PostgreSQL/Redis (8 fichiers, 17 tests) verts | Notifications JDR Hub maintenues ; DM après adhésion consentie ; OAuth `guilds.join` distinct ; aucun contenu de chat transmis | [Fiche F07](features/013-attendance-notifications.md) |
+| F07B | Messagerie textuelle par partie | `IN_PROGRESS` | `feat/game-messaging` | Non créée | 108 fichiers, 306 tests verts ; build Docker Compose, intégrations PostgreSQL/Redis et conteneurs sains ; vérification navigateur restante | Autorisation propriétaire/membre actif, lecture seule après fermeture, texte borné/échappé, SSE revalidé, Redis interne | [Fiche F07B](features/015-game-messaging.md) |
 | F08 | Dashboard et gestion MJ | `IN_PROGRESS` | `feat/dashboard-and-gm-management` | Non créée | 115 fichiers, 308 tests monorepo verts + 8 tests d'intégration PostgreSQL ; lint, typecheck et build verts | Session/origine/rate limit, autorisation par ressource, projection minimale, notifications destinataire-scopées, validation stricte, contrainte d'invitation et transactions | [Fiche F08](features/014-dashboard-and-gm-management.md) |
 | F09 | XP, niveaux et historique de progression | `MERGED` | `feat/xp-and-levels` | Fusion confirmée par le propriétaire dans `develop` | 122 fichiers et 326 tests verts ; 11 tests d'intégration PostgreSQL ; lint, typecheck et builds verts | Session authentifiée, historique privé, limites Zod, idempotence DB, transaction présence/XP, absence de champs internes | [Fiche F09](features/015-xp-and-levels.md) |
 | F10 | Responsive, accessibilité et états UI | `IN_PROGRESS` | `feat/responsive-accessibility` | Non créée | 125 fichiers et 333 tests verts ; lint, typecheck et build verts | Aucun changement API/auth ; erreurs traduites, focus clavier, cibles tactiles et réduction des animations | [Fiche F10](features/016-responsive-accessibility.md) |
@@ -47,6 +48,12 @@ Seuls les statuts suivants sont autorisés :
 | FIX-SEC-003 | Scan gratuit des images Docker dans la CI | `IN_PROGRESS` | `fix/free-image-scanning` | Création automatique refusée (`403`) ; [ouvrir manuellement vers `develop`](https://github.com/thomasO82/jdr_hub/compare/develop...fix/free-image-scanning?expand=1) | 125 fichiers/334 tests, 11 intégration PostgreSQL, lint, typecheck, build, audit, build Docker et scans locaux des deux images verts ; CI GitHub à confirmer | Trivy épinglé par SHA, images web/API, seuil critique/élevé bloquant, base runtime corrigée, aucun abonnement Scout | [Fiche FIX-SEC-003](features/020-free-image-scanning.md) |
 
 ## Blocages
+
+- 2026-10-13 — F07/F07B : la décision 006 est acceptée et l'implémentation
+  est en cours sur `feat/game-messaging` ; aucune PR n'est ouverte. L'interface
+  de consentement/onboarding et le réglage du profil sont implémentés. Restent
+  la vérification navigateur (outil absent) et la revue TDD de la livraison
+  Discord déjà codée avant ses tests unitaires.
 
 - 2026-09-04 — F12 : la branche `fix/jwt-session-security` est poussée,
   mais l'intégration GitHub a refusé la création de PR vers `develop`
@@ -65,6 +72,11 @@ Seuls les statuts suivants sont autorisés :
 - 2026-09-06 — F06 : la branche `feat/sessions-scheduling` est poussée et
   vérifiée ; l'ouverture automatique est indisponible car `gh` n'est pas
   installé. La PR doit être ouverte manuellement et F06 reste `IN_PROGRESS`.
+- 2026-09-06 — F07B : la branche `feat/game-messaging` est poussée et
+  vérifiée, mais l'intégration GitHub refuse l'ouverture automatique
+  (`403 Resource not accessible by integration`). La PR doit être ouverte
+  manuellement et F07B reste `IN_PROGRESS` :
+  https://github.com/thomasO82/jdr_hub/pull/new/feat/game-messaging
 - 2026-09-06 — F08 : la branche `feat/dashboard-and-gm-management` est
   poussée et vérifiée, mais l'intégration GitHub a refusé la création de PR
   (`403 Resource not accessible by integration`) et `gh` n'est pas installé.

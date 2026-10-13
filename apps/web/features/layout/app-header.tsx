@@ -1,3 +1,4 @@
+import React from 'react'
 import { NotificationBell } from '../notifications/notification-bell'
 import { MobileHeader } from './mobile-header'
 

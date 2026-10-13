@@ -14,6 +14,8 @@ import { registerAttendanceRoutes } from './modules/attendance/routes.js'
 import type { AttendanceDependencies } from './modules/attendance/handlers.js'
 import { registerNotificationRoutes } from './modules/notifications/routes.js'
 import type { NotificationsDependencies } from './modules/notifications/handlers.js'
+import { registerMessageRoutes } from './modules/messages/routes.js'
+import type { MessagesDependencies } from './modules/messages/handlers.js'
 import { registerInvitationRoutes } from './modules/invitations/routes.js'
 import type { InvitationsDependencies } from './modules/invitations/handlers.js'
 import { registerMemberRoutes } from './modules/members/routes.js'
@@ -40,7 +42,7 @@ const SECURITY_HEADERS = {
   'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
 } as const
 
-export function createApiApp(options?: { auth: { config: AuthConfig; repository: AuthRepository }; games?: GamesDependencies; applications?: ApplicationsDependencies; availability?: AvailabilityDependencies; scheduling?: SchedulingDependencies; attendance?: AttendanceDependencies; notifications?: NotificationsDependencies; invitations?: InvitationsDependencies; members?: MembersDependencies; dashboard?: DashboardDependencies; gamification?: GamificationDependencies }): ApiApp {
+export function createApiApp(options?: { auth: { config: AuthConfig; repository: AuthRepository }; games?: GamesDependencies; applications?: ApplicationsDependencies; availability?: AvailabilityDependencies; scheduling?: SchedulingDependencies; attendance?: AttendanceDependencies; notifications?: NotificationsDependencies; messages?: MessagesDependencies; invitations?: InvitationsDependencies; members?: MembersDependencies; dashboard?: DashboardDependencies; gamification?: GamificationDependencies }): ApiApp {
   const app = new Hono<{ Variables: ApiVariables }>()
 
   app.use('*', async (c, next) => {
@@ -111,6 +113,9 @@ export function createApiApp(options?: { auth: { config: AuthConfig; repository:
   }
   if (options?.notifications) {
     registerNotificationRoutes(app, options.notifications)
+  }
+  if (options?.messages) {
+    registerMessageRoutes(app, options.messages)
   }
   if (options?.invitations) {
     registerInvitationRoutes(app, options.invitations)

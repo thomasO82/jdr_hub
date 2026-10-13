@@ -94,12 +94,18 @@ services:
       APP_ORIGIN: ${APP_ORIGIN:-http://localhost:18080}
       DISCORD_CLIENT_ID: ${DISCORD_CLIENT_ID:?DISCORD_CLIENT_ID must be set}
       DISCORD_CLIENT_SECRET: ${DISCORD_CLIENT_SECRET:?DISCORD_CLIENT_SECRET must be set}
-      DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN:?DISCORD_BOT_TOKEN must be set}
       DISCORD_REDIRECT_URI: ${DISCORD_REDIRECT_URI:-http://localhost:18080/api/auth/discord/callback}
+      DISCORD_GUILD_ID: ${DISCORD_GUILD_ID:-}
+      DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN:-}
+      DISCORD_NOTIFICATION_INTERVAL_MS: ${DISCORD_NOTIFICATION_INTERVAL_MS:-30000}
+      DISCORD_NOTIFICATION_BATCH_LIMIT: ${DISCORD_NOTIFICATION_BATCH_LIMIT:-10}
       JWT_SIGNING_SECRET: ${JWT_SIGNING_SECRET:?JWT_SIGNING_SECRET must be set}
       JWT_PREVIOUS_SIGNING_SECRET: ${JWT_PREVIOUS_SIGNING_SECRET:-}
+      REDIS_URL: ${REDIS_URL:-redis://redis:6379}
     depends_on:
       postgres:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     healthcheck:
       test:
@@ -135,6 +141,31 @@ services:
       timeout: 5s
       retries: 5
       start_period: 10s
+    security_opt:
+      - no-new-privileges:true
+
+  redis:
+    image: redis:7.4.2-alpine@sha256:02419de7eddf55aa5bcf49efb74e88fa8d931b4d77c07eff8a6b2144472b6952
+    init: true
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    expose:
+      - "6379"
+    networks:
+      - database-internal
+    healthcheck:
+      test:
+        - CMD
+        - redis-cli
+        - ping
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    cap_drop:
+      - ALL
+    # L'entrypoint Redis bascule vers l'utilisateur non-root redis via su-exec.
+    cap_add:
+      - SETUID
+      - SETGID
     security_opt:
       - no-new-privileges:true
 

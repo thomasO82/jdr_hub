@@ -14,8 +14,11 @@ import { createPostgresNotificationRepository } from './modules/notifications/re
 import { createPostgresInvitationRepository } from './modules/invitations/repository.js'
 import { createPostgresMemberRepository } from './modules/members/repository.js'
 import { createPostgresDashboardRepository } from './modules/dashboard/repository.js'
-import { createDiscordNotifier } from './modules/notifications/discord-client.js'
+import { parseMessageConfig } from './modules/messages/config.js'
+import { createPostgresGameMessageRepository } from './modules/messages/repository.js'
+import { createRedisGameMessageEventBus } from './modules/messages/redis-event-bus.js'
 import { parseNotificationConfig } from './modules/notifications/config.js'
+import { createDiscordNotifier } from './modules/notifications/discord-client.js'
 import { processDiscordDeliveries, startNotificationWorker } from './modules/notifications/worker.js'
 
 async function startApi(): Promise<void> {
@@ -23,14 +26,16 @@ async function startApi(): Promise<void> {
   const database = createDatabase(process.env.DATABASE_URL)
   const authConfig = parseAuthConfig(process.env)
   const notificationConfig = parseNotificationConfig(process.env)
+  const messageConfig = parseMessageConfig(process.env)
   const authRepository = createPostgresAuthRepository(database.db)
   const gamificationRepository = createPostgresGamificationRepository(database.db)
   const attendanceRepository = createPostgresAttendanceRepository(database.db, { awardSessionXp: gamificationRepository.awardSessionXp })
   const notificationRepository = createPostgresNotificationRepository(database.db)
+  const messageRepository = createPostgresGameMessageRepository(database.db)
+  const messageEventBus = createRedisGameMessageEventBus(messageConfig.redisUrl)
   const invitationRepository = createPostgresInvitationRepository(database.db)
   const memberRepository = createPostgresMemberRepository(database.db)
   const dashboardRepository = createPostgresDashboardRepository(database.db)
-  const notifier = createDiscordNotifier(notificationConfig)
   await migrateDatabase(database)
 
   const server = serve({
@@ -42,6 +47,7 @@ async function startApi(): Promise<void> {
       scheduling: { authConfig, authRepository, repository: createPostgresSchedulingRepository(database.db) },
       attendance: { authConfig, authRepository, repository: attendanceRepository },
       notifications: { authConfig, authRepository, repository: notificationRepository },
+      messages: { authConfig, authRepository, repository: messageRepository, eventBus: messageEventBus },
       invitations: { authConfig, authRepository, repository: invitationRepository },
       members: { authConfig, authRepository, repository: memberRepository },
       dashboard: { authConfig, authRepository, repository: dashboardRepository, notificationsRepository: notificationRepository },
@@ -49,10 +55,16 @@ async function startApi(): Promise<void> {
     }).fetch,
     port,
   })
-  const stopNotificationWorker = startNotificationWorker({
-    process: () => processDiscordDeliveries({ repository: notificationRepository, notifier, limit: 20 }),
-    intervalMs: 30_000,
-  })
+  const stopNotificationWorker = notificationConfig
+    ? startNotificationWorker({
+      process: () => processDiscordDeliveries({
+        repository: notificationRepository,
+        notifier: createDiscordNotifier(notificationConfig),
+        limit: notificationConfig.batchSize,
+      }),
+      intervalMs: notificationConfig.intervalMs,
+    })
+    : () => undefined
   const shutdown = () => {
     stopNotificationWorker()
     server.close(() => { void database.client.end() })
