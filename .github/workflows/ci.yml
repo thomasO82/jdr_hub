@@ -83,6 +83,10 @@ jobs:
           ! git grep -nE 'dangerouslySetInnerHTML|eval\(|new Function|child_process|shell: *true' -- apps packages ':(exclude)apps/**/tests/**' ':(exclude)packages/**/tests/**'
 
       - name: Build images
+        env:
+          DISCORD_CLIENT_ID: 123456789012345678
+          DISCORD_CLIENT_SECRET: ci-only-build-secret
+          JWT_SIGNING_SECRET: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         run: docker compose -f docker-compose.yml build web-next api-hono
 
       - name: Scan web image with Trivy
