@@ -1,6 +1,7 @@
 import { and, eq, inArray } from 'drizzle-orm'
 import { attendanceSchema, authSchema, gameSchema, schedulingSchema, type createDatabase } from '@jdr-hub/database'
 import type { AttendanceEntry, AttendanceRecord, SessionContext } from '@jdr-hub/shared'
+import type { GamificationRepository } from '../gamification/repository.js'
 import type { DiscordDelivery, NotificationRecord } from '../notifications/repository.js'
 import { createAbsenceDiscordContent } from '../notifications/discord-content.js'
 
@@ -17,6 +18,7 @@ export interface AttendanceRepository {
 }
 
 type Database = ReturnType<typeof createDatabase>['db']
+type AttendanceDependencies = Pick<GamificationRepository, 'awardSessionXp'>
 
 type SessionContextRow = {
   sessionId: string
@@ -46,11 +48,11 @@ const toNotification = (row: { id: string; type: string; recipientId: string; ga
 })
 
 /** Persists an absence and its two notification projections atomically. */
-export function createPostgresAttendanceRepository(database: Database): AttendanceRepository {
+export function createPostgresAttendanceRepository(database: Database, dependencies: AttendanceDependencies = { awardSessionXp: async () => {} }): AttendanceRepository {
+  const { users } = authSchema
   const { games, gameMembers } = gameSchema
   const { gameSessions } = schedulingSchema
   const { sessionAttendance, notifications, notificationDeliveries } = attendanceSchema
-  const { users } = authSchema
 
   const readContext = async (sessionId: string, userId: string, db: Pick<Database, 'select'> = database): Promise<SessionContext | null> => {
     const [row] = await db.select({
@@ -197,6 +199,12 @@ export function createPostgresAttendanceRepository(database: Database): Attendan
           records.push(toAttendance(record))
         }
         await tx.update(gameSessions).set({ status: 'COMPLETED', updatedAt: now }).where(eq(gameSessions.id, sessionId))
+        await dependencies.awardSessionXp({
+          tx,
+          sessionId,
+          presentUserIds: records.filter((record) => record.status === 'PRESENT').map((record) => record.userId),
+          now,
+        })
         return records
       })
     },

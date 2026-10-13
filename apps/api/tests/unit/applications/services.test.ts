@@ -12,6 +12,11 @@ describe('application services', () => {
     expect(application).toMatchObject({ gameId: 'game-1', userId: 'player-1', message: 'Je suis disponible le jeudi.', status: 'PENDING' })
   })
 
+  it('does not resolve a game application target by its public slug', async () => {
+    const repository = createInMemoryApplicationsRepository({ games: [{ ...baseGame, slug: 'la-vallee-des-brumes' }] })
+    await expect(submitApplication({ userId: 'player-1', gameId: 'la-vallee-des-brumes', repository })).rejects.toThrow('APPLICATION_NOT_FOUND')
+  })
+
   it('rejects self-application, hidden games and duplicate applications', async () => {
     const repository = createInMemoryApplicationsRepository({ games: [baseGame, { ...baseGame, id: 'private', visibility: 'PRIVATE' }, { ...baseGame, id: 'closed', status: 'CLOSED' }] })
     await expect(submitApplication({ userId: 'gm-1', gameId: 'game-1', repository })).rejects.toThrow('APPLICATION_CONFLICT')

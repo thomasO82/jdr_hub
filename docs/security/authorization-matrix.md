@@ -16,6 +16,14 @@ un contrôle d'autorisation.
 | Écrire un message dans une partie | Non | Non | Non | Oui si partie `OPEN`/`ACTIVE` | Oui si partie `OPEN`/`ACTIVE` | Selon politique support |
 | Lire les messages d’une partie `CLOSED`/`COMPLETED` | Non | Non | Non | Oui si membre toujours actif | Oui, uniquement ses parties | Selon politique support |
 | Écrire dans une partie `CLOSED`/`COMPLETED` | Non | Non | Non | Non | Non | Selon politique support |
+| Lire son dashboard | Non | Oui, uniquement ses projections | Oui, selon ses droits | Oui, selon ses droits | Oui, selon ses droits | Selon politique support |
+| Lire ses invitations reçues | Non | Oui, uniquement les siennes | Oui, uniquement les siennes | Oui, uniquement les siennes | Oui, uniquement les siennes | Selon politique support |
+| Créer/lire/annuler les invitations d'une partie | Non | Non | Non | Non | Oui, uniquement ses parties | Selon politique support |
+| Accepter/refuser une invitation reçue | Non | Oui, uniquement les siennes | Oui, uniquement les siennes | Oui, uniquement les siennes | Non pour une invitation reçue par autrui | Selon politique support |
+| Lire la gestion d'une partie | Non | Non | Non | Non | Oui, uniquement ses parties | Selon politique support |
+| Retirer un joueur du roster | Non | Non | Non | Non | Oui, uniquement ses parties ; jamais le MJ | Selon politique support |
+| Lire son historique XP et sa progression | Non | Oui, uniquement les siennes | Oui, uniquement les siennes | Oui, uniquement les siennes | Oui, uniquement les siennes | Selon politique support |
+| Attribuer l'XP d'une séance validée | Non | Non | Non | Non | Oui, uniquement ses parties et après validation | Selon politique support |
 
 Règles F04 : toutes les mutations exigent une session active et l'origine
 exacte configurée ; `userId`, `ownerId`, `role` et `status` protégés sont
@@ -38,3 +46,19 @@ Règles d'adhésion Discord : seul un utilisateur authentifié peut démarrer le
 flux `guilds.join`, lié à son état OAuth, son compte et sa session. Le callback
 ne modifie pas la session JDR Hub. Un refus ne bloque ni le compte ni les
 notifications internes. Aucun message de partie n'est transmis à Discord.
+Règles F08 : le dashboard est toujours calculé pour l'utilisateur authentifié
+et n'accepte aucun identifiant utilisateur fourni par le client. Les routes de
+gestion, de roster et d'invitations d'une partie vérifient côté serveur le
+rôle de MJ propriétaire. Les invitations sont limitées à une partie ouverte ou
+active, expirent après sept jours, ne peuvent être acceptées qu'une fois et
+leur acceptation réserve la place dans une transaction. Les mutations exigent
+également l'origine applicative exacte, un payload Zod strict et le rate
+limiting prévu ; les projections excluent les identifiants Discord et les
+informations de disponibilité privées.
+
+Règles F09 : `GET /profile/xp` dérive exclusivement l'utilisateur de la session
+active et ignore tout identifiant fourni par le client. Les événements XP sont
+créés côté serveur uniquement pour les présences `PRESENT`, avec une clé
+d'idempotence unique et une transaction partagée avec la validation de séance.
+Le montant, le niveau et le motif ne sont jamais des champs d'autorité du
+navigateur ; la réponse n'expose ni clé d'idempotence ni identifiant Discord.

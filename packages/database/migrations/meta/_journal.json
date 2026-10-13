@@ -61,15 +61,22 @@
     {
       "idx": 8,
       "version": "7",
-      "when": 1788716562277,
-      "tag": "0008_game_messages",
+      "when": 1788710718369,
+      "tag": "0008_invitations",
       "breakpoints": true
     },
     {
       "idx": 9,
       "version": "7",
-      "when": 1791894768851,
-      "tag": "0009_discord_server_membership",
+      "when": 1788865514039,
+      "tag": "0009_lethal_mattie_franklin",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1791902626217,
+      "tag": "0010_game-messages-and-discord-consent",
       "breakpoints": true
     }
   ]

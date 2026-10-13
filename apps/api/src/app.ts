@@ -16,6 +16,14 @@ import { registerNotificationRoutes } from './modules/notifications/routes.js'
 import type { NotificationsDependencies } from './modules/notifications/handlers.js'
 import { registerMessageRoutes } from './modules/messages/routes.js'
 import type { MessagesDependencies } from './modules/messages/handlers.js'
+import { registerInvitationRoutes } from './modules/invitations/routes.js'
+import type { InvitationsDependencies } from './modules/invitations/handlers.js'
+import { registerMemberRoutes } from './modules/members/routes.js'
+import type { MembersDependencies } from './modules/members/handlers.js'
+import { registerDashboardRoutes } from './modules/dashboard/routes.js'
+import type { DashboardDependencies } from './modules/dashboard/handlers.js'
+import { registerGamificationRoutes } from './modules/gamification/routes.js'
+import type { GamificationDependencies } from './modules/gamification/handlers.js'
 
 type ApiVariables = {
   requestId: string
@@ -34,7 +42,7 @@ const SECURITY_HEADERS = {
   'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
 } as const
 
-export function createApiApp(options?: { auth: { config: AuthConfig; repository: AuthRepository }; games?: GamesDependencies; applications?: ApplicationsDependencies; availability?: AvailabilityDependencies; scheduling?: SchedulingDependencies; attendance?: AttendanceDependencies; notifications?: NotificationsDependencies; messages?: MessagesDependencies }): ApiApp {
+export function createApiApp(options?: { auth: { config: AuthConfig; repository: AuthRepository }; games?: GamesDependencies; applications?: ApplicationsDependencies; availability?: AvailabilityDependencies; scheduling?: SchedulingDependencies; attendance?: AttendanceDependencies; notifications?: NotificationsDependencies; messages?: MessagesDependencies; invitations?: InvitationsDependencies; members?: MembersDependencies; dashboard?: DashboardDependencies; gamification?: GamificationDependencies }): ApiApp {
   const app = new Hono<{ Variables: ApiVariables }>()
 
   app.use('*', async (c, next) => {
@@ -108,6 +116,18 @@ export function createApiApp(options?: { auth: { config: AuthConfig; repository:
   }
   if (options?.messages) {
     registerMessageRoutes(app, options.messages)
+  }
+  if (options?.invitations) {
+    registerInvitationRoutes(app, options.invitations)
+  }
+  if (options?.members) {
+    registerMemberRoutes(app, options.members)
+  }
+  if (options?.dashboard) {
+    registerDashboardRoutes(app, options.dashboard)
+  }
+  if (options?.gamification) {
+    registerGamificationRoutes(app, options.gamification)
   }
 
   app.notFound((c) =>

@@ -4,6 +4,7 @@ import {
   timestamp,
   uuid,
   varchar,
+  integer,
 } from 'drizzle-orm/pg-core'
 
 export const users = pgTable(
@@ -16,6 +17,8 @@ export const users = pgTable(
     timezone: varchar('timezone', { length: 64 })
       .notNull()
       .default('Europe/Paris'),
+    xp: integer('xp').notNull().default(0),
+    level: integer('level').notNull().default(1),
     createdAt: timestamp('created_at', { withTimezone: true })
       .notNull()
       .defaultNow(),

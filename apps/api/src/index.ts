@@ -9,7 +9,11 @@ import { createPostgresApplicationRepository } from './modules/applications/repo
 import { createPostgresAvailabilityRepository } from './modules/availability/repository.js'
 import { createPostgresSchedulingRepository } from './modules/scheduling/repository.js'
 import { createPostgresAttendanceRepository } from './modules/attendance/repository.js'
+import { createPostgresGamificationRepository } from './modules/gamification/repository.js'
 import { createPostgresNotificationRepository } from './modules/notifications/repository.js'
+import { createPostgresInvitationRepository } from './modules/invitations/repository.js'
+import { createPostgresMemberRepository } from './modules/members/repository.js'
+import { createPostgresDashboardRepository } from './modules/dashboard/repository.js'
 import { parseMessageConfig } from './modules/messages/config.js'
 import { createPostgresGameMessageRepository } from './modules/messages/repository.js'
 import { createRedisGameMessageEventBus } from './modules/messages/redis-event-bus.js'
@@ -24,10 +28,14 @@ async function startApi(): Promise<void> {
   const notificationConfig = parseNotificationConfig(process.env)
   const messageConfig = parseMessageConfig(process.env)
   const authRepository = createPostgresAuthRepository(database.db)
-  const attendanceRepository = createPostgresAttendanceRepository(database.db)
+  const gamificationRepository = createPostgresGamificationRepository(database.db)
+  const attendanceRepository = createPostgresAttendanceRepository(database.db, { awardSessionXp: gamificationRepository.awardSessionXp })
   const notificationRepository = createPostgresNotificationRepository(database.db)
   const messageRepository = createPostgresGameMessageRepository(database.db)
   const messageEventBus = createRedisGameMessageEventBus(messageConfig.redisUrl)
+  const invitationRepository = createPostgresInvitationRepository(database.db)
+  const memberRepository = createPostgresMemberRepository(database.db)
+  const dashboardRepository = createPostgresDashboardRepository(database.db)
   await migrateDatabase(database)
 
   const server = serve({
@@ -40,6 +48,10 @@ async function startApi(): Promise<void> {
       attendance: { authConfig, authRepository, repository: attendanceRepository },
       notifications: { authConfig, authRepository, repository: notificationRepository },
       messages: { authConfig, authRepository, repository: messageRepository, eventBus: messageEventBus },
+      invitations: { authConfig, authRepository, repository: invitationRepository },
+      members: { authConfig, authRepository, repository: memberRepository },
+      dashboard: { authConfig, authRepository, repository: dashboardRepository, notificationsRepository: notificationRepository },
+      gamification: { authConfig, authRepository, repository: gamificationRepository },
     }).fetch,
     port,
   })

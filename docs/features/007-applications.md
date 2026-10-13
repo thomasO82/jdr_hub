@@ -43,12 +43,22 @@ Voir `docs/superpowers/specs/2026-09-05-applications-design.md`.
 - API `POST /games/:id/applications`, `GET /applications`,
   `GET /games/:id/applications` et `PATCH /applications/:id`.
 - Acceptation transactionnelle avec contrôle de capacité et création du membre
-  `PLAYER`; résolution possible par UUID ou slug public.
+  `PLAYER`; les endpoints de participation utilisent exclusivement l’UUID de
+  la partie.
 - Formulaire sur le détail public, page candidat `/candidatures` et page MJ
   `/gestion/parties/[id]/candidatures`, en Tailwind et responsive.
 - Matrice d'autorisation créée dans `docs/security/authorization-matrix.md`.
 - Dockerfile `web-next` complété pour copier et compiler `@jdr-hub/shared`
   avant le build Next.js.
+
+### Correctif du 2026-09-06
+
+- `POST /games/:id/applications` ne résout plus de slug ; il exige l’UUID de
+  la partie.
+- La projection publique d’une partie expose son UUID afin que le frontend
+  puisse transmettre `game.id` tout en conservant le slug pour la navigation.
+- Les valeurs non-UUID sont rejetées avant toute requête PostgreSQL typée
+  UUID, ce qui évite l’erreur de conversion auparavant renvoyée comme `409`.
 
 ## Parcours utilisateur
 
@@ -67,8 +77,20 @@ Voir `docs/superpowers/specs/2026-09-05-applications-design.md`.
 - **Green :** contrats, repository, services, handlers et composants ont été
   implémentés au minimum pour faire passer chaque scénario.
 - **Refactor :** résolution UUID/slug, contrôle d'origine, projections et
-  responsabilités ont été séparés sans affaiblir les assertions.
+  responsabilités ont été séparés sans affaiblir les assertions ; le correctif
+  de septembre 2026 supprime la résolution slug des routes de participation.
 - Suite finale : 57 fichiers, 135 tests verts.
+
+### Vérification du correctif du 2026-09-06
+
+- Tests écrits avant le changement : rejet du slug par le service et l’API,
+  présence de l’UUID dans la projection publique et transmission de `game.id`
+  par la vue.
+- Vérification finale : 98 fichiers, 250 tests verts ; lint, typecheck et
+  builds API/web verts.
+- Branche : `fix/applications-id-only`.
+- PR : ouverture automatique bloquée par GitHub (`403 Resource not accessible by
+  integration`) ; ouverture manuelle nécessaire.
 
 ## Sécurité
 
@@ -79,6 +101,9 @@ Voir `docs/superpowers/specs/2026-09-05-applications-design.md`.
 - Anti-doublon par vérification métier et contrainte unique SQL.
 - Acceptation transactionnelle verrouillée et limite `maxPlayers` contrôlée.
 - Projections sans token Discord, cookie, session ou données privées inutiles.
+- Les identifiants de partie sont validés comme UUID avant toute requête
+  PostgreSQL typée UUID ; les slugs publics ne sont pas acceptés par les
+  routes de participation.
 - Messages rendus par React avec échappement par défaut.
 
 ## Vérification

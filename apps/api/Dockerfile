@@ -1,4 +1,4 @@
-FROM node:24.8.0-alpine3.22@sha256:3e843c608bb5232f39ecb2b25e41214b958b0795914707374c8acc28487dea17 AS dependencies
+FROM node:24.20.0-alpine3.24@sha256:e67514e5d0f6c46656005e1b693b2ec9d52e80b641307de684d4a015ba7a4eaf AS dependencies
 
 ENV PNPM_HOME=/pnpm
 ENV PATH=$PNPM_HOME:$PATH
@@ -21,9 +21,11 @@ RUN pnpm --filter @jdr-hub/api deploy --prod --legacy /runtime
 RUN cp -R apps/api/dist /runtime/dist
 RUN mkdir -p /runtime/node_modules/@jdr-hub/database && cp -R packages/database/migrations /runtime/node_modules/@jdr-hub/database/migrations
 
-FROM node:24.8.0-alpine3.22@sha256:3e843c608bb5232f39ecb2b25e41214b958b0795914707374c8acc28487dea17 AS runtime
+FROM node:24.20.0-alpine3.24@sha256:e67514e5d0f6c46656005e1b693b2ec9d52e80b641307de684d4a015ba7a4eaf AS runtime
 ENV NODE_ENV=production
 ENV PORT=8787
+
+RUN apk upgrade --no-cache && rm -rf /usr/local/lib/node_modules/npm /usr/local/bin/npm /usr/local/bin/npx
 
 WORKDIR /app
 COPY --from=build --chown=node:node /runtime ./

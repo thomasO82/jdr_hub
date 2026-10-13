@@ -20,7 +20,7 @@ export function createInMemoryApplicationsRepository(seed: { games?: TestApplica
   const view = (application: StoredApplication): Application => ({ ...application, gameTitle: games.get(application.gameId)?.id ?? application.gameId, username: application.userId })
 
   return {
-    async findEligibleGame(gameId: string) { return [...games.values()].find((game) => game.id === gameId || game.slug === gameId) ?? null },
+    async findEligibleGame(gameId: string) { return games.get(gameId) ?? null },
     async findByGameAndUser(gameId: string, userId: string) { const application = [...applications.values()].find((value) => value.gameId === gameId && value.userId === userId); return application ? view(application) : null },
     async create(input: { gameId: string; userId: string; message: string | null }) {
       if ([...applications.values()].some((value) => value.gameId === input.gameId && value.userId === input.userId)) throw new Error('APPLICATION_CONFLICT')

@@ -7,7 +7,9 @@ import * as availabilitySchema from './schema/availability.js'
 import * as attendanceSchema from './schema/attendance.js'
 import * as gameSchema from './schema/games.js'
 import * as gameMessagesSchema from './schema/game-messages.js'
+import * as invitationsSchema from './schema/invitations.js'
 import * as schedulingSchema from './schema/scheduling.js'
+import * as gamificationSchema from './schema/gamification.js'
 
 export {
   authSchema,
@@ -15,8 +17,13 @@ export {
   attendanceSchema,
   gameMessagesSchema,
   gameSchema,
+  invitationsSchema,
   schedulingSchema,
+  gamificationSchema,
 }
+
+export type DatabaseHandle = ReturnType<typeof createDatabase>['db']
+export type DatabaseTransaction = Parameters<DatabaseHandle['transaction']>[0] extends (transaction: infer Transaction) => Promise<unknown> ? Transaction : never
 /** Parse and validate the server-only PostgreSQL connection URL. */
 export function parseDatabaseUrl(rawUrl: string | undefined): URL {
   if (!rawUrl) {
@@ -55,7 +62,9 @@ export function createDatabase(rawUrl: string | undefined) {
         ...attendanceSchema,
         ...gameMessagesSchema,
         ...gameSchema,
+        ...invitationsSchema,
         ...schedulingSchema,
+        ...gamificationSchema,
       },
     }),
   }

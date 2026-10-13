@@ -69,7 +69,7 @@ consentement d'adhésion au serveur privé. Aucun contenu de chat n'est transmis
 
 ## Fonctionnalités effectivement réalisées
 
-- migration additive `0008_game_messages` et table `game_messages` ;
+- migration additive `0010_game-messages-and-discord-consent` et table `game_messages` ;
 - contrat partagé strict limité au texte, borné à 2 000 caractères ;
 - pagination stable par curseur et résolution par UUID ou slug public ;
 - contrôle serveur de l'appartenance, du rôle propriétaire et du statut de la
@@ -127,7 +127,7 @@ déjà validé en base.
 `game_messages` contient `id`, `game_id`, `author_id`, `content` borné et
 `created_at`, avec clés étrangères en cascade et index `(game_id, created_at,
 id)`. La migration additive est
-`packages/database/migrations/0008_game_messages.sql`. Les DMs d'absence
+`packages/database/migrations/0010_game-messages-and-discord-consent.sql`. Les DMs d'absence
 utilisent séparément l'outbox `notification_deliveries` et ne contiennent
 jamais le texte d'un message de partie.
 

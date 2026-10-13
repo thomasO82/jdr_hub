@@ -497,7 +497,7 @@ SSE revalide l'accès et limite les connexions par utilisateur et partie.
 
 ### Tests et migration
 
-La migration additive `0008_game_messages.sql` est couverte par des tests
+La migration additive `0010_game-messages-and-discord-consent.sql` est couverte par des tests
 PostgreSQL. Les contrats, politiques, services, routes, flux Redis/SSE et
 composants web suivent le cycle TDD Red/Green/Refactor. Les détails et
 commandes sont consignés dans `docs/features/015-game-messaging.md`.

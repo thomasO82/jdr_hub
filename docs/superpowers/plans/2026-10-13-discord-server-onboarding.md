@@ -42,7 +42,7 @@
 - Modify `apps/api/src/modules/auth/services/oauth.ts` only for shared safe primitives; create `apps/api/src/modules/auth/services/discord-guild-membership.ts` for the single join use case.
 - Create `apps/api/src/modules/auth/discord-guild-client.ts` to exchange the authorization code and call Discord’s Add Guild Member endpoint.
 - Modify `apps/api/src/modules/auth/handlers.ts` and `routes.ts` to expose membership start, callback dispatch through the existing fixed Discord callback, status, and dismiss operations; keep HTTP parsing/cookies in handlers.
-- Modify `packages/database/src/schema/auth.ts`, `packages/database/src/index.ts`, and add migration `packages/database/migrations/0009_discord_server_membership.sql` plus generated snapshot/journal entries.
+- Modify `packages/database/src/schema/auth.ts`, `packages/database/src/index.ts`, and add the additive migration `packages/database/migrations/0010_game-messages-and-discord-consent.sql` plus generated snapshot/journal entries.
 
 ### Web consent and account settings
 
@@ -67,8 +67,8 @@
 - Create: `apps/api/src/modules/auth/services/discord-guild-membership.ts`
 - Modify: `packages/database/src/schema/auth.ts`
 - Modify: `packages/database/src/index.ts`
-- Create: `packages/database/migrations/0009_discord_server_membership.sql`
-- Create: `packages/database/migrations/meta/0009_snapshot.json`
+- Create: `packages/database/migrations/0010_game-messages-and-discord-consent.sql`
+- Create: `packages/database/migrations/meta/0010_snapshot.json`
 - Modify: `packages/database/migrations/meta/_journal.json`
 - Test: `apps/api/tests/unit/auth/discord-guild-client.test.ts`
 - Test: `apps/api/tests/unit/auth/discord-guild-membership.test.ts`

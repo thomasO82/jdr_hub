@@ -4,7 +4,7 @@ import { getTableColumns, getTableName } from 'drizzle-orm'
 import { describe, expect, it } from 'vitest'
 import { gameMessages } from '../src/schema/game-messages.js'
 
-const migrationPath = resolve(import.meta.dirname, '../migrations/0008_game_messages.sql')
+const migrationPath = resolve(import.meta.dirname, '../migrations/0010_game-messages-and-discord-consent.sql')
 
 describe('game messages database schema', () => {
   it('defines the durable message projection and pagination columns', () => {

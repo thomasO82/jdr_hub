@@ -24,6 +24,12 @@ export function createInMemoryNotificationsRepository(input: { notifications?: N
         unreadCount: sorted.filter((notification) => notification.readAt === null).length,
       }
     },
+    async listUnreadForUser({ userId, limit }) {
+      const unread = notifications
+        .filter((notification) => notification.recipientId === userId && notification.readAt === null)
+        .sort((left, right) => right.createdAt.getTime() - left.createdAt.getTime())
+      return { items: unread.slice(0, limit), unreadCount: unread.length }
+    },
     async markRead({ notificationId, userId, now }) {
       const notification = notifications.find((item) => item.id === notificationId && item.recipientId === userId)
       if (!notification) return false

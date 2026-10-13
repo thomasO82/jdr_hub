@@ -31,8 +31,7 @@ describe('public games API routes', () => {
     const response = await createApp().request('/public/games')
     expect(response.status).toBe(200)
     const game = (await response.json()).data.items[0]
-    expect(game).toMatchObject({ slug: 'crypte', title: 'La Crypte' })
-    expect(game).not.toHaveProperty('id')
+    expect(game).toMatchObject({ id: 'game-1', slug: 'crypte', title: 'La Crypte' })
     expect(game).not.toHaveProperty('ownerId')
   })
 

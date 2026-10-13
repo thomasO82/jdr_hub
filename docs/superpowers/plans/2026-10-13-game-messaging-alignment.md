@@ -35,7 +35,7 @@
 
 ### Existing shared contract and persistence
 
-- Review/adjust `packages/shared/src/game-messages.ts`, `packages/database/src/schema/game-messages.ts`, `packages/database/src/index.ts`, and the existing `0008_game_messages` migration only if the tests identify a concrete mismatch.
+- Review/adjust `packages/shared/src/game-messages.ts`, `packages/database/src/schema/game-messages.ts`, `packages/database/src/index.ts`, and the additive `0010_game-messages-and-discord-consent` migration only if the tests identify a concrete mismatch.
 - Extend `packages/shared/tests/game-messages.test.ts`, `packages/database/tests/game-messages-schema.test.ts`, and `apps/api/tests/integration/postgres-game-messaging.test.ts` for the exact contract and pagination gaps below.
 
 ### API and realtime
