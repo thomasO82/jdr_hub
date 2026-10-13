@@ -6,8 +6,8 @@
 
 ## Statut
 
-Proposée après validation conversationnelle ; à confirmer après revue de la
-conception écrite.
+Acceptée par le propriétaire le 2026-10-13 après revue de la conception et
+du plan d'implémentation.
 
 ## Contexte
 
@@ -16,7 +16,7 @@ Discord d'absence décrit dans la décision 005 ne correspond pas au besoin
 confirmé : ces notifications Discord doivent être conservées, en complément
 des notifications déjà visibles dans JDR Hub.
 
-## Décision proposée
+## Décision
 
 - le signalement d'absence crée toujours une notification interne ;
 - le bot envoie en plus un DM Discord au MJ si celui-ci a autorisé l'ajout au
@@ -36,9 +36,15 @@ des notifications déjà visibles dans JDR Hub.
 - Discord OAuth initial demeure limité à l'identité ; un second flux protégé
   par `state` gère l'adhésion au serveur ;
 - le serveur privé doit être créé et le bot doit déjà en être membre ;
+- pour l'API Discord d'ajout au serveur, le bot doit disposer de la permission
+  `CREATE_INSTANT_INVITE` ; aucune permission supplémentaire n'est demandée ;
 - les livraisons Discord restent complémentaires et idempotentes ; leur échec
   ne supprime jamais les notifications dans JDR Hub ;
-- la décision 005 et le plan de messagerie qui en découle sont supersédés sur
-  le retrait des DMs et doivent être réconciliés avant implémentation ;
-- cette décision est effective uniquement après revue/validation de la
-  conception écrite par le propriétaire.
+- les absences survenues avant le consentement ne déclenchent pas de DM
+  rétroactif ;
+- la décision 005 est supersédée uniquement sur le retrait des DMs d'absence ;
+  la séparation du chat de partie et l'absence de synchronisation avec Discord
+  restent applicables.
+- la fiche F07, la fiche F07B et le plan d'implémentation doivent refléter ce
+  comportement optionnel, sans déclarer la fonctionnalité terminée avant
+  vérification et revue.

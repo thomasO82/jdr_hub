@@ -53,9 +53,10 @@ Les utilisateurs doivent pouvoir coordonner une partie sur table sans être
 obligés de rejoindre un serveur ou un salon Discord contenant un Bot. Le MVP
 fournit donc une conversation textuelle de groupe dans chaque partie.
 
-Les DMs Discord d'absence sont supprimés de l'exécution : les notifications
-d'absence restent internes à JDR Hub. Quitter un serveur ou un salon Discord
-n'a aucun effet sur l'accès applicatif.
+Le chat de partie reste exclusivement dans JDR Hub. Selon la décision 006, les
+DMs d'absence sont une fonctionnalité séparée et facultative, activée par le
+consentement d'adhésion au serveur privé. Aucun contenu de chat n'est transmis
+à Discord ; quitter Discord ne change pas les permissions applicatives.
 
 ## Périmètre prévu
 
@@ -126,9 +127,9 @@ déjà validé en base.
 `game_messages` contient `id`, `game_id`, `author_id`, `content` borné et
 `created_at`, avec clés étrangères en cascade et index `(game_id, created_at,
 id)`. La migration additive est
-`packages/database/migrations/0008_game_messages.sql`. La table historique
-`notification_deliveries` est conservée mais ne reçoit plus de nouvelles
-livraisons Discord.
+`packages/database/migrations/0008_game_messages.sql`. Les DMs d'absence
+utilisent séparément l'outbox `notification_deliveries` et ne contiennent
+jamais le texte d'un message de partie.
 
 ## Routes API
 
@@ -225,5 +226,18 @@ test de configuration et par un démarrage réel de la stack.
 ## Limites
 
 Le chat est volontairement textuel et limité à une conversation par partie.
-Il n'y a pas de bot Discord, de DM Discord, de chat privé, de pièces jointes,
+Il n'y a pas de synchronisation du chat avec Discord, de chat privé, de pièces jointes,
 de modération avancée ni de test E2E navigateur automatisé dans cette PR.
+
+## Addendum du 2026-10-13 — reprise et alignement Discord
+
+La décision 006 maintient les notifications d'absence Discord comme option
+distincte ; elle ne change ni le contenu, ni les permissions, ni le transport
+du chat. La conversation reste exclusivement dans JDR Hub.
+
+La reprise serveur a vérifié le démarrage SSE avant chargement d'historique,
+l'absence de doublons, la récupération après erreur de flux et la révocation
+d'un membre pendant un flux inactif. Résultats du 2026-10-13 : suite complète
+`pnpm test` — 106 fichiers / 291 tests verts ; lint, TypeScript et build API/web
+verts ; `pnpm test:integration` — 8 fichiers / 17 tests verts. L'UI n'a pas été
+modifiée ; la vérification visuelle/accessibilité reste à faire.

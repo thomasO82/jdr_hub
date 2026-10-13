@@ -41,7 +41,7 @@
 - Modify `apps/api/src/modules/auth/repository.ts` and `apps/api/tests/helpers/in-memory-auth-repository.ts` for one-use guild-join attempts and membership state.
 - Modify `apps/api/src/modules/auth/services/oauth.ts` only for shared safe primitives; create `apps/api/src/modules/auth/services/discord-guild-membership.ts` for the single join use case.
 - Create `apps/api/src/modules/auth/discord-guild-client.ts` to exchange the authorization code and call Discord’s Add Guild Member endpoint.
-- Modify `apps/api/src/modules/auth/handlers.ts` and `routes.ts` to expose start, callback, status, and dismiss operations; keep HTTP parsing/cookies in handlers.
+- Modify `apps/api/src/modules/auth/handlers.ts` and `routes.ts` to expose membership start, callback dispatch through the existing fixed Discord callback, status, and dismiss operations; keep HTTP parsing/cookies in handlers.
 - Modify `packages/database/src/schema/auth.ts`, `packages/database/src/index.ts`, and add migration `packages/database/migrations/0009_discord_server_membership.sql` plus generated snapshot/journal entries.
 
 ### Web consent and account settings
@@ -78,15 +78,15 @@
 **Interfaces:**
 - `DiscordGuildMembershipClient.addCurrentUser(input: { code: string; codeVerifier: string; discordUserId: string; config: AuthConfig }): Promise<void>` exchanges the code, calls Discord with the OAuth user access token and bot token, accepts `201` and already-member `204`, and returns no token or Discord payload.
 - `AuthRepository.createGuildJoinAttempt(input: { userId: string; sessionId: string; attempt: OAuthLoginAttempt }): Promise<void>` stores only the state digest, PKCE verifier, user ID, session ID, expiry, and consumed time.
-- `AuthRepository.consumeGuildJoinAttempt(stateDigest: string, now: Date): Promise<{ userId: string; sessionId: string; attempt: OAuthLoginAttempt } | null>` atomically consumes a valid one-use attempt.
+- `AuthRepository.consumeGuildJoinAttempt(stateDigest: string, now: Date, binding: { userId: string; sessionId: string }): Promise<{ userId: string; sessionId: string; attempt: OAuthLoginAttempt } | null>` atomically consumes a valid one-use attempt only for the initiating user and session.
 - `AuthRepository.markDiscordGuildJoined(userId: string, now: Date): Promise<void>` sets `users.discord_server_joined_at`; `getDiscordGuildMembership(userId: string): Promise<{ joinedAt: Date | null; promptDismissedAt: Date | null }>` returns only local state.
 - `completeDiscordGuildJoin(input: { code: string; state: string; sessionId: string; sessionUserId: string; config: AuthConfig; repository: AuthRepository; client: DiscordGuildMembershipClient; now: () => Date }): Promise<string | null>` requires both authenticated session identifiers to match; it never accepts client-supplied identity.
 
-- [ ] **Step 1: Write failing client and repository tests.** Assert token exchange uses the fixed Discord endpoint, the `guilds.join` scope, the configured guild ID and minimal Bot authorization; accept `201`/`204`; reject malformed responses and provider failures without exposing tokens. Assert expired/replayed state cannot be consumed and membership state stores timestamps only.
-- [ ] **Step 2: Run the focused tests and confirm Red.** Run `pnpm exec vitest run apps/api/tests/unit/auth/discord-guild-client.test.ts apps/api/tests/unit/auth/discord-guild-membership.test.ts packages/database/tests/auth-schema.test.ts`. Expected: FAIL because the client/use case/schema/migration do not exist.
-- [ ] **Step 3: Implement config, persistence, and the Discord client.** Add the nullable membership/dismissal timestamps and one-use `discord_guild_join_attempts` table; generate the additive migration from Drizzle. The Discord client handles `201 Created` and `204 No Content` as success, checks `response.ok` otherwise, and never includes raw response bodies in errors.
-- [ ] **Step 4: Run the focused tests and confirm Green.** Re-run the command from Step 2. Expected: all new OAuth client, repository, config, and additive migration assertions pass.
-- [ ] **Step 5: Commit the independently testable membership foundation.** `git add` only the auth client/use case/repository/schema/migration/tests, then `git commit -m "feat: model optional Discord server membership"`.
+- [x] **Step 1: Write failing client and repository tests.** Assert token exchange uses the fixed Discord endpoint, the `guilds.join` scope, the configured guild ID and minimal Bot authorization; accept `201`/`204`; reject malformed responses and provider failures without exposing tokens. Assert expired/replayed state cannot be consumed and membership state stores timestamps only.
+- [x] **Step 2: Run the focused tests and confirm Red.** Run `pnpm exec vitest run apps/api/tests/unit/auth/discord-guild-client.test.ts apps/api/tests/unit/auth/discord-guild-membership.test.ts packages/database/tests/auth-schema.test.ts`. Expected: FAIL because the client/use case/schema/migration do not exist.
+- [x] **Step 3: Implement config, persistence, and the Discord client.** Add the nullable membership/dismissal timestamps and one-use `discord_guild_join_attempts` table; generate the additive migration from Drizzle. The Discord client handles `201 Created` and `204 No Content` as success, checks `response.ok` otherwise, and never includes raw response bodies in errors.
+- [x] **Step 4: Run the focused tests and confirm Green.** Re-run the command from Step 2. Expected: all new OAuth client, repository, config, and additive migration assertions pass.
+- [x] **Step 5: Commit the independently testable membership foundation.** Commit `9d956f7` (`feat: model optional Discord server membership`).
 
 ## Task 2: Add authenticated consent routes and French onboarding
 
@@ -106,14 +106,14 @@
 
 **Interfaces:**
 - `GET /auth/discord/server` requires an authenticated session, creates a purpose-bound OAuth attempt, and redirects to Discord with only `guilds.join`.
-- `GET /auth/discord/server/callback` accepts either a valid `{ code, state }` or a valid user denial `{ error: "access_denied", state }`; denial redirects safely without changing the JDR Hub session.
+- The existing `GET /auth/discord/callback` dispatches membership callbacks by one-use stored state; it accepts either a valid `{ code, state }` or user denial `{ error: "access_denied", state }`, without changing the JDR Hub session.
 - `POST /auth/discord/server/dismiss` requires the trusted Origin and active session, records `promptDismissedAt`, and returns `204`.
 - `GET /me` adds `discordServerJoined: boolean` and `discordServerPromptDismissed: boolean`; it exposes no Discord token or guild ID.
 - The profile card offers “Autoriser le bot à rejoindre le serveur”, “Pas maintenant”, and a connected status; its explanation says the server is for bot notifications, refusal does not block the app, and DMs may still be blocked by Discord privacy settings.
 
-- [ ] **Step 1: Add failing API tests for the consent routes.** Cover authenticated start, unauthenticated denial, exact `guilds.join` scope, valid join success, explicit denial, wrong session/state, callback replay, trusted-Origin dismissal, and safe `/me` projection. Assert no denied/failed consent revokes or prevents the session.
-- [ ] **Step 2: Run the auth route tests and confirm Red.** Run `pnpm exec vitest run apps/api/tests/api/auth/routes.test.ts`. Expected: FAIL because the server-consent routes and membership fields are absent.
-- [ ] **Step 3: Implement handlers/routes and frontend consent/status.** Keep transport validation in Hono handlers and OAuth coordination in the single-purpose service. Return only fixed internal redirects. Redirect the Discord login CTA to `/profil` after login so newly registered users immediately see the optional choice; existing users can revisit the same profile card.
+- [x] **Step 1: Add failing API tests for the consent routes.** Cover authenticated start, unauthenticated denial, exact `guilds.join` scope, valid join success, explicit denial, wrong session/state, callback replay, trusted-Origin dismissal, and safe `/me` projection. Assert no denied/failed consent revokes or prevents the session.
+- [x] **Step 2: Run the auth route tests and confirm Red.** Run `pnpm exec vitest run apps/api/tests/api/auth/routes.test.ts`. Expected: FAIL because the server-consent routes and membership fields are absent.
+- [ ] **Step 3: Implement handlers/routes and frontend consent/status.** Keep transport validation in Hono handlers and OAuth coordination in the single-purpose service. Return only fixed internal redirects. Once `/profil` exists, redirect the Discord login CTA there so newly registered users immediately see the optional choice; until then preserve the current `/` landing route to avoid redirecting users to a missing page.
 - [ ] **Step 4: Add failing frontend tests, then run them Red.** Assert French explanation/refusal copy, connected/not-connected states, API credentials, translated errors, and no token/guild-ID in rendered source. Run `pnpm exec vitest run apps/web/tests/discord-server-api.test.ts apps/web/tests/discord-server-card.test.ts`; expected: FAIL because the card/API do not exist.
 - [ ] **Step 5: Implement the profile page/card and API client.** Use the shared app shell, Tailwind tokens, keyboard focus, and mobile layouts; “Pas maintenant” leaves the account usable.
 - [ ] **Step 6: Run focused API and web tests and confirm Green.** Run both test commands from Steps 1 and 4. Expected: all consent, denial, access-control, and UI assertions pass.
@@ -142,11 +142,11 @@
 - `createDiscordNotifier(config).sendDirectMessage({ recipientDiscordId, content, idempotencyKey }): Promise<{ providerMessageId: string }>` validates the recipient/content, disables mentions, and maps provider failures to safe internal codes.
 - `AttendanceRepository.reportAbsence(...)` keeps returning `{ attendance, notification }`; within the same PostgreSQL transaction it inserts the unique Discord delivery only when the owner has `discordServerJoinedAt !== null`.
 
-- [ ] **Step 1: Write failing outbox/worker/integration tests.** Assert every absence persists its in-app notification; a joined owner gets exactly one Discord delivery; an unjoined owner gets none; request replay creates neither duplicate notification nor delivery; Discord retry/permanent failure leaves the internal notification intact.
-- [ ] **Step 2: Run focused tests and confirm Red.** Run `pnpm exec vitest run apps/api/tests/unit/attendance/services.test.ts apps/api/tests/unit/notifications/discord-client.test.ts apps/api/tests/unit/notifications/worker.test.ts apps/api/tests/integration/postgres-attendance-notifications.test.ts`. Expected: FAIL because the branch removed the Discord notifier/worker and conditional outbox behavior.
-- [ ] **Step 3: Restore and adapt F07 delivery modules.** Base behavior on the current `origin/develop` F07 implementation, preserving mention suppression, bounded content, idempotency, retry cap/backoff, and lease recovery; add membership gating without weakening F07 tests.
-- [ ] **Step 4: Wire startup and local configuration.** Parse configuration once, start/stop the worker with API lifecycle, pass secrets through Compose, and keep Redis/PostgreSQL internal. If Discord HTTP calls fail, the worker records a bounded delivery failure; the API’s absence response still succeeds.
-- [ ] **Step 5: Run tests and confirm Green.** Re-run Step 2. Expected: in-app notification transaction and all joined/unjoined, retry, idempotency, and provider tests pass.
+- [ ] **Step 1: Write failing outbox/worker/integration tests.** The conditional outbox and post-consent replay scenarios have explicit failing PostgreSQL tests; dedicated worker/client unit tests were added after their implementation, so TDD evidence for those modules is incomplete and recorded in the progress ledger.
+- [x] **Step 2: Run focused tests and confirm Red.** The PostgreSQL integration test failed before the conditional outbox implementation: opted-in owner returned no delivery.
+- [x] **Step 3: Restore and adapt F07 delivery modules.** Restored bounded content, mention suppression, idempotency, retry cap/backoff, and lease recovery; added opt-in gating. Worker/client unit tests were added after these modules; this is a TDD evidence gap recorded in the progress ledger.
+- [x] **Step 4: Wire startup and local configuration.** Configuration is parsed once, worker lifecycle is tied to API startup/shutdown, secrets are runtime-only in Compose, and PostgreSQL/Redis remain internal.
+- [x] **Step 5: Run tests and confirm Green.** Final verification passed: `pnpm test` — 106 files/291 tests; `pnpm test:integration` — 8 files/17 tests; `pnpm run lint`, `pnpm run typecheck`, `pnpm build`, and Compose config. The first web build was blocked by sandbox port binding, then passed with local network permission.
 - [ ] **Step 6: Commit the Discord notification restoration.** `git add` only attendance/outbox/worker/config/Compose/env/tests, then `git commit -m "feat: preserve Discord absence notifications"`.
 
 ## Task 4: Reconcile documentation and verify the Discord subsystem
@@ -158,7 +158,7 @@
 - Modify: `.env.example`
 - Verify: `apps/api`, `packages/database`, and `apps/web` focused suites
 
-- [ ] **Step 1: Update documentation from implemented behavior.** Record internal notification fallback, optional server consent, no retroactive DMs for pre-consent absences, DM delivery limits, required Discord configuration/permission, and tests actually run. Mark the feature `IN_PROGRESS` until a PR is opened.
+- [x] **Step 1: Update documentation from implemented behavior.** Record internal notification fallback, optional server consent, no retroactive DMs for pre-consent absences, DM delivery limits, required Discord configuration/permission, and tests actually run. Mark the feature `IN_PROGRESS` until a PR is opened.
 - [ ] **Step 2: Run verification.** Run `pnpm exec vitest run apps/api/tests/unit/auth apps/api/tests/api/auth apps/api/tests/unit/notifications apps/api/tests/unit/attendance apps/api/tests/integration/postgres-attendance-notifications.test.ts apps/web/tests/discord-server-api.test.ts apps/web/tests/discord-server-card.test.ts packages/database/tests/auth-schema.test.ts`, then `pnpm lint`, `pnpm typecheck`, and `pnpm build`.
-- [ ] **Step 3: Review integration state.** Run `git diff --check`, inspect `git status` and the complete diff, verify no real secret or unrelated test edit, and validate Compose config with test-only values. Record command results in the feature sheet.
+- [x] **Step 3: Review integration state.** `git diff --check`, status/diff review, secret-free fixtures, and Compose config with test-only values passed. Web UI review remains pending.
 - [ ] **Step 4: Commit documentation and verification evidence.** Commit only after the required checks pass; do not push/open a PR until the companion game-messaging plan is also complete and the whole branch is verified.

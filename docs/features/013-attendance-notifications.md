@@ -65,20 +65,25 @@ les entrées de membres actifs.
 Les notifications push natives, l’XP et la messagerie de groupe par partie ne
 font pas partie de cette branche.
 
-## Addendum du 2026-09-06 — remplacement des DMs Discord
+## Addendum du 2026-10-13 — consentement Discord facultatif
 
-La décision acceptée dans `docs/decisions/005-in-app-messaging-replaces-discord-dms.md`
-remplace la livraison Discord prévue dans cette fiche pour l'exécution actuelle
-du MVP. Cette section conserve le périmètre historique de F07 et trace le
-changement sans réécrire les éléments réalisés sur la branche d'origine.
+La décision 006 (`docs/decisions/006-discord-absence-notifications-and-server-consent.md`)
+réactive les DMs d'absence comme complément facultatif aux notifications
+internes. Elle supersède la décision 005 uniquement sur le retrait des DMs ;
+le chat de partie reste exclusivement dans JDR Hub.
 
-- `DISCORD_BOT_TOKEN`, le worker Discord et l'envoi de DM ne sont plus démarrés ;
-- les notifications d'absence restent persistées et consultables dans JDR Hub ;
-- `notification_deliveries` est conservée pour éviter une migration destructive,
-  mais ne reçoit plus de nouvelles livraisons ;
-- le chat textuel par partie, SSE et Redis Streams sont livrés séparément dans
-  F07B (`feat/game-messaging`) ;
-- quitter un serveur ou un salon Discord n'a aucun effet applicatif.
+- après la création du compte, l'utilisateur peut autoriser l'ajout du bot au
+  serveur Discord privé dédié ; les comptes existants peuvent activer cette
+  option depuis leur profil ;
+- l'outbox reçoit une livraison DM seulement après consentement du MJ et
+  confirmation d'adhésion ; un refus ou un échec conserve la notification
+  interne ;
+- aucun DM rétroactif n'est créé pour les absences antérieures au consentement.
+  Le bot doit être déjà membre du serveur et n'a besoin que de la permission
+  Discord `CREATE_INSTANT_INVITE` ([documentation Discord](https://docs.discord.com/developers/resources/guild#add-guild-member)) ;
+- aucun contenu de chat ni donnée privée de partie n'est envoyé à Discord ;
+- l'implémentation est en cours sur `feat/game-messaging` et n'est pas déclarée
+  fusionnée.
 
 ## Besoin utilisateur
 
@@ -130,7 +135,8 @@ conception F07/F07B.
 
 1. Un membre authentifié ouvre son planning.
 2. Il choisit une séance confirmée et confirme son absence.
-3. Le MJ retrouve une notification interne et reçoit un DM Discord.
+3. Le MJ retrouve une notification interne et reçoit un DM Discord uniquement
+   s'il a accepté l'adhésion au serveur privé.
 4. Le MJ valide les présences de la séance.
 
 ### Réalisé
@@ -142,8 +148,9 @@ français. Le MJ peut envoyer la liste de présences validées par la route déd
 
 ### Restant à faire
 
-La réception Discord réelle dépend d’un token bot fourni par l’environnement
-de déploiement et n’a pas été appelée pendant les tests.
+La réception Discord réelle dépend du token bot fourni par l'environnement de
+déploiement et n'a pas été appelée pendant les tests. Les flux OAuth et la file
+de livraison utilisent des clients simulés pendant les tests.
 
 ## Règles métier
 
@@ -357,8 +364,8 @@ Aucune route F07 restante. Les routes chat/SSE sont F07B.
 - le DM Discord est asynchrone : une indisponibilité du fournisseur laisse la
   notification interne disponible et marque la livraison pour retry ou échec ;
 - les tests E2E Discord restent à ajouter dans un harness isolé ;
-- F07B implémentera séparément la conversation textuelle par partie, SSE et
-  Redis Streams ; aucun départ de salon Discord ne déclenche d’action.
+- F07B conserve séparément la conversation textuelle par partie, SSE et Redis
+  Streams ; aucun départ de salon Discord ne déclenche d’action.
 
 ## Documentation consultée
 
@@ -378,3 +385,30 @@ https://superdesign.dev/teams/7d4c232a-149e-4854-94a5-097beff389ba/projects/b4d5
 La récupération HTML automatique du brouillon a rencontré deux erreurs DNS
 temporaires du registre npm ; l’implémentation finale a donc été contrôlée par
 le design system local, les tests Tailwind-only et le build Next.
+
+## Addendum du 2026-10-13 — décision 006 en cours d'implémentation
+
+La décision 006 a été acceptée : chaque absence garde sa notification interne ;
+un DM Discord complémentaire est mis en file uniquement si le MJ a accepté
+l'adhésion du bot au serveur privé. Le compte reste utilisable en cas de refus,
+d'indisponibilité Discord ou de DM bloqué. Aucun texte de chat n'est transmis.
+
+### Preuve TDD de la reprise serveur
+
+- Red : le test d'intégration PostgreSQL d'un MJ ayant rejoint le serveur
+  recevait `delivery: undefined`; le callback lancé depuis une autre session
+  consommait également l'autorisation légitime.
+- Green : l'outbox est créée dans la transaction d'absence uniquement quand
+  `discord_server_joined_at` est renseigné ; la consommation OAuth vérifie
+  atomiquement compte et session avant de marquer l'état consommé.
+- Vérifications du 2026-10-13 : `pnpm test` — 106 fichiers / 291 tests verts ;
+  `pnpm run lint` et `pnpm run typecheck` verts ; build API/web vert ;
+  intégrations `pnpm test:integration` — 8 fichiers / 17 tests verts ;
+  configuration Compose avec valeurs fictives valide. Le build Next a dû être
+  relancé hors du bac à sable après un refus d'ouverture de port Turbopack.
+- L'UI de consentement/profil et la réception Discord réelle restent à faire ;
+  le statut demeure `IN_PROGRESS`.
+- Limite TDD à ne pas masquer : les tests unitaires du client Discord et du
+  worker ont été ajoutés après leur code et n'ont pas eu de phase Red observée.
+  Cette preuve manque avant toute PR ; les tests PostgreSQL de l'outbox et du
+  callback OAuth ont, eux, échoué avant leur correction.

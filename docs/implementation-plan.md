@@ -422,7 +422,7 @@ D05, D07/D13, D08, D09, M07, M11, M05 et dashboard.
 
 ### Objectif
 
-Permettre de signaler une absence à une séance, de notifier le MJ dans JDR Hub et de valider ensuite les présences. Les DMs Discord ne font plus partie du flux courant depuis la décision 005.
+Permettre de signaler une absence à une séance, notifier le MJ dans JDR Hub et valider les présences. Un DM Discord complémentaire est envoyé uniquement si le MJ a explicitement autorisé l'ajout du bot au serveur privé, conformément à la décision 006 ; le refus ou l'indisponibilité Discord ne bloque jamais le parcours interne.
 
 ### Dépendances
 
