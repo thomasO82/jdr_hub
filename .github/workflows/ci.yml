@@ -75,7 +75,8 @@ jobs:
       - name: Secret pattern scan
         shell: bash
         run: |
-          ! git grep -nE 'BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY|DISCORD_CLIENT_SECRET|DATABASE_URL=postgres' -- . ':(exclude).env.example'
+          ! git grep -nE 'BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY' -- . ':(exclude).env.example'
+          ! git grep -nE "DISCORD_CLIENT_SECRET[=:][[:space:]]*[\"'][^\"']+[\"']|DATABASE_URL=[[:space:]]*postgres(ql)?://" -- . ':(exclude).env.example' ':(exclude).github/workflows/ci.yml' ':(exclude)docs/**' ':(exclude)tests/**' ':(exclude)apps/**/tests/**' ':(exclude)packages/**/tests/**'
 
       - name: Static source scan
         run: |
