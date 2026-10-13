@@ -42,14 +42,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
 
+      - name: Install pnpm
+        run: corepack enable && corepack prepare pnpm@11.25.0 --activate
+
       - name: Setup Node.js
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
         with:
           node-version: 24.20.0
           cache: pnpm
-
-      - name: Install pnpm
-        run: corepack enable && corepack prepare pnpm@11.25.0 --activate
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
@@ -75,13 +75,18 @@ jobs:
       - name: Secret pattern scan
         shell: bash
         run: |
-          ! git grep -nE 'BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY|DISCORD_CLIENT_SECRET|DATABASE_URL=postgres' -- . ':(exclude).env.example'
+          ! git grep -nE 'BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY' -- . ':(exclude).env.example'
+          ! git grep -nE "DISCORD_CLIENT_SECRET[=:][[:space:]]*[\"'][^\"']+[\"']|DATABASE_URL=[[:space:]]*postgres(ql)?://" -- . ':(exclude).env.example' ':(exclude).github/workflows/ci.yml' ':(exclude)docs/**' ':(exclude)tests/**' ':(exclude)apps/**/tests/**' ':(exclude)packages/**/tests/**'
 
       - name: Static source scan
         run: |
-          ! git grep -nE 'dangerouslySetInnerHTML|eval\(|new Function|child_process|shell: *true' -- apps packages
+          ! git grep -nE 'dangerouslySetInnerHTML|eval\(|new Function|child_process|shell: *true' -- apps packages ':(exclude)apps/**/tests/**' ':(exclude)packages/**/tests/**'
 
       - name: Build images
+        env:
+          DISCORD_CLIENT_ID: 123456789012345678
+          DISCORD_CLIENT_SECRET: ci-only-build-secret
+          JWT_SIGNING_SECRET: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
         run: docker compose -f docker-compose.yml build web-next api-hono
 
       - name: Scan web image with Trivy

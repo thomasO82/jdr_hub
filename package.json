@@ -4,8 +4,8 @@
   "type": "module",
   "packageManager": "pnpm@11.25.0",
   "scripts": {
-    "lint": "pnpm --filter @jdr-hub/api --filter @jdr-hub/web --filter @jdr-hub/shared --filter @jdr-hub/database -r run lint",
-    "typecheck": "pnpm --filter @jdr-hub/api --filter @jdr-hub/web --filter @jdr-hub/shared --filter @jdr-hub/database -r run typecheck",
+    "lint": "pnpm --filter @jdr-hub/shared --filter @jdr-hub/database -r run build && pnpm --filter @jdr-hub/api --filter @jdr-hub/web --filter @jdr-hub/shared --filter @jdr-hub/database -r run lint",
+    "typecheck": "pnpm --filter @jdr-hub/shared --filter @jdr-hub/database -r run build && pnpm --filter @jdr-hub/api --filter @jdr-hub/web --filter @jdr-hub/shared --filter @jdr-hub/database -r run typecheck",
     "test": "pnpm --filter @jdr-hub/shared build && pnpm --filter @jdr-hub/database build && vitest run",
     "test:integration": "vitest run --config vitest.integration.config.ts",
     "build": "pnpm --filter @jdr-hub/api build && pnpm --filter @jdr-hub/web build",

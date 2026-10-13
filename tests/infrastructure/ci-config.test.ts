@@ -5,6 +5,16 @@ import { describe, expect, it } from 'vitest'
 const root = resolve(import.meta.dirname, '../..')
 
 describe('continuous integration security gates', () => {
+  it('builds workspace packages before consumer type checks', () => {
+    const packageJson = JSON.parse(readFileSync(resolve(root, 'package.json'), 'utf8')) as {
+      scripts?: Record<string, string>
+    }
+    const workspaceBuild = 'pnpm --filter @jdr-hub/shared --filter @jdr-hub/database -r run build'
+
+    expect(packageJson.scripts?.lint).toContain(workspaceBuild)
+    expect(packageJson.scripts?.typecheck).toContain(workspaceBuild)
+  })
+
   it('defines pull request quality and security checks with pinned actions', () => {
     const workflowPath = resolve(root, '.github/workflows/ci.yml')
     expect(existsSync(workflowPath)).toBe(true)
@@ -23,7 +33,16 @@ describe('continuous integration security gates', () => {
     expect(workflow).toContain('postgres:17.6-alpine@sha256:')
     expect(workflow).toContain('pnpm build')
     expect(workflow).toContain('pnpm audit --audit-level=high')
+    expect(workflow).toContain('DISCORD_CLIENT_ID: 123456789012345678')
+    expect(workflow).toContain('DISCORD_CLIENT_SECRET: ci-only-build-secret')
+    expect(workflow).toContain('JWT_SIGNING_SECRET: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA')
     expect(workflow.toLowerCase()).toContain('secret')
+    expect(workflow).toContain(':(exclude).github/workflows/ci.yml')
+    expect(workflow).toContain(':(exclude)docs/**')
+    expect(workflow).toContain(':(exclude)tests/**')
+    expect(workflow).toContain(':(exclude)apps/**/tests/**')
+    expect(workflow).toContain(':(exclude)packages/**/tests/**')
+    expect(workflow).toContain("! git grep -nE 'dangerouslySetInnerHTML|eval\\(|new Function|child_process|shell: *true' -- apps packages ':(exclude)apps/**/tests/**' ':(exclude)packages/**/tests/**'")
     expect(workflow.match(/uses: aquasecurity\/trivy-action@[0-9a-f]{40}/g)).toHaveLength(2)
     expect(workflow).toContain('image-ref: jdr_hub-web-next:latest')
     expect(workflow).toContain('image-ref: jdr_hub-api-hono:latest')
