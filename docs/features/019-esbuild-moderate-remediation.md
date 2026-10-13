@@ -6,7 +6,8 @@ FIX-SEC-002
 
 ## Statut
 
-IN_PROGRESS — branche préparée ; PR non encore créée.
+IN_PROGRESS — branche poussée ; création de PR refusée par l'intégration GitHub
+(`403 Resource not accessible by integration`).
 
 ## Dates
 
@@ -16,6 +17,11 @@ IN_PROGRESS — branche préparée ; PR non encore créée.
 ## Branche
 
 `fix/esbuild-moderate-remediation`
+
+## Pull Request
+
+Non créée automatiquement : le connecteur GitHub a renvoyé `403 Resource not
+accessible by integration`. [Ouvrir manuellement la PR vers `develop`](https://github.com/thomasO82/jdr_hub/pull/new/fix/esbuild-moderate-remediation).
 
 ## Contexte et besoin utilisateur
 
