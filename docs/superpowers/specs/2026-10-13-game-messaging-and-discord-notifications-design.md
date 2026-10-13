@@ -103,6 +103,10 @@ signalement volontaire d'un membre et n'est jamais un envoi collectif. Discord
 documente `guilds.join` pour l'ajout d'un utilisateur et précise que le bot
 doit déjà appartenir au serveur cible
 ([documentation OAuth2 Discord](https://docs.discord.com/developers/topics/oauth2#oauth2-scopes)).
+L'endpoint d'ajout exige aussi que le bot possède la permission
+`CREATE_INSTANT_INVITE` dans ce serveur ; un membre déjà présent est un résultat
+idempotent, pas une erreur
+([documentation Discord — Add Guild Member](https://docs.discord.com/developers/resources/guild#add-guild-member)).
 L'endpoint de création de DM demande de limiter les ouvertures rapides et
 précise qu'un DM devrait généralement correspondre à une action de l'utilisateur
 ([documentation Discord — Create DM](https://docs.discord.com/developers/resources/user#create-dm)).
@@ -235,7 +239,8 @@ fusionné ne peut être modifié sans l'exception documentée par `AGENTS.md`.
 - `DISCORD_BOT_TOKEN` reste une configuration secrète runtime ; un identifiant
   du serveur privé est également requis côté API ;
 - le propriétaire crée/configure le serveur et y ajoute le bot avec les
-  permissions minimales avant d'activer l'environnement ;
+  permissions minimales, dont `CREATE_INSTANT_INVITE` requise par l'API
+  d'adhésion, avant d'activer l'environnement ;
 - le départ ultérieur d'un utilisateur du serveur peut rendre les DMs
   impossibles ; l'application conserve la notification interne et propose une
   nouvelle autorisation ;
