@@ -5,6 +5,16 @@ import { describe, expect, it } from 'vitest'
 const root = resolve(import.meta.dirname, '../..')
 
 describe('continuous integration security gates', () => {
+  it('builds workspace packages before consumer type checks', () => {
+    const packageJson = JSON.parse(readFileSync(resolve(root, 'package.json'), 'utf8')) as {
+      scripts?: Record<string, string>
+    }
+    const workspaceBuild = 'pnpm --filter @jdr-hub/shared --filter @jdr-hub/database -r run build'
+
+    expect(packageJson.scripts?.lint).toContain(workspaceBuild)
+    expect(packageJson.scripts?.typecheck).toContain(workspaceBuild)
+  })
+
   it('defines pull request quality and security checks with pinned actions', () => {
     const workflowPath = resolve(root, '.github/workflows/ci.yml')
     expect(existsSync(workflowPath)).toBe(true)
