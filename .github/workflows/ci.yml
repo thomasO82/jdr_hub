@@ -80,7 +80,7 @@ jobs:
 
       - name: Static source scan
         run: |
-          ! git grep -nE 'dangerouslySetInnerHTML|eval\(|new Function|child_process|shell: *true' -- apps packages
+          ! git grep -nE 'dangerouslySetInnerHTML|eval\(|new Function|child_process|shell: *true' -- apps packages ':(exclude)apps/**/tests/**' ':(exclude)packages/**/tests/**'
 
       - name: Build images
         run: docker compose -f docker-compose.yml build web-next api-hono

@@ -39,6 +39,7 @@ describe('continuous integration security gates', () => {
     expect(workflow).toContain(':(exclude)tests/**')
     expect(workflow).toContain(':(exclude)apps/**/tests/**')
     expect(workflow).toContain(':(exclude)packages/**/tests/**')
+    expect(workflow).toContain("! git grep -nE 'dangerouslySetInnerHTML|eval\\(|new Function|child_process|shell: *true' -- apps packages ':(exclude)apps/**/tests/**' ':(exclude)packages/**/tests/**'")
     expect(workflow.match(/uses: aquasecurity\/trivy-action@[0-9a-f]{40}/g)).toHaveLength(2)
     expect(workflow).toContain('image-ref: jdr_hub-web-next:latest')
     expect(workflow).toContain('image-ref: jdr_hub-api-hono:latest')
