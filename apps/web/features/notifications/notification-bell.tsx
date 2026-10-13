@@ -1,6 +1,7 @@
 'use client'
 
 import { Bell } from 'lucide-react'
+import React from 'react'
 import { useEffect, useState } from 'react'
 import type { NotificationsPage } from '@jdr-hub/shared'
 import { createNotificationsApi, NOTIFICATIONS_ERROR } from '../../lib/notifications-api'

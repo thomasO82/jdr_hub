@@ -37,15 +37,16 @@ Seuls les statuts suivants sont autorisés :
 | DEV-003 | Drizzle Studio local | `IN_PROGRESS` | `chore/drizzle-studio` | Non créée | 61 fichiers, 146 tests verts ; lint, typecheck, build et image Studio vérifiés | Port local uniquement, réseau PostgreSQL privé, conteneur non-root | [Fiche DEV-003](features/010-drizzle-studio.md) |
 | F05 | Disponibilités et recherche de joueurs | `MERGED` | `feat/availability-and-player-search` | Fusion confirmée par le propriétaire dans `develop` | 72 fichiers, 173 tests monorepo verts ; lint, typecheck et builds verts | Session obligatoire, origine stricte, rate limit d’écriture, horaires privés, projection agrégée et validation bornée | [Fiche F05](features/011-availability-and-player-search.md) |
 | F06 | Séances, créneaux, votes et planning | `IN_PROGRESS` | `feat/sessions-scheduling` | Non créée | 84 fichiers, 203 tests monorepo verts ; lint, typecheck et build web verts | Appartenance/MJ, origine stricte, votes uniques, transaction de sélection, dates bornées | [Fiche F06](features/012-sessions-scheduling.md) |
-| F07 | Présences, absences et notifications Discord optionnelles | `IN_PROGRESS` | `feat/game-messaging` | Non créée | Consentement API et intégration PostgreSQL vérifiés ; interface et vérification globale restantes | Notification JDR Hub maintenue ; DM seulement après adhésion consentie ; aucun contenu de chat transmis à Discord | [Fiche F07](features/013-attendance-notifications.md) |
-| F07B | Messagerie textuelle par partie | `IN_PROGRESS` | `feat/game-messaging` | Non créée | Tests unitaires/API/PostgreSQL/Redis ciblés exécutés ; interface et vérification globale restantes | Autorisation propriétaire/membre actif, lecture seule après fermeture, texte borné/échappé, SSE revalidé, Redis interne | [Fiche F07B](features/015-game-messaging.md) |
+| F07 | Présences, absences et notifications Discord optionnelles | `IN_PROGRESS` | `feat/game-messaging` | Non créée | 108 fichiers, 306 tests verts ; lint, typecheck, builds et intégrations PostgreSQL/Redis (8 fichiers, 17 tests) verts | Notifications JDR Hub maintenues ; DM après adhésion consentie ; OAuth `guilds.join` distinct ; aucun contenu de chat transmis | [Fiche F07](features/013-attendance-notifications.md) |
+| F07B | Messagerie textuelle par partie | `IN_PROGRESS` | `feat/game-messaging` | Non créée | 108 fichiers, 306 tests verts ; build Docker Compose, intégrations PostgreSQL/Redis et conteneurs sains ; vérification navigateur restante | Autorisation propriétaire/membre actif, lecture seule après fermeture, texte borné/échappé, SSE revalidé, Redis interne | [Fiche F07B](features/015-game-messaging.md) |
 
 ## Blocages
 
 - 2026-10-13 — F07/F07B : la décision 006 est acceptée et l'implémentation
-  serveur est en cours sur `feat/game-messaging` ; aucune PR n'est ouverte.
-  Consentement API, outbox conditionnelle et intégrations passent. L'interface
-  de profil/onboarding reste à réaliser après résolution de l'outil web requis.
+  est en cours sur `feat/game-messaging` ; aucune PR n'est ouverte. L'interface
+  de consentement/onboarding et le réglage du profil sont implémentés. Restent
+  la vérification navigateur (outil absent) et la revue TDD de la livraison
+  Discord déjà codée avant ses tests unitaires.
 
 - 2026-09-04 — F12 : la branche `fix/jwt-session-security` est poussée,
   mais l'intégration GitHub a refusé la création de PR vers `develop`

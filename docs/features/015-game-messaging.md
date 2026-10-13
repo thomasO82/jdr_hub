@@ -238,6 +238,10 @@ du chat. La conversation reste exclusivement dans JDR Hub.
 La reprise serveur a vérifié le démarrage SSE avant chargement d'historique,
 l'absence de doublons, la récupération après erreur de flux et la révocation
 d'un membre pendant un flux inactif. Résultats du 2026-10-13 : suite complète
-`pnpm test` — 106 fichiers / 291 tests verts ; lint, TypeScript et build API/web
-verts ; `pnpm test:integration` — 8 fichiers / 17 tests verts. L'UI n'a pas été
-modifiée ; la vérification visuelle/accessibilité reste à faire.
+`pnpm test` — 108 fichiers / 306 tests verts ; lint, TypeScript et build API/web
+verts ; build Docker Compose complet et conteneurs PostgreSQL, Redis, API,
+frontend et proxy sains. La suite `pnpm test:integration` — 8 fichiers / 17
+tests verts — a été exécutée avec des conteneurs PostgreSQL et Redis éphémères
+dédiés sur les ports locaux de test. L'UI n'a pas été modifiée dans F07B ; la
+vérification visuelle/accessibilité reste à faire, l'outil Browser et
+Playwright n'étant pas disponibles.

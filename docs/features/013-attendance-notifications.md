@@ -13,7 +13,7 @@ F07
 
 ## Branche
 
-`feat/attendance-notifications`
+`feat/game-messaging`
 
 ## Lien ou numéro de Pull Request
 
@@ -128,6 +128,17 @@ conception F07/F07B.
 - cloche/panneau de notifications, dialogue d’absence et raccordement au
   planning desktop/mobile avec Tailwind uniquement ;
 - configuration Compose et `.env.example` sans secret réel.
+
+### Addendum du 2026-10-13 — interface de consentement
+
+- après connexion, un panneau non bloquant explique l’adhésion facultative au
+  serveur Discord privé réservé au bot et permet de différer le choix ;
+- la page privée `/profil` permet de démarrer l’autorisation Discord plus tard
+  et présente les retours de réussite, refus ou indisponibilité ;
+- l’interface précise que les notifications restent disponibles dans JDR Hub
+  et que les messages de partie ne sont jamais envoyés à Discord ;
+- la page d’accueil conserve un lien vers les préférences du profil après le
+  masquage du panneau d’onboarding.
 
 ## Parcours utilisateur
 
@@ -263,7 +274,9 @@ Aucune route F07 restante. Les routes chat/SSE sont F07B.
 
 ### Restants
 
-- capture E2E avec un vrai navigateur et fournisseur Discord simulé ;
+- vérification visuelle et interaction en vrai navigateur, indisponible dans
+  cette session (aucun plugin Browser, Playwright absent et démarrage local
+  refusé par le bac à sable) ;
 - messagerie de groupe par partie dans F07B.
 
 ## Tests
@@ -294,11 +307,18 @@ Aucune route F07 restante. Les routes chat/SSE sont F07B.
 | `pnpm --filter @jdr-hub/web build` | Build Next/Turbopack vert | 2026-09-06 |
 | `docker compose -f docker-compose.yml up --build --wait --wait-timeout 120` | API, web, proxy et PostgreSQL healthy ; migration appliquée | 2026-09-06 |
 | `curl http://127.0.0.1:18080/api/health` | Réponse JSON `status: ok` | 2026-09-06 |
+| `pnpm exec vitest run apps/web/tests/discord-guild-consent.test.ts` | 11 tests UI/API/profil verts ; échecs Red observés pour le chargement et l’erreur d’onboarding | 2026-10-13 |
+| `pnpm test` | 108 fichiers, 306 tests verts | 2026-10-13 |
+| `pnpm lint` | 4 packages verts | 2026-10-13 |
+| `pnpm typecheck` | 4 packages verts | 2026-10-13 |
+| `pnpm build` | Builds API et Next.js verts ; avertissement Next.js sur plusieurs lockfiles | 2026-10-13 |
+| `pnpm test:integration` avec PostgreSQL et Redis éphémères sur `127.0.0.1:15432/16379` | 8 fichiers, 17 tests verts | 2026-10-13 |
 
 ### Restants
 
 - test E2E Discord simulé et vérification manuelle du parcours dans un
-  navigateur.
+  navigateur ; aucun plugin Browser n’est disponible et Playwright n’est pas
+  installé (`pnpm exec playwright --version` échoue).
 
 ## Preuve TDD Red, Green, Refactor
 
@@ -307,11 +327,19 @@ Aucune route F07 restante. Les routes chat/SSE sont F07B.
 - Les tests de contrats, schéma, adaptateur, services, routes et interface ont
   été écrits avant leurs modules respectifs.
 - Les commandes ciblées ont échoué avec des modules absents, comme attendu.
+- Pour l’interface de consentement, le test a échoué car le client API et le
+  composant n’existaient pas ; un test ajouté ensuite a aussi échoué car la page
+  d’accueil ne permettait pas d’accéder au profil après « Plus tard ».
+- Pour l’onboarding, les tests ont d’abord échoué car les états de chargement et
+  d’erreur étaient masqués avant leur rendu ; la condition de masquage a été
+  resserrée.
 
 ### Green
 
 - Les implémentations minimales ont fait passer les tests ciblés : 7, 3, 6,
   13, 8 puis 11 tests selon les tranches.
+- Les 11 tests du client API, du consentement et du profil passent ; la suite
+  complète compte 306 tests verts.
 - Une reconstruction des packages `shared`/`database` a été nécessaire avant
   les typechecks, car leurs déclarations `dist` étaient obsolètes.
 - La suite PostgreSQL a d’abord révélé le verrouillage interdit d’un `LEFT
@@ -324,6 +352,10 @@ Aucune route F07 restante. Les routes chat/SSE sont F07B.
 - Le worker centralise la classification sûre des erreurs et le backoff.
 - Le shell conserve une seule cloche responsive et le planning réutilise un
   dialogue unique desktop/mobile.
+- Le panneau d’onboarding et le réglage de profil réutilisent le même composant
+  de présentation ; l’état d’adhésion reste fourni par `/me`.
+- La page `/profil`, le shell et la cloche de notifications sont rendables par
+  le harness SSR de test sans exposer de configuration Discord sensible.
 
 ## Sécurité
 
@@ -343,6 +375,9 @@ Aucune route F07 restante. Les routes chat/SSE sont F07B.
   secrets de vérification manifestement fictifs ;
 - réponses et interface sans stack trace, token, `discordId` ou détail de
   fournisseur.
+- l’ajout au serveur demande un clic distinct puis réutilise le flux OAuth
+  `guilds.join` protégé par `state` ; « Plus tard » ne coupe pas les
+  notifications JDR Hub ; `/profil` est exclu de l’indexation.
 
 ## Vérifications manuelles
 
@@ -401,7 +436,7 @@ d'indisponibilité Discord ou de DM bloqué. Aucun texte de chat n'est transmis.
 - Green : l'outbox est créée dans la transaction d'absence uniquement quand
   `discord_server_joined_at` est renseigné ; la consommation OAuth vérifie
   atomiquement compte et session avant de marquer l'état consommé.
-- Vérifications du 2026-10-13 : `pnpm test` — 106 fichiers / 291 tests verts ;
+- Vérifications du 2026-10-13 : `pnpm test` — 108 fichiers / 306 tests verts ;
   `pnpm run lint` et `pnpm run typecheck` verts ; build API/web vert ;
   intégrations `pnpm test:integration` — 8 fichiers / 17 tests verts ;
   configuration Compose avec valeurs fictives valide. Le build Next a dû être
