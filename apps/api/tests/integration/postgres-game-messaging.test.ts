@@ -73,6 +73,8 @@ describe('PostgreSQL game message repository', () => {
       await database.db.update(games).set({ status: 'CLOSED' }).where(eq(games.id, seed.gameId))
       expect(await repository.getAccess({ gameIdOrSlug: seed.gameId, userId: seed.memberId })).toMatchObject({ canRead: true, canWrite: false })
       await expect(repository.create({ gameIdOrSlug: seed.gameId, authorId: seed.memberId, content: 'Refusé', now: new Date() })).rejects.toThrow('MESSAGE_FORBIDDEN')
+      await database.db.update(gameMembers).set({ status: 'REMOVED' }).where(eq(gameMembers.userId, seed.memberId))
+      expect(await repository.getAccess({ gameIdOrSlug: seed.gameId, userId: seed.memberId })).toMatchObject({ canRead: false, canWrite: false, memberStatus: 'REMOVED' })
       await database.db.delete(games).where(eq(games.id, seed.gameId))
       expect(await database.db.select().from(gameMessages).where(eq(gameMessages.gameId, seed.gameId))).toHaveLength(0)
     } finally {

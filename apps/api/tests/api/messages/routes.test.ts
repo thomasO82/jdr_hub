@@ -14,12 +14,13 @@ const now = new Date()
 
 async function createTestApp(input: { gameStatus?: GameStatus; eventBus?: GameMessageEventBus } = {}) {
   const authRepository = createInMemoryAuthRepository()
-  const [owner, member, removed] = await Promise.all([
+  const [owner, member, removed, outsider] = await Promise.all([
     authRepository.upsertDiscordUser({ discordId: 'discord-owner', username: 'MJ', avatarUrl: null }, now),
     authRepository.upsertDiscordUser({ discordId: 'discord-member', username: 'Joueur', avatarUrl: null }, now),
     authRepository.upsertDiscordUser({ discordId: 'discord-removed', username: 'Ancien', avatarUrl: null }, now),
+    authRepository.upsertDiscordUser({ discordId: 'discord-outsider', username: 'Exterieur', avatarUrl: null }, now),
   ])
-  const credentials = await Promise.all([owner, member, removed].map(async (user, index) => {
+  const credentials = await Promise.all([owner, member, removed, outsider].map(async (user, index) => {
     const credential = createSessionCredential({ now, randomBytes: () => new Uint8Array(32).fill(index + 1) })
     await authRepository.createSession(user.id, credential)
     const token = await createAccessToken({ config, now, sessionId: credential.id, userId: user.id })
@@ -34,7 +35,7 @@ async function createTestApp(input: { gameStatus?: GameStatus; eventBus?: GameMe
     auth: { config, repository: authRepository },
     messages: { authConfig: config, authRepository, repository, eventBus, now: () => now },
   })
-  return { app, owner: credentials[0]!, member: credentials[1]!, removed: credentials[2]!, repository, eventBus }
+  return { app, owner: credentials[0]!, member: credentials[1]!, removed: credentials[2]!, outsider: credentials[3]!, repository, eventBus }
 }
 
 const jsonHeaders = (cookie: string) => ({ cookie, origin: config.appOrigin, 'content-type': 'application/json' })
@@ -139,5 +140,22 @@ describe('game messaging API routes', () => {
     const firstChunk = await reader.read()
     expect(new TextDecoder().decode(firstChunk.value)).toContain('event: ready')
     await reader.cancel()
+  })
+
+  it('closes an idle member stream after access is revoked and rejects outsiders', async () => {
+    const { app, member, outsider, repository, eventBus } = await createTestApp()
+    const message = await repository.create({ gameIdOrSlug: 'brumes', authorId: member.user.id, content: 'Confidentiel à la partie', now })
+    const outsiderResponse = await app.request('/games/brumes/messages/stream', { headers: { cookie: outsider.cookie } })
+    expect(outsiderResponse.status).toBe(403)
+
+    const response = await app.request('/games/brumes/messages/stream', { headers: { cookie: member.cookie } })
+    const reader = response.body!.getReader()
+    expect(new TextDecoder().decode((await reader.read()).value)).toContain('event: ready')
+    repository.setMemberStatus(member.user.id, 'REMOVED')
+    await eventBus.publish({ gameId: 'game-1', messageId: message.id })
+
+    const revoked = await reader.read()
+    expect(revoked.done).toBe(true)
+    expect(new TextDecoder().decode(revoked.value)).not.toContain(message.content)
   })
 })

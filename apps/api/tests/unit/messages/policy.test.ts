@@ -21,8 +21,9 @@ describe('game message access policy', () => {
 
   it('denies drafts, removed members, candidates, and outsiders', () => {
     expect(canReadGameMessages({ gameStatus: 'DRAFT', isOwner: true, memberStatus: 'NONE' })).toBe(false)
-    expect(canReadGameMessages({ gameStatus: 'ACTIVE', isOwner: false, memberStatus: 'REMOVED' })).toBe(false)
-    expect(canWriteGameMessages({ gameStatus: 'ACTIVE', isOwner: false, memberStatus: 'PENDING' })).toBe(false)
-    expect(canWriteGameMessages({ gameStatus: 'ACTIVE', isOwner: false, memberStatus: 'NONE' })).toBe(false)
+    for (const memberStatus of ['REMOVED', 'PENDING', 'INVITED', 'NONE']) {
+      expect(canReadGameMessages({ gameStatus: 'ACTIVE', isOwner: false, memberStatus })).toBe(false)
+      expect(canWriteGameMessages({ gameStatus: 'ACTIVE', isOwner: false, memberStatus })).toBe(false)
+    }
   })
 })

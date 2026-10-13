@@ -12,6 +12,7 @@ type SeedGame = {
 
 type InMemoryMessagesRepository = GameMessageRepository & {
   messages: MessageRecord[]
+  setMemberStatus: (userId: string, status: string) => void
 }
 
 const encodeCursor = (message: Pick<MessageRecord, 'id' | 'createdAt'>): string => Buffer.from(JSON.stringify({ id: message.id, createdAt: message.createdAt.toISOString() }), 'utf8').toString('base64url')
@@ -43,6 +44,10 @@ export function createInMemoryMessagesRepository(input: { games: SeedGame[]; mes
 
   return {
     messages,
+    setMemberStatus(userId, status) {
+      const game = games[0]
+      if (game) game.members[userId] = status
+    },
     getAccess,
     async list({ gameId, cursor, limit }) {
       const decoded = decodeCursor(cursor)
