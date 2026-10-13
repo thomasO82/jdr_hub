@@ -107,3 +107,11 @@ Le nouveau scan Docker Scout doit encore être confirmé par la CI GitHub.
 - Vérifier le run CI de la PR, notamment les deux étapes Docker Scout.
 - Après ouverture de la PR, passer le statut à `IN_REVIEW` et s'arrêter pour la
   revue et la fusion par le propriétaire.
+
+## Suivi après fusion — 2026-10-13
+
+Le propriétaire a confirmé la fusion dans la [PR #26](https://github.com/thomasO82/jdr_hub/pull/26).
+Le run GitHub associé a terminé en échec sur le job `quality` ; les étapes et
+logs ne sont pas disponibles via l'intégration, donc la cause exacte n'est pas
+confirmée. Le remplacement de Docker Scout par un scanner sans abonnement est
+suivi séparément dans FIX-SEC-003 (`docs/features/020-free-image-scanning.md`).

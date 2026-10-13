@@ -43,7 +43,8 @@ Seuls les statuts suivants sont autorisés :
 | F09 | XP, niveaux et historique de progression | `MERGED` | `feat/xp-and-levels` | Fusion confirmée par le propriétaire dans `develop` | 122 fichiers et 326 tests verts ; 11 tests d'intégration PostgreSQL ; lint, typecheck et builds verts | Session authentifiée, historique privé, limites Zod, idempotence DB, transaction présence/XP, absence de champs internes | [Fiche F09](features/015-xp-and-levels.md) |
 | F10 | Responsive, accessibilité et états UI | `IN_PROGRESS` | `feat/responsive-accessibility` | Non créée | 125 fichiers et 333 tests verts ; lint, typecheck et build verts | Aucun changement API/auth ; erreurs traduites, focus clavier, cibles tactiles et réduction des animations | [Fiche F10](features/016-responsive-accessibility.md) |
 | FIX-SEC-001 | Mise à jour des dépendances vulnérables | `MERGED` | `fix/security-dependency-updates` | [PR #24](https://github.com/thomasO82/jdr_hub/pull/24) | 124 fichiers, 330 tests unitaires/composants/API verts ; 11 tests PostgreSQL ; lint, typecheck, build et Compose verts | Plus aucune vulnérabilité critique/haute à l'audit pnpm ; la vulnérabilité modérée transitive a été traitée dans FIX-SEC-002 | [Fiche FIX-SEC-001](features/018-security-dependency-updates.md) |
-| FIX-SEC-002 | Remédiation esbuild et correction du scan Docker Scout CI | `IN_PROGRESS` | `fix/esbuild-moderate-remediation` | Création auto refusée (`403`) ; [ouverture manuelle](https://github.com/thomasO82/jdr_hub/pull/new/fix/esbuild-moderate-remediation) | Lint/typecheck, builds, audit et 333 tests réussis avec PostgreSQL temporaire ; scan Scout à confirmer dans la CI | Override esbuild vers 0.25.12 ; action Docker Scout épinglée à un SHA, commentaires PR désactivés et seuil high/critical conservé | [Fiche FIX-SEC-002](features/019-esbuild-moderate-remediation.md) |
+| FIX-SEC-002 | Remédiation esbuild | `MERGED` | `fix/esbuild-moderate-remediation` | [PR #26](https://github.com/thomasO82/jdr_hub/pull/26) | Vérifications locales réussies avant fusion ; job CI `quality` en échec sur le commit fusionné, cause indisponible dans les logs | Override esbuild vers 0.25.12 ; remplacement du scan Scout suivi séparément dans FIX-SEC-003 | [Fiche FIX-SEC-002](features/019-esbuild-moderate-remediation.md) |
+| FIX-SEC-003 | Scan gratuit des images Docker dans la CI | `IN_PROGRESS` | `fix/free-image-scanning` | Création automatique refusée (`403`) ; [ouvrir manuellement vers `develop`](https://github.com/thomasO82/jdr_hub/compare/develop...fix/free-image-scanning?expand=1) | 125 fichiers/334 tests, 11 intégration PostgreSQL, lint, typecheck, build, audit, build Docker et scans locaux des deux images verts ; CI GitHub à confirmer | Trivy épinglé par SHA, images web/API, seuil critique/élevé bloquant, base runtime corrigée, aucun abonnement Scout | [Fiche FIX-SEC-003](features/020-free-image-scanning.md) |
 
 ## Blocages
 
@@ -68,17 +69,25 @@ Seuls les statuts suivants sont autorisés :
   poussée et vérifiée, mais l'intégration GitHub a refusé la création de PR
   (`403 Resource not accessible by integration`) et `gh` n'est pas installé.
   La PR doit être ouverte manuellement et F08 reste `IN_PROGRESS`.
-- 2026-10-13 — FIX-SEC-002 : la branche `fix/esbuild-moderate-remediation` est
-  poussée après les vérifications ; le connecteur GitHub a refusé la création
-  de PR (`403 Resource not accessible by integration`). [Ouvrir la PR vers
-  `develop`](https://github.com/thomasO82/jdr_hub/pull/new/fix/esbuild-moderate-remediation).
+- 2026-10-13 — FIX-SEC-003 : le job `quality` de la PR #26 a échoué après
+  fusion. Les étapes et journaux du run ne sont pas accessibles via
+  l'intégration ; le scan payant Docker Scout est remplacé par Trivy, sans
+  désactiver l'analyse bloquante des images.
+- 2026-10-13 — FIX-SEC-003 : le scan local a identifié l'ancienne base Node
+  (Alpine 3.22.1) et npm intégré dans les images runtime. Après mise à jour de
+  la base, des paquets Alpine et retrait de npm/npx du runtime, Trivy v0.75.0
+  ne signale plus de vulnérabilité HIGH/CRITICAL dans les deux images.
+- 2026-10-13 — FIX-SEC-003 : la branche a été poussée, mais le connecteur
+  GitHub a refusé l'ouverture de la PR (`403 Resource not accessible by
+  integration`). L'ouverture manuelle reste nécessaire.
 
 ## Mise à jour après fusion — 2026-10-12
 
 Le propriétaire a confirmé la fusion de FIX-SEC-001 dans la
-[PR #24](https://github.com/thomasO82/jdr_hub/pull/24). La remédiation de la
-vulnérabilité modérée d'esbuild et le remplacement de l'appel Docker Scout
-manquant dans le workflow sont suivis séparément dans FIX-SEC-002.
+[PR #24](https://github.com/thomasO82/jdr_hub/pull/24). FIX-SEC-002 a ensuite
+été fusionnée dans la [PR #26](https://github.com/thomasO82/jdr_hub/pull/26).
+Le job CI de cette PR ayant échoué, le remplacement de Docker Scout par un
+scanner sans abonnement est suivi séparément dans FIX-SEC-003.
 
 ## Mise à jour architecture — 2026-09-05
 
