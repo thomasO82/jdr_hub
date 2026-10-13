@@ -9,20 +9,30 @@ const session = {
   gameTitle: 'Les Brumes de Valombre',
   sessionStartsAt: new Date('2026-09-10T18:00:00.000Z'),
   ownerId: 'gm-1',
+  ownerDiscordId: '100000000000000001',
+  ownerDiscordServerJoined: false,
   gameStatus: 'ACTIVE' as const,
   sessionStatus: 'SCHEDULED' as const,
 }
 
 describe('attendance services', () => {
-  it('reports an absence as EXCUSED and creates only one local notification', async () => {
+  it('keeps the in-app notification when the owner did not opt in to Discord', async () => {
     const repository = createInMemoryAttendanceRepository({ sessions: [{ ...session, memberStatuses: { 'player-1': 'ACTIVE' } }] })
     const result = await reportAbsence({ sessionId: 'session-1', userId: 'player-1', repository, now: () => new Date('2026-09-06T12:00:00.000Z') })
 
     expect(result.attendance.status).toBe('EXCUSED')
     expect(result.notification).toMatchObject({ type: 'ABSENCE_REPORTED', recipientId: 'gm-1', actorId: 'player-1' })
-    expect('delivery' in result).toBe(false)
+    expect(result.delivery).toBeNull()
     expect(repository.notifications).toHaveLength(1)
     expect(repository.deliveries).toHaveLength(0)
+  })
+
+  it('creates a Discord delivery only when the owner joined the bot server', async () => {
+    const repository = createInMemoryAttendanceRepository({ sessions: [{ ...session, ownerDiscordServerJoined: true, memberStatuses: { 'player-1': 'ACTIVE' } }] })
+    const result = await reportAbsence({ sessionId: 'session-1', userId: 'player-1', repository })
+
+    expect(result.delivery).toMatchObject({ channel: 'DISCORD_DM', status: 'PENDING', recipientDiscordId: '100000000000000001' })
+    expect(repository.deliveries).toHaveLength(1)
   })
 
   it('is idempotent for a repeated absence and never creates duplicate effects', async () => {

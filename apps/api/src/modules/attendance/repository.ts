@@ -1,11 +1,13 @@
 import { and, eq, inArray } from 'drizzle-orm'
-import { attendanceSchema, gameSchema, schedulingSchema, type createDatabase } from '@jdr-hub/database'
+import { attendanceSchema, authSchema, gameSchema, schedulingSchema, type createDatabase } from '@jdr-hub/database'
 import type { AttendanceEntry, AttendanceRecord, SessionContext } from '@jdr-hub/shared'
-import type { NotificationRecord } from '../notifications/repository.js'
+import type { DiscordDelivery, NotificationRecord } from '../notifications/repository.js'
+import { createAbsenceDiscordContent } from '../notifications/discord-content.js'
 
 export type AbsenceEvent = {
   attendance: AttendanceRecord
   notification: NotificationRecord
+  delivery: DiscordDelivery | null
 }
 
 export interface AttendanceRepository {
@@ -47,7 +49,8 @@ const toNotification = (row: { id: string; type: string; recipientId: string; ga
 export function createPostgresAttendanceRepository(database: Database): AttendanceRepository {
   const { games, gameMembers } = gameSchema
   const { gameSessions } = schedulingSchema
-  const { sessionAttendance, notifications } = attendanceSchema
+  const { sessionAttendance, notifications, notificationDeliveries } = attendanceSchema
+  const { users } = authSchema
 
   const readContext = async (sessionId: string, userId: string, db: Pick<Database, 'select'> = database): Promise<SessionContext | null> => {
     const [row] = await db.select({
@@ -101,7 +104,25 @@ export function createPostgresAttendanceRepository(database: Database): Attendan
           const logicalKey = `absence:${sessionId}:${userId}`
           const notification = await readNotificationByKey(logicalKey, tx)
           if (!notification) throw new Error('ATTENDANCE_CONFLICT')
-          return { attendance: existing, notification }
+          const [owner] = await tx.select({ discordId: users.discordId, joinedAt: users.discordServerJoinedAt })
+            .from(users).where(eq(users.id, context.ownerId)).limit(1)
+          if (!owner) throw new Error('ATTENDANCE_CONFLICT')
+          const [delivery] = await tx.select().from(notificationDeliveries).where(and(eq(notificationDeliveries.notificationId, notification.id), eq(notificationDeliveries.channel, 'DISCORD_DM'))).limit(1)
+          if (!delivery) {
+            if (owner.joinedAt && owner.joinedAt <= notification.createdAt) throw new Error('ATTENDANCE_CONFLICT')
+            return { attendance: existing, notification, delivery: null }
+          }
+          return {
+            attendance: existing,
+            notification,
+            delivery: {
+              ...delivery,
+              channel: 'DISCORD_DM',
+              status: delivery.status as DiscordDelivery['status'],
+              recipientDiscordId: owner.discordId,
+              content: createAbsenceDiscordContent({ gameTitle: context.gameTitle, sessionStartsAt: context.sessionStartsAt }),
+            },
+          }
         }
         if (existing) throw new Error('ATTENDANCE_CONFLICT')
 
@@ -120,9 +141,32 @@ export function createPostgresAttendanceRepository(database: Database): Attendan
           createdAt: now,
         }).returning()
         if (!notificationRow) throw new Error('ATTENDANCE_CREATE_FAILED')
+        const [owner] = await tx.select({ discordId: users.discordId, joinedAt: users.discordServerJoinedAt })
+          .from(users).where(eq(users.id, context.ownerId)).limit(1)
+        let delivery: DiscordDelivery | null = null
+        if (owner?.joinedAt) {
+          const [deliveryRow] = await tx.insert(notificationDeliveries).values({
+            notificationId: notificationRow.id,
+            channel: 'DISCORD_DM',
+            status: 'PENDING',
+            attempts: 0,
+            processingAt: null,
+            createdAt: now,
+            updatedAt: now,
+          }).returning()
+          if (!deliveryRow) throw new Error('ATTENDANCE_CREATE_FAILED')
+          delivery = {
+            ...deliveryRow,
+            channel: 'DISCORD_DM',
+            status: 'PENDING',
+            recipientDiscordId: owner.discordId,
+            content: createAbsenceDiscordContent({ gameTitle: context.gameTitle, sessionStartsAt: context.sessionStartsAt }),
+          }
+        }
         return {
           attendance: toAttendance(attendanceRow),
           notification: toNotification(notificationRow),
+          delivery,
         }
       })
     },

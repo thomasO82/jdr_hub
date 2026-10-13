@@ -13,11 +13,15 @@ import { createPostgresNotificationRepository } from './modules/notifications/re
 import { parseMessageConfig } from './modules/messages/config.js'
 import { createPostgresGameMessageRepository } from './modules/messages/repository.js'
 import { createRedisGameMessageEventBus } from './modules/messages/redis-event-bus.js'
+import { parseNotificationConfig } from './modules/notifications/config.js'
+import { createDiscordNotifier } from './modules/notifications/discord-client.js'
+import { processDiscordDeliveries, startNotificationWorker } from './modules/notifications/worker.js'
 
 async function startApi(): Promise<void> {
   const port = parsePort(process.env.PORT)
   const database = createDatabase(process.env.DATABASE_URL)
   const authConfig = parseAuthConfig(process.env)
+  const notificationConfig = parseNotificationConfig(process.env)
   const messageConfig = parseMessageConfig(process.env)
   const authRepository = createPostgresAuthRepository(database.db)
   const attendanceRepository = createPostgresAttendanceRepository(database.db)
@@ -39,7 +43,18 @@ async function startApi(): Promise<void> {
     }).fetch,
     port,
   })
+  const stopNotificationWorker = notificationConfig
+    ? startNotificationWorker({
+      process: () => processDiscordDeliveries({
+        repository: notificationRepository,
+        notifier: createDiscordNotifier(notificationConfig),
+        limit: notificationConfig.batchSize,
+      }),
+      intervalMs: notificationConfig.intervalMs,
+    })
+    : () => undefined
   const shutdown = () => {
+    stopNotificationWorker()
     server.close(() => { void database.client.end() })
   }
   process.once('SIGTERM', shutdown)

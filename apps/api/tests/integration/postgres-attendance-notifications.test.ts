@@ -22,13 +22,13 @@ const { sessionAttendance, notifications, notificationDeliveries } = attendanceS
 
 type Seed = { ownerId: string; playerId: string; gameId: string; sessionId: string }
 
-async function seedSession(): Promise<Seed> {
+async function seedSession(ownerJoinedDiscord = false): Promise<Seed> {
   const ownerId = randomUUID()
   const playerId = randomUUID()
   const gameId = randomUUID()
   const sessionId = randomUUID()
   await database.db.insert(users).values([
-    { id: ownerId, discordId: '100000000000000001', username: 'MJ integration' },
+    { id: ownerId, discordId: '100000000000000001', username: 'MJ integration', discordServerJoinedAt: ownerJoinedDiscord ? new Date('2026-09-01T12:00:00.000Z') : null },
     { id: playerId, discordId: '200000000000000002', username: 'Joueur integration' },
   ])
   await database.db.insert(games).values({ id: gameId, ownerId, slug: `integration-${gameId}`, title: 'Partie intégration', system: 'Systeme', description: 'Données de test', type: 'CAMPAIGN', status: 'ACTIVE', visibility: 'PRIVATE', maxPlayers: 4 })
@@ -62,6 +62,41 @@ describe('PostgreSQL attendance and notification repositories', () => {
       expect((await database.db.select().from(sessionAttendance).where(eq(sessionAttendance.sessionId, seed.sessionId)))).toHaveLength(1)
       expect((await database.db.select().from(notifications).where(eq(notifications.sessionId, seed.sessionId)))).toHaveLength(1)
       expect((await database.db.select().from(notificationDeliveries).where(eq(notificationDeliveries.notificationId, first.notification.id)))).toHaveLength(0)
+    } finally {
+      await clean(seed)
+    }
+  })
+
+  it('queues one Discord delivery for an opted-in owner inside the absence transaction', async () => {
+    await migrateDatabase(database)
+    const seed = await seedSession(true)
+    try {
+      const repository = createPostgresAttendanceRepository(database.db)
+      const first = await repository.reportAbsence({ sessionId: seed.sessionId, userId: seed.playerId, now: new Date('2026-09-06T12:00:00.000Z') })
+      const second = await repository.reportAbsence({ sessionId: seed.sessionId, userId: seed.playerId, now: new Date('2026-09-06T12:01:00.000Z') })
+      const deliveries = await database.db.select().from(notificationDeliveries).where(eq(notificationDeliveries.notificationId, first.notification.id))
+
+      expect(second).toEqual(first)
+      expect(first.delivery).toMatchObject({ channel: 'DISCORD_DM', recipientDiscordId: '100000000000000001', status: 'PENDING' })
+      expect(deliveries).toHaveLength(1)
+      expect(deliveries[0]).toMatchObject({ channel: 'DISCORD_DM', status: 'PENDING', attempts: 0 })
+    } finally {
+      await clean(seed)
+    }
+  })
+
+  it('does not retroactively enqueue a Discord DM when the owner opts in after an absence', async () => {
+    await migrateDatabase(database)
+    const seed = await seedSession(false)
+    try {
+      const repository = createPostgresAttendanceRepository(database.db)
+      const first = await repository.reportAbsence({ sessionId: seed.sessionId, userId: seed.playerId, now: new Date('2026-09-06T12:00:00.000Z') })
+      await database.db.update(users).set({ discordServerJoinedAt: new Date('2026-09-06T12:05:00.000Z') }).where(eq(users.id, seed.ownerId))
+      const replay = await repository.reportAbsence({ sessionId: seed.sessionId, userId: seed.playerId, now: new Date('2026-09-06T12:06:00.000Z') })
+
+      expect(replay).toEqual(first)
+      expect(replay.delivery).toBeNull()
+      expect(await database.db.select().from(notificationDeliveries).where(eq(notificationDeliveries.notificationId, first.notification.id))).toHaveLength(0)
     } finally {
       await clean(seed)
     }

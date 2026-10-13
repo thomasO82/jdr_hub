@@ -4,12 +4,14 @@ import type { NotificationRecord } from '../../src/modules/notifications/reposit
 
 type SeedSession = Omit<SessionContext, 'memberStatus'> & {
   memberStatuses: Record<string, string>
+  ownerDiscordId?: string
+  ownerDiscordServerJoined?: boolean
 }
 
 type InMemoryAttendanceRepository = AttendanceRepository & {
   attendance: AttendanceRecord[]
   notifications: NotificationRecord[]
-  deliveries: never[]
+  deliveries: { id: string; notificationId: string; recipientDiscordId: string; content: string; channel: 'DISCORD_DM'; status: 'PENDING'; attempts: number; processingAt: null; nextAttemptAt: null; providerMessageId: null; lastErrorCode: null }[]
   sessionStatuses: Map<string, SessionStatus>
 }
 
@@ -20,7 +22,7 @@ export function createInMemoryAttendanceRepository(input: { sessions: SeedSessio
   const sessionStatuses = new Map(input.sessions.map((session) => [session.sessionId, session.sessionStatus]))
   const attendance: AttendanceRecord[] = []
   const notifications: NotificationRecord[] = []
-  const deliveries: never[] = []
+  const deliveries: InMemoryAttendanceRepository['deliveries'] = []
   let sequence = 1
 
   const context = (sessionId: string, userId: string): SessionContext | null => {
@@ -43,14 +45,21 @@ export function createInMemoryAttendanceRepository(input: { sessions: SeedSessio
     if (existing) {
       const notification = notifications.find((entry) => entry.sessionId === session.sessionId && entry.actorId === userId)
       if (!notification) throw new Error('ATTENDANCE_CONFLICT')
-      return { attendance: existing, notification }
+      const delivery = deliveries.find((entry) => entry.notificationId === notification.id) ?? null
+      return { attendance: existing, notification, delivery }
     }
     if (attendance.some((entry) => entry.sessionId === session.sessionId && entry.userId === userId)) throw new Error('ATTENDANCE_CONFLICT')
     const attendanceRecord: AttendanceRecord = { id: id('attendance', sequence++), sessionId: session.sessionId, userId, status: 'EXCUSED', createdAt: now, updatedAt: now }
     const notification: NotificationRecord = { id: id('notification', sequence++), type: 'ABSENCE_REPORTED', recipientId: session.ownerId, gameId: session.gameId, sessionId: session.sessionId, actorId: userId, title: 'Absence signalée', body: 'Un joueur a signalé son absence pour une séance.', readAt: null, createdAt: now }
     attendance.push(attendanceRecord)
     notifications.push(notification)
-    return { attendance: attendanceRecord, notification }
+    const delivery = session.ownerDiscordServerJoined && session.ownerDiscordId ? {
+      id: id('delivery', sequence++), notificationId: notification.id, recipientDiscordId: session.ownerDiscordId,
+      content: `Absence signalée pour « ${session.gameTitle} ».`, channel: 'DISCORD_DM' as const, status: 'PENDING' as const,
+      attempts: 0, processingAt: null, nextAttemptAt: null, providerMessageId: null, lastErrorCode: null,
+    } : null
+    if (delivery) deliveries.push(delivery)
+    return { attendance: attendanceRecord, notification, delivery }
   }
 
   return {
