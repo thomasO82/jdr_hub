@@ -48,8 +48,8 @@ export async function completeDiscordGuildJoin(input: {
   client: DiscordGuildMembershipClient
   now: () => Date
 }): Promise<string | null> {
-  const consumed = await input.repository.consumeGuildJoinAttempt(hashOAuthState(input.state), input.now())
-  if (!consumed || consumed.sessionId !== input.sessionId || consumed.userId !== input.sessionUserId) return null
+  const consumed = await input.repository.consumeGuildJoinAttempt(hashOAuthState(input.state), input.now(), { sessionId: input.sessionId, userId: input.sessionUserId })
+  if (!consumed) return null
   if (consumed.attempt.expiresAt.getTime() <= input.now().getTime()) return null
   const discordUserId = await input.repository.findDiscordIdForUser(consumed.userId)
   if (!discordUserId) return null
@@ -62,4 +62,18 @@ export async function completeDiscordGuildJoin(input: {
   })
   await input.repository.markDiscordGuildJoined(consumed.userId, input.now())
   return MEMBERSHIP_RETURN_TO
+}
+
+/** Consumes a denied consent callback without changing the JDR Hub session or membership state. */
+export async function cancelDiscordGuildJoin(input: {
+  state: string
+  sessionId: string
+  sessionUserId: string
+  outcome: 'declined' | 'unavailable'
+  repository: AuthRepository
+  now: () => Date
+}): Promise<string | null> {
+  const consumed = await input.repository.consumeGuildJoinAttempt(hashOAuthState(input.state), input.now(), { sessionId: input.sessionId, userId: input.sessionUserId })
+  if (!consumed) return null
+  return input.outcome === 'declined' ? '/profil?discord=declined' : '/profil?discord=unavailable'
 }

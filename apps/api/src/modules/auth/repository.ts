@@ -20,7 +20,7 @@ export type StoredSession = StoredSessionCredential & {
 }
 
 export interface AuthRepository {
-  consumeGuildJoinAttempt(stateDigest: string, now: Date): Promise<{ userId: string; sessionId: string; attempt: OAuthLoginAttempt } | null>
+  consumeGuildJoinAttempt(stateDigest: string, now: Date, binding: { userId: string; sessionId: string }): Promise<{ userId: string; sessionId: string; attempt: OAuthLoginAttempt } | null>
   consumeLoginAttempt(stateDigest: string, now: Date): Promise<OAuthLoginAttempt | null>
   createGuildJoinAttempt(input: { userId: string; sessionId: string; attempt: OAuthLoginAttempt }): Promise<void>
   createLoginAttempt(attempt: OAuthLoginAttempt): Promise<void>
@@ -32,6 +32,7 @@ export interface AuthRepository {
   getDiscordGuildMembership(userId: string): Promise<{ joinedAt: Date | null; promptDismissedAt: Date | null }>
   logoutSession(tokenDigest: string, now: Date): Promise<void>
   markDiscordGuildJoined(userId: string, now: Date): Promise<void>
+  markDiscordGuildPromptDismissed(userId: string, now: Date): Promise<void>
   revokeUserSessions(userId: string, now: Date): Promise<void>
   rotateSession(currentTokenDigest: string, replacement: NewSessionCredential, now: Date): Promise<StoredSession | null>
   touchSession(tokenDigest: string, now: Date): Promise<void>
@@ -54,7 +55,7 @@ export function createPostgresAuthRepository(database: AuthDatabase): AuthReposi
         consumedAt: attempt.consumedAt,
       })
     },
-    async consumeGuildJoinAttempt(stateDigest, now) {
+    async consumeGuildJoinAttempt(stateDigest, now, binding) {
       const [attempt] = await database
         .update(discordGuildJoinAttempts)
         .set({ consumedAt: now })
@@ -62,6 +63,7 @@ export function createPostgresAuthRepository(database: AuthDatabase): AuthReposi
           eq(discordGuildJoinAttempts.stateDigest, stateDigest),
           isNull(discordGuildJoinAttempts.consumedAt),
           gt(discordGuildJoinAttempts.expiresAt, now),
+          ...(binding ? [eq(discordGuildJoinAttempts.userId, binding.userId), eq(discordGuildJoinAttempts.sessionId, binding.sessionId)] : []),
         ))
         .returning()
       return attempt ? {
@@ -89,6 +91,9 @@ export function createPostgresAuthRepository(database: AuthDatabase): AuthReposi
     },
     async markDiscordGuildJoined(userId, now) {
       await database.update(users).set({ discordServerJoinedAt: now, discordServerPromptDismissedAt: null }).where(eq(users.id, userId))
+    },
+    async markDiscordGuildPromptDismissed(userId, now) {
+      await database.update(users).set({ discordServerPromptDismissedAt: now }).where(eq(users.id, userId))
     },
     async createLoginAttempt(attempt) {
       await database.insert(oauthLoginAttempts).values(attempt)

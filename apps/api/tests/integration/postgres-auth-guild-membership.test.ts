@@ -32,8 +32,8 @@ describe('PostgreSQL Discord guild membership repository', () => {
     try {
       await repository.createGuildJoinAttempt({ userId, sessionId, attempt })
       const consumed = await Promise.all([
-        repository.consumeGuildJoinAttempt(attempt.stateDigest, now),
-        repository.consumeGuildJoinAttempt(attempt.stateDigest, now),
+        repository.consumeGuildJoinAttempt(attempt.stateDigest, now, { userId, sessionId }),
+        repository.consumeGuildJoinAttempt(attempt.stateDigest, now, { userId, sessionId }),
       ])
       expect(consumed.filter(Boolean)).toHaveLength(1)
       expect(await repository.findDiscordIdForUser(userId)).toBe(discordId)
@@ -66,7 +66,7 @@ describe('PostgreSQL Discord guild membership repository', () => {
 
     try {
       await repository.createGuildJoinAttempt({ userId, sessionId, attempt })
-      expect(await repository.consumeGuildJoinAttempt(attempt.stateDigest, now)).toBeNull()
+      expect(await repository.consumeGuildJoinAttempt(attempt.stateDigest, now, { userId, sessionId })).toBeNull()
       expect(await repository.getDiscordGuildMembership(userId)).toEqual({ joinedAt: null, promptDismissedAt: null })
     } finally {
       await database.db.delete(authSchema.users).where(eq(authSchema.users.id, userId))

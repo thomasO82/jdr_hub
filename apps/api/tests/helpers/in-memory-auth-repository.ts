@@ -22,9 +22,9 @@ export function createInMemoryAuthRepository(): AuthRepository & { debugStoredVa
       if (guildJoinAttempts.has(attempt.stateDigest)) throw new Error('OAUTH_ATTEMPT_ALREADY_EXISTS')
       guildJoinAttempts.set(attempt.stateDigest, { userId, sessionId, attempt: { ...attempt } })
     },
-    async consumeGuildJoinAttempt(stateDigest, now) {
+    async consumeGuildJoinAttempt(stateDigest, now, binding) {
       const stored = guildJoinAttempts.get(stateDigest)
-      if (!stored || stored.attempt.consumedAt || stored.attempt.expiresAt.getTime() <= now.getTime()) return null
+      if (!stored || stored.attempt.consumedAt || stored.attempt.expiresAt.getTime() <= now.getTime() || (binding && (stored.userId !== binding.userId || stored.sessionId !== binding.sessionId))) return null
       const consumed = { ...stored, attempt: { ...stored.attempt, consumedAt: now } }
       guildJoinAttempts.set(stateDigest, consumed)
       return consumed
@@ -52,6 +52,10 @@ export function createInMemoryAuthRepository(): AuthRepository & { debugStoredVa
     async findDiscordIdForUser(userId) { return discordIdsByUserId.get(userId) ?? null },
     async getDiscordGuildMembership(userId) { return guildMemberships.get(userId) ?? { joinedAt: null, promptDismissedAt: null } },
     async markDiscordGuildJoined(userId, now) { guildMemberships.set(userId, { joinedAt: now, promptDismissedAt: null }) },
+    async markDiscordGuildPromptDismissed(userId, now) {
+      const current = guildMemberships.get(userId) ?? { joinedAt: null, promptDismissedAt: null }
+      guildMemberships.set(userId, { ...current, promptDismissedAt: now })
+    },
     async createSession(userId: string, credential: NewSessionCredential) {
       sessions.set(credential.tokenDigest, {
         id: credential.id,
