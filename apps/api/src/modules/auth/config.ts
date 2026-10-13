@@ -5,6 +5,8 @@ const authEnvironmentSchema = z.object({
   DISCORD_CLIENT_ID: z.string().regex(/^\d{17,20}$/),
   DISCORD_CLIENT_SECRET: z.string().min(1),
   DISCORD_REDIRECT_URI: z.string().url(),
+  DISCORD_GUILD_ID: z.preprocess((value) => value === '' ? undefined : value, z.string().regex(/^\d{17,20}$/).optional()),
+  DISCORD_BOT_TOKEN: z.preprocess((value) => value === '' ? undefined : value, z.string().min(1).optional()),
   JWT_SIGNING_SECRET: z.string().min(1),
   JWT_PREVIOUS_SIGNING_SECRET: z.preprocess(
     (value) => value === '' ? undefined : value,
@@ -17,6 +19,8 @@ export type AuthConfig = {
   appOrigin: string
   clientId: string
   clientSecret: string
+  discordBotToken: string | null
+  discordGuildId: string | null
   isProduction: boolean
   jwtSigningSecret: string
   previousJwtSigningSecret: string | null
@@ -70,6 +74,8 @@ export function parseAuthConfig(environment: unknown): AuthConfig {
     appOrigin,
     clientId: values.DISCORD_CLIENT_ID,
     clientSecret: values.DISCORD_CLIENT_SECRET,
+    discordBotToken: values.DISCORD_BOT_TOKEN ?? null,
+    discordGuildId: values.DISCORD_GUILD_ID ?? null,
     isProduction,
     jwtSigningSecret,
     previousJwtSigningSecret,

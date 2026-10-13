@@ -27,4 +27,20 @@ describe('authentication configuration', () => {
       }),
     ).toThrow('DISCORD_REDIRECT_URI must match the fixed callback URL')
   })
+
+  it('accepts the optional server-only Discord membership configuration', () => {
+    expect(parseAuthConfig({
+      ...validEnvironment,
+      DISCORD_GUILD_ID: '123456789012345678',
+      DISCORD_BOT_TOKEN: 'test-only-bot-token',
+    })).toMatchObject({
+      discordGuildId: '123456789012345678',
+      discordBotToken: 'test-only-bot-token',
+    })
+    expect(parseAuthConfig(validEnvironment)).toMatchObject({ discordGuildId: null, discordBotToken: null })
+  })
+
+  it('rejects malformed Discord server identifiers', () => {
+    expect(() => parseAuthConfig({ ...validEnvironment, DISCORD_GUILD_ID: 'not-a-snowflake' })).toThrow()
+  })
 })

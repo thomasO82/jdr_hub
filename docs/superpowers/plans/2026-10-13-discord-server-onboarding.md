@@ -77,10 +77,10 @@
 
 **Interfaces:**
 - `DiscordGuildMembershipClient.addCurrentUser(input: { code: string; codeVerifier: string; discordUserId: string; config: AuthConfig }): Promise<void>` exchanges the code, calls Discord with the OAuth user access token and bot token, accepts `201` and already-member `204`, and returns no token or Discord payload.
-- `AuthRepository.createGuildJoinAttempt(input: { userId: string; attempt: OAuthLoginAttempt }): Promise<void>` stores only the state digest, PKCE verifier, user ID, expiry, and consumed time.
-- `AuthRepository.consumeGuildJoinAttempt(stateDigest: string, now: Date): Promise<{ userId: string; attempt: OAuthLoginAttempt } | null>` atomically consumes a valid one-use attempt.
+- `AuthRepository.createGuildJoinAttempt(input: { userId: string; sessionId: string; attempt: OAuthLoginAttempt }): Promise<void>` stores only the state digest, PKCE verifier, user ID, session ID, expiry, and consumed time.
+- `AuthRepository.consumeGuildJoinAttempt(stateDigest: string, now: Date): Promise<{ userId: string; sessionId: string; attempt: OAuthLoginAttempt } | null>` atomically consumes a valid one-use attempt.
 - `AuthRepository.markDiscordGuildJoined(userId: string, now: Date): Promise<void>` sets `users.discord_server_joined_at`; `getDiscordGuildMembership(userId: string): Promise<{ joinedAt: Date | null; promptDismissedAt: Date | null }>` returns only local state.
-- `completeDiscordGuildJoin(input: { code: string; state: string; config: AuthConfig; repository: AuthRepository; client: DiscordGuildMembershipClient; now: () => Date }): Promise<string | null>` returns a safe internal destination on success; it never accepts a client-supplied user ID.
+- `completeDiscordGuildJoin(input: { code: string; state: string; sessionId: string; sessionUserId: string; config: AuthConfig; repository: AuthRepository; client: DiscordGuildMembershipClient; now: () => Date }): Promise<string | null>` requires both authenticated session identifiers to match; it never accepts client-supplied identity.
 
 - [ ] **Step 1: Write failing client and repository tests.** Assert token exchange uses the fixed Discord endpoint, the `guilds.join` scope, the configured guild ID and minimal Bot authorization; accept `201`/`204`; reject malformed responses and provider failures without exposing tokens. Assert expired/replayed state cannot be consumed and membership state stores timestamps only.
 - [ ] **Step 2: Run the focused tests and confirm Red.** Run `pnpm exec vitest run apps/api/tests/unit/auth/discord-guild-client.test.ts apps/api/tests/unit/auth/discord-guild-membership.test.ts packages/database/tests/auth-schema.test.ts`. Expected: FAIL because the client/use case/schema/migration do not exist.

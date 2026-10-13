@@ -22,6 +22,8 @@ export const users = pgTable(
     updatedAt: timestamp('updated_at', { withTimezone: true })
       .notNull()
       .defaultNow(),
+    discordServerJoinedAt: timestamp('discord_server_joined_at', { withTimezone: true }),
+    discordServerPromptDismissedAt: timestamp('discord_server_prompt_dismissed_at', { withTimezone: true }),
   },
 )
 
@@ -68,4 +70,22 @@ export const oauthLoginAttempts = pgTable(
       .defaultNow(),
   },
   (table) => [index('oauth_login_attempts_expiry_index').on(table.expiresAt)],
+)
+
+export const discordGuildJoinAttempts = pgTable(
+  'discord_guild_join_attempts',
+  {
+    id: uuid('id').defaultRandom().primaryKey(),
+    userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+    sessionId: uuid('session_id').notNull().references(() => sessions.id, { onDelete: 'cascade' }),
+    stateDigest: varchar('state_digest', { length: 43 }).notNull().unique(),
+    codeVerifier: varchar('code_verifier', { length: 128 }).notNull(),
+    expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+    consumedAt: timestamp('consumed_at', { withTimezone: true }),
+    createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index('discord_guild_join_attempts_user_id_index').on(table.userId),
+    index('discord_guild_join_attempts_expiry_index').on(table.expiresAt),
+  ],
 )

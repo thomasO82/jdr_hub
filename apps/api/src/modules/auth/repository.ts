@@ -20,13 +20,18 @@ export type StoredSession = StoredSessionCredential & {
 }
 
 export interface AuthRepository {
+  consumeGuildJoinAttempt(stateDigest: string, now: Date): Promise<{ userId: string; sessionId: string; attempt: OAuthLoginAttempt } | null>
   consumeLoginAttempt(stateDigest: string, now: Date): Promise<OAuthLoginAttempt | null>
+  createGuildJoinAttempt(input: { userId: string; sessionId: string; attempt: OAuthLoginAttempt }): Promise<void>
   createLoginAttempt(attempt: OAuthLoginAttempt): Promise<void>
   createSession(userId: string, credential: NewSessionCredential): Promise<void>
   findSession(tokenDigest: string): Promise<StoredSession | null>
   findSessionById(id: string): Promise<StoredSession | null>
+  findDiscordIdForUser(userId: string): Promise<string | null>
   findUser(userId: string): Promise<AuthenticatedUser | null>
+  getDiscordGuildMembership(userId: string): Promise<{ joinedAt: Date | null; promptDismissedAt: Date | null }>
   logoutSession(tokenDigest: string, now: Date): Promise<void>
+  markDiscordGuildJoined(userId: string, now: Date): Promise<void>
   revokeUserSessions(userId: string, now: Date): Promise<void>
   rotateSession(currentTokenDigest: string, replacement: NewSessionCredential, now: Date): Promise<StoredSession | null>
   touchSession(tokenDigest: string, now: Date): Promise<void>
@@ -37,8 +42,54 @@ type AuthDatabase = ReturnType<typeof createDatabase>['db']
 
 /** Creates the PostgreSQL repository used by the production API. */
 export function createPostgresAuthRepository(database: AuthDatabase): AuthRepository {
-  const { oauthLoginAttempts, sessions, users } = authSchema
+  const { discordGuildJoinAttempts, oauthLoginAttempts, sessions, users } = authSchema
   return {
+    async createGuildJoinAttempt({ userId, sessionId, attempt }) {
+      await database.insert(discordGuildJoinAttempts).values({
+        userId,
+        sessionId,
+        stateDigest: attempt.stateDigest,
+        codeVerifier: attempt.codeVerifier,
+        expiresAt: attempt.expiresAt,
+        consumedAt: attempt.consumedAt,
+      })
+    },
+    async consumeGuildJoinAttempt(stateDigest, now) {
+      const [attempt] = await database
+        .update(discordGuildJoinAttempts)
+        .set({ consumedAt: now })
+        .where(and(
+          eq(discordGuildJoinAttempts.stateDigest, stateDigest),
+          isNull(discordGuildJoinAttempts.consumedAt),
+          gt(discordGuildJoinAttempts.expiresAt, now),
+        ))
+        .returning()
+      return attempt ? {
+        userId: attempt.userId,
+        sessionId: attempt.sessionId,
+        attempt: {
+          stateDigest: attempt.stateDigest,
+          codeVerifier: attempt.codeVerifier,
+          returnTo: '/profil?discord=connected',
+          expiresAt: attempt.expiresAt,
+          consumedAt: attempt.consumedAt,
+        },
+      } : null
+    },
+    async findDiscordIdForUser(userId) {
+      const [user] = await database.select({ discordId: users.discordId }).from(users).where(eq(users.id, userId)).limit(1)
+      return user?.discordId ?? null
+    },
+    async getDiscordGuildMembership(userId) {
+      const [user] = await database.select({
+        joinedAt: users.discordServerJoinedAt,
+        promptDismissedAt: users.discordServerPromptDismissedAt,
+      }).from(users).where(eq(users.id, userId)).limit(1)
+      return { joinedAt: user?.joinedAt ?? null, promptDismissedAt: user?.promptDismissedAt ?? null }
+    },
+    async markDiscordGuildJoined(userId, now) {
+      await database.update(users).set({ discordServerJoinedAt: now, discordServerPromptDismissedAt: null }).where(eq(users.id, userId))
+    },
     async createLoginAttempt(attempt) {
       await database.insert(oauthLoginAttempts).values(attempt)
     },
