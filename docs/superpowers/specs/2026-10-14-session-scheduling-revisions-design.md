@@ -70,6 +70,9 @@ consomme plus cette limite.
 - Ajouter une commande API de modification d'horaire et une commande
   d'annulation de séance, ciblées par partie et séance afin de vérifier
   l'appartenance de ressource et prévenir les IDOR.
+- Ajouter une lecture des séances d'une partie réservée au MJ propriétaire,
+  incluant les séances planifiées et leur historique terminal, pour alimenter
+  les actions de gestion sans dépendre du planning personnel paginé.
 - La création de créneaux crée une nouvelle série, jamais des options dans une
   série retenue. Les endpoints de vote rejettent toute option dont la série
   n'est plus `OPEN`.
