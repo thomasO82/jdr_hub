@@ -48,6 +48,36 @@ describe('scheduling API routes', () => {
     expect((await voted.json()).data[0].votes.yes).toBe(1)
   })
 
+  it('selects one option per round, closes siblings and preserves votes in later rounds', async () => {
+    const { app, owner, member } = await createTestApp()
+    const ownerHeaders = { cookie: owner.cookie, origin: config.appOrigin, 'content-type': 'application/json' }
+    const firstRound = await app.request(`/games/${gameId}/proposals`, {
+      method: 'POST',
+      headers: ownerHeaders,
+      body: JSON.stringify({ slots: [slot, { startsAt: '2026-10-21T18:00:00.000Z', endsAt: '2026-10-21T21:00:00.000Z' }] }),
+    })
+    expect(firstRound.status).toBe(201)
+    const firstOptions = (await firstRound.json()).data as Array<{ id: string; roundId: string }>
+    expect(firstOptions[0]?.roundId).toBe(firstOptions[1]?.roundId)
+
+    const memberHeaders = { ...ownerHeaders, cookie: member.cookie }
+    expect((await app.request(`/proposals/${firstOptions[0]!.id}/votes`, { method: 'POST', headers: memberHeaders, body: JSON.stringify({ vote: 'YES' }) })).status).toBe(200)
+    expect((await app.request(`/games/${gameId}/proposals`, { method: 'POST', headers: ownerHeaders, body: JSON.stringify({ slots: [slot] }) })).status).toBe(409)
+
+    const selected = await app.request(`/games/${gameId}/sessions`, { method: 'POST', headers: ownerHeaders, body: JSON.stringify({ proposalId: firstOptions[1]!.id }) })
+    expect(selected.status).toBe(201)
+    const history = (await app.request(`/games/${gameId}/proposals`, { headers: { cookie: member.cookie } })).json()
+    const historyData = (await history).data as Array<{ id: string; status: string; roundStatus: string; votes: { yes: number }; userVote: string | null }>
+    expect(historyData.find((proposal) => proposal.id === firstOptions[0]!.id)).toMatchObject({ status: 'CLOSED', roundStatus: 'SELECTED', votes: { yes: 1 }, userVote: 'YES' })
+    expect((await app.request(`/proposals/${firstOptions[0]!.id}/votes`, { method: 'POST', headers: memberHeaders, body: JSON.stringify({ vote: 'NO' }) })).status).toBe(409)
+
+    const nextRound = await app.request(`/games/${gameId}/proposals`, { method: 'POST', headers: ownerHeaders, body: JSON.stringify({ slots: [slot] }) })
+    expect(nextRound.status).toBe(201)
+    const nextOption = ((await nextRound.json()).data as Array<{ roundId: string; roundStatus: string }>).find((proposal) => proposal.roundStatus === 'OPEN')
+    expect(nextOption?.roundId).not.toBe(firstOptions[0]?.roundId)
+    expect(nextOption?.roundStatus).toBe('OPEN')
+  })
+
   it('returns generic errors for invalid payloads and duplicate votes', async () => {
     const { app, owner, member } = await createTestApp()
     const headers = { cookie: owner.cookie, origin: config.appOrigin, 'content-type': 'application/json' }

@@ -1,8 +1,9 @@
-import type { GameStatus, ProposalStatus, SessionStatus, VoteValue } from '@jdr-hub/shared'
+import type { GameStatus, ProposalRoundStatus, ProposalStatus, SessionStatus, VoteValue } from '@jdr-hub/shared'
 import type { PlanningPage, ProposalRecord, ProposalView, SchedulingGame, SchedulingRepository, SessionRecord } from '../../src/modules/scheduling/repository.js'
 
 type InMemoryGame = SchedulingGame
 type VoteRecord = { proposalId: string; userId: string; vote: VoteValue }
+type RoundRecord = { id: string; gameId: string; proposerId: string; status: ProposalRoundStatus; createdAt: Date; updatedAt: Date }
 
 export function createInMemorySchedulingRepository(input: { games: InMemoryGame[]; members: Array<{ gameId: string; userId: string }> }): SchedulingRepository & {
   setGameStatus(gameId: string, status: GameStatus): void
@@ -11,6 +12,7 @@ export function createInMemorySchedulingRepository(input: { games: InMemoryGame[
 } {
   const games = [...input.games]
   const members = [...input.members]
+  const rounds: RoundRecord[] = []
   const proposals: ProposalRecord[] = []
   const votes: VoteRecord[] = []
   const sessions: SessionRecord[] = []
@@ -20,8 +22,10 @@ export function createInMemorySchedulingRepository(input: { games: InMemoryGame[
   const proposal = (proposalId: string) => proposals.find((candidate) => candidate.id === proposalId) ?? null
   const toView = (record: ProposalRecord, userId: string): ProposalView => {
     const proposalVotes = votes.filter((vote) => vote.proposalId === record.id)
+    const currentRound = rounds.find((round) => round.id === record.roundId)
     return {
       ...record,
+      roundStatus: currentRound?.status ?? record.roundStatus,
       votes: {
         yes: proposalVotes.filter((vote) => vote.vote === 'YES').length,
         maybe: proposalVotes.filter((vote) => vote.vote === 'MAYBE').length,
@@ -39,13 +43,23 @@ export function createInMemorySchedulingRepository(input: { games: InMemoryGame[
     async countSessions(gameId) { return sessions.filter((item) => item.gameId === gameId && item.status !== 'CANCELLED').length },
     async isActiveMember(gameId, userId) { return members.some((member) => member.gameId === gameId && member.userId === userId) || game(gameId)?.ownerId === userId },
     async createProposals({ gameId, proposerId, slots, now }) {
-      const created = slots.map((slot) => ({ id: nextId(), gameId, proposerId, startsAt: new Date(slot.startsAt), endsAt: new Date(slot.endsAt), status: 'OPEN' as ProposalStatus, createdAt: now, updatedAt: now }))
+      if (rounds.some((round) => round.gameId === gameId && round.status === 'OPEN')) throw new Error('SCHEDULING_CONFLICT')
+      const round: RoundRecord = { id: nextId(), gameId, proposerId, status: 'OPEN', createdAt: now, updatedAt: now }
+      rounds.push(round)
+      const created = slots.map((slot) => ({ id: nextId(), gameId, proposerId, roundId: round.id, roundStatus: round.status, startsAt: new Date(slot.startsAt), endsAt: new Date(slot.endsAt), status: 'OPEN' as ProposalStatus, createdAt: now, updatedAt: now }))
       proposals.push(...created)
       return created
     },
     async listProposals(gameId, userId) { return proposals.filter((item) => item.gameId === gameId).sort((a, b) => a.startsAt.getTime() - b.startsAt.getTime()).map((item) => toView(item, userId)) },
-    async findProposal(proposalId) { return proposal(proposalId) },
+    async findProposal(proposalId) {
+      const found = proposal(proposalId)
+      if (!found) return null
+      return { ...found, roundStatus: rounds.find((round) => round.id === found.roundId)?.status ?? found.roundStatus }
+    },
     async createVote({ proposalId, userId, vote }) {
+      const found = proposal(proposalId)
+      const round = rounds.find((candidate) => candidate.id === found?.roundId)
+      if (!found || found.status !== 'OPEN' || round?.status !== 'OPEN') throw new Error('SCHEDULING_CONFLICT')
       if (votes.some((item) => item.proposalId === proposalId && item.userId === userId)) throw new Error('SCHEDULING_CONFLICT')
       votes.push({ proposalId, userId, vote })
     },
@@ -57,11 +71,19 @@ export function createInMemorySchedulingRepository(input: { games: InMemoryGame[
     async selectProposal({ gameId, proposalId, now }) {
       const selected = proposal(proposalId)
       if (!selected || selected.gameId !== gameId) throw new Error('SCHEDULING_NOT_FOUND')
+      const round = rounds.find((candidate) => candidate.id === selected.roundId)
+      if (!round) throw new Error('SCHEDULING_NOT_FOUND')
       const existing = sessions.find((item) => item.proposalId === proposalId)
-      if (existing) return existing
-      if (selected.status !== 'OPEN') throw new Error('SCHEDULING_CONFLICT')
+      if (existing?.status === 'SCHEDULED') return existing
+      if (existing || selected.status !== 'OPEN' || round.status !== 'OPEN') throw new Error('SCHEDULING_CONFLICT')
+      for (const sibling of proposals.filter((item) => item.roundId === round.id && item.id !== proposalId && item.status === 'OPEN')) {
+        sibling.status = 'CLOSED'
+        sibling.updatedAt = now
+      }
       selected.status = 'SELECTED'
       selected.updatedAt = now
+      round.status = 'SELECTED'
+      round.updatedAt = now
       const created = session(gameId, proposalId, selected.startsAt, selected.endsAt, 'SCHEDULED', null)
       sessions.push(created)
       return created

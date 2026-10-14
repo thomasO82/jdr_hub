@@ -64,6 +64,33 @@ describe('scheduling services', () => {
     expect((await listProposals({ gameId, userId: ownerId, repository: repo }))[0]?.status).toBe('SELECTED')
   })
 
+  it('closes sibling slots and allows a new round without rewriting the previous votes', async () => {
+    const repo = repository()
+    const slots = [
+      slot,
+      { startsAt: '2026-10-21T18:00:00.000Z', endsAt: '2026-10-21T21:00:00.000Z' },
+    ]
+    const [first, second] = await createProposals({ gameId, ownerId, slots, repository: repo, now: () => now })
+
+    expect(first?.roundId).toBe(second?.roundId)
+    expect(first?.roundStatus).toBe('OPEN')
+    await castVote({ proposalId: first!.id, userId: memberId, vote: 'YES', repository: repo, now: () => now })
+    await expect(createProposals({ gameId, ownerId, slots: [slot], repository: repo, now: () => now })).rejects.toThrow('SCHEDULING_CONFLICT')
+
+    await selectProposal({ gameId, ownerId, proposalId: second!.id, repository: repo, now: () => now })
+    const history = await listProposals({ gameId, userId: memberId, repository: repo })
+    expect(history).toEqual(expect.arrayContaining([
+      expect.objectContaining({ id: first!.id, status: 'CLOSED', roundStatus: 'SELECTED', votes: { yes: 1, maybe: 0, no: 0 }, userVote: 'YES' }),
+      expect.objectContaining({ id: second!.id, status: 'SELECTED', roundStatus: 'SELECTED' }),
+    ]))
+    await expect(castVote({ proposalId: first!.id, userId: memberId, vote: 'NO', repository: repo, now: () => now })).rejects.toThrow('SCHEDULING_CONFLICT')
+
+    const replacement = (await createProposals({ gameId, ownerId, slots: [slot], repository: repo, now: () => now })).find((proposal) => proposal.roundStatus === 'OPEN')
+    expect(replacement?.roundId).not.toBe(first?.roundId)
+    expect(replacement?.roundStatus).toBe('OPEN')
+    expect((await listProposals({ gameId, userId: memberId, repository: repo })).find((proposal) => proposal.id === first!.id)?.userVote).toBe('YES')
+  })
+
   it('rejects selecting a fourth one-shot session', async () => {
     const repo = repository()
     await repo.seedSessions(gameId, 3)
