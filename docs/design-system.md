@@ -58,9 +58,15 @@ Les tokens Arcane System desktop/mobile sont retenus car ils sont communs aux de
 
 Les versions `inverse-*` (`#2D3133`, `#EFF1F3`, `#D2BBFF`) servent aux surfaces inversées et à l’écran de connexion. Une couleur doit être choisie avec son token `on-*` correspondant pour respecter le contraste.
 
-### Thème public provisoire
+### Thème public
 
-Le landing desktop est sombre tandis que le landing mobile est clair. En attendant la validation humaine signalée dans l’audit, la règle provisoire est : application et pages authentifiées sur surfaces claires ; connexion Discord sur thème sombre ; landing publique utilisant la composition du desktop et une surface sombre sur grand écran, avec une adaptation claire possible sur mobile seulement après validation. Ce point est volontairement marqué comme décision produit ouverte et ne doit pas être figé silencieusement dans le code.
+La landing utilise la composition et le thème sombre de la référence desktop à
+toutes les tailles. La hiérarchie de branding donne priorité à la landing
+desktop ; sa mise en page s'adapte sur mobile sans changer de thème. Les tokens
+`inverse-surface` (`#2D3133`), `inverse-on-surface` (`#EFF1F3`) et
+`inverse-primary` (`#D2BBFF`) sont définis dans `apps/web/app/globals.css` et
+servent aux pages publiques sombres, dont la landing et la connexion. Les pages
+applicatives gardent leurs surfaces claires.
 
 ## Typographie
 

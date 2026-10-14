@@ -117,6 +117,8 @@ git commit -m "feat: guard application pages before server rendering"
 - Create: `apps/web/features/home/landing-view.tsx`
 - Modify: `apps/web/app/page.tsx`
 - Test: `apps/web/tests/landing-view.test.ts`
+- Modify: `apps/web/app/globals.css`, `docs/design-system.md`
+- Modify: `apps/web/tests/dashboard-pages.test.ts`, `apps/web/tests/dashboard-visual.test.ts` (their root-route contract is superseded by the approved spec)
 
 **Interfaces:**
 - Produce `LandingView(): React.JSX.Element` in `apps/web/features/home/landing-view.tsx`.
@@ -133,7 +135,7 @@ Expected: FAIL because `LandingView` does not exist.
 
 - [ ] **Step 3: Implement the landing**
 
-Use the desktop D01 composition and adapt it responsively: public header, hero, clear Discord sign-in CTA, capability cards for implemented functionality, and public footer. Use only existing Tailwind tokens, Hanken Grotesk/Inter/Geist roles, Lucide icons, and the official logo. Do not show public games or route links that now require a session. Do not use Stitch demo assets or external user imagery.
+Use the desktop D01 composition and adapt it responsively: public header, hero, clear Discord sign-in CTA, capability cards for implemented functionality, and public footer. Use Tailwind tokens, Hanken Grotesk/Inter/Geist roles, Lucide icons, and the official logo. Define the documented inverse palette as `@theme` tokens in the global Tailwind entrypoint. Do not show public games or route links that now require a session. Do not use Stitch demo assets or external user imagery.
 
 - [ ] **Step 4: Verify GREEN**
 
