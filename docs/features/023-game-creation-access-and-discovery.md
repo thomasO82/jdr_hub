@@ -12,6 +12,19 @@
 
 [PR #33](https://github.com/thomasO82/jdr_hub/pull/33), ouverte vers `develop`.
 
+## Évolution du périmètre — 2026-10-14
+
+À la demande du propriétaire, la décision 007 remplace l'accès visiteur au
+catalogue F03 : `/` devient la présentation publique, `/connexion` reste
+accessible pour ouvrir une session, et toute autre page exige une session
+vérifiée côté serveur par Next.js auprès de Hono. Un utilisateur connecté qui
+arrive sur `/` est envoyé vers `/dashboard`. Les endpoints API `public/*`
+restent inchangés ; cette évolution porte sur les pages web.
+
+La landing reprend la composition sombre D01 à toutes les tailles, utilise le
+logo officiel, décrit des fonctions implémentées et ne présente aucune partie
+publique. Le sitemap ne publie que `/`.
+
 ## Contexte et besoin
 
 Trois défauts ont été signalés pendant les essais : les écrans de compte
@@ -22,7 +35,7 @@ Le cahier des charges F03 maintient le catalogue et les fiches publiques
 accessibles aux visiteurs. Les écrans de compte restent privés et l'API
 conserve ses contrôles de session.
 
-## Comportement réalisé
+## Comportement du correctif initial avant la décision 007
 
 - Une vérification de `/api/me` masque les écrans de compte et redirige les
   visiteurs non authentifiés vers `/connexion`.
@@ -89,3 +102,30 @@ isolées pour être testées sans dépendance externe.
 - Vérifier dans le navigateur : visiteur vers `/dashboard`, accès anonyme à
   `/parties`, création publique avec détail ouvert, création privée vers la
   gestion et tag non reconnu.
+
+## Sécurité après décision 007
+
+- Le proxy Next.js protège les pages avant leur rendu et demande à Hono de
+  valider la session ; une session expirée ou révoquée ne suffit pas.
+- Une panne du service de session renvoie une réponse 503 `no-store` et ne
+  détruit pas les cookies.
+- Le cookie d'accès reste `HttpOnly`, `SameSite=Lax`, `Secure` en production et
+  conserve son expiration. Son chemin `/` permet la vérification serveur ; le
+  cookie de renouvellement reste limité à `/api/auth`.
+- L'ancien cookie d'accès `Path=/api` est expiré au login, au refresh et au
+  logout. Le proxy ne transmet jamais le cookie de renouvellement.
+- Hono conserve tous ses contrôles API d'authentification, d'origine et
+  d'autorisation par ressource ; les endpoints `public/*` restent hors du
+  périmètre de la décision.
+
+## Vérification manuelle après décision 007
+
+- Sans session, `/` affiche la présentation et `/connexion` affiche le parcours
+  Discord ; les pages `/parties`, `/mj`, `/tags`, `/jeux` et `/dashboard`
+  redirigent vers `/connexion`.
+- Avec une session valide, les pages applicatives s'ouvrent et `/` mène au
+  dashboard.
+- Si `/me` renvoie 503 ou est inaccessible, le contenu privé ne s'affiche pas
+  et l'écran indique une indisponibilité temporaire sans effacer la session.
+- Contrôle visuel mobile/desktop à terminer : Browser absent et Playwright non
+  installé dans l'environnement au moment de cette fiche.

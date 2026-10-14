@@ -3,6 +3,15 @@
 Cette matrice décrit les permissions côté API. Le frontend ne constitue jamais
 un contrôle d'autorisation.
 
+## Accès aux pages web
+
+Selon la décision 007, les visiteurs sans session peuvent ouvrir uniquement la
+présentation `/` et la page nécessaire à la connexion `/connexion`. Toute autre
+page Next.js exige une session active, vérifiée côté serveur avant le rendu.
+Cette règle ne modifie pas les permissions API ci-dessous : les endpoints
+`public/*` restent des projections publiques et chaque API privée conserve ses
+propres contrôles d'authentification et d'autorisation.
+
 | Ressource/action | Visiteur | Utilisateur connecté | Candidat | Membre | MJ propriétaire | Administrateur |
 | --- | --- | --- | --- | --- | --- | --- |
 | Lire le catalogue et les fiches publiques | Oui | Oui | Oui | Oui | Oui | Oui |

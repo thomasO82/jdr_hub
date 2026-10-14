@@ -158,7 +158,7 @@ Les noms de répertoires existants sont parfois générés avec des caractères 
 
 ## Points nécessitant validation humaine
 
-1. Thème de la landing : conserver le thème sombre prioritaire du desktop sur mobile, ou adopter le thème clair visible dans la landing mobile ? La décision modifie fortement l’identité publique.
+1. Thème de la landing : résolu par la décision 007 ; la composition et le thème sombre D01 desktop sont conservés sur mobile, conformément à la priorité de branding.
 2. Wording du mode en ligne : le cahier des charges exclut le VTT, tandis que plusieurs maquettes mentionnent `VTT`, `Foundry` et `Roll20`. Il faut confirmer le libellé et le périmètre exacts du mode en ligne.
 3. Périmètre de l’écran mobile de catalogue : doit-il être un catalogue public identique au desktop ou une vue des campagnes de l’utilisateur ?
 4. Identité éditoriale : confirmer que toute l’interface MVP doit être en français, y compris les noms de navigation actuellement en anglais dans Stitch.
