@@ -14,6 +14,7 @@ export async function proxy(request: NextRequest): Promise<NextResponse | Respon
     return NextResponse.next()
   }
   if (access === 'login-required') return NextResponse.redirect(new URL('/connexion', request.url))
+  if (pathname === '/') return NextResponse.next()
 
   return new Response('La vérification de votre connexion est temporairement indisponible. Réessayez dans un instant.', {
     status: 503,

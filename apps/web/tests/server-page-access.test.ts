@@ -159,4 +159,16 @@ describe('server page access', () => {
     expect(response?.status).toBe(503)
     expect(response?.headers.get('cache-control')).toContain('no-store')
   })
+
+  it('keeps the public presentation available when session verification is unavailable', async () => {
+    const proxy = (await loadProxyModule())?.proxy
+    vi.stubGlobal('fetch', vi.fn<typeof fetch>().mockResolvedValue(new Response(null, { status: 503 })))
+    const request = new NextRequest('https://jdr.example.test/', {
+      headers: { cookie: 'jdr_hub_access=expired-token' },
+    })
+
+    const response = proxy ? await proxy(request) : null
+
+    expect(response?.status).toBe(200)
+  })
 })

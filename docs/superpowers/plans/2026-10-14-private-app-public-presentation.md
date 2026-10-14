@@ -43,25 +43,25 @@
 - Keep: `clearAuthCookies(c, config): void`.
 - Change access cookie path to `/`; keep refresh cookie path `/api/auth`.
 
-- [ ] **Step 1: Write failing cookie scope and migration assertions**
+- [x] **Step 1: Write failing cookie scope and migration assertions**
 
 Extend the auth route tests to assert access cookies use `Path=/`, refresh cookies use `Path=/api/auth`, and login/refresh/logout expire the old access cookie at `Path=/api` as well as clearing the active `Path=/` cookie on logout.
 
-- [ ] **Step 2: Verify RED**
+- [x] **Step 2: Verify RED**
 
 Run: `pnpm exec vitest run apps/api/tests/api/auth/routes-jwt.test.ts apps/api/tests/api/auth/routes.test.ts`
 Expected: the new access-path and legacy-path assertions fail against the current `/api` implementation.
 
-- [ ] **Step 3: Implement the cookie migration**
+- [x] **Step 3: Implement the cookie migration**
 
 Set the access cookie at `/`; retain its name, expiry, `HttpOnly`, `SameSite=Lax`, and production `Secure` attributes. Clear the former `/api` access-cookie variant during login and refresh. On logout, expire both `/` and `/api` variants. Do not widen the refresh-cookie path.
 
-- [ ] **Step 4: Verify GREEN**
+- [x] **Step 4: Verify GREEN**
 
 Run: `pnpm exec vitest run apps/api/tests/api/auth/routes-jwt.test.ts apps/api/tests/api/auth/routes.test.ts`
 Expected: all tests pass, including cookie migration and refresh/logout behavior.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add apps/api/src/modules/auth/cookies.ts apps/api/tests/api/auth/routes-jwt.test.ts apps/api/tests/api/auth/routes.test.ts
@@ -82,29 +82,29 @@ git commit -m "fix: scope access cookie for server page checks"
 - Produce Next.js `proxy(request: NextRequest): Promise<NextResponse>` in `apps/web/proxy.ts`.
 - Public page allowlist is exact: `/` and `/connexion` (optional trailing slash normalized).
 
-- [ ] **Step 1: Write failing guard tests**
+- [x] **Step 1: Write failing guard tests**
 
 Add cases for exact public routes; anonymous private routes and deep routes; Hono `200`, `401`, unexpected `5xx`; API URL resolution from `API_INTERNAL_URL`; forwarding only `jdr_hub_access`; and bypasses for API/static metadata resources. Assert that a `5xx` returns `unavailable`, not `login-required`.
 
-- [ ] **Step 2: Verify RED**
+- [x] **Step 2: Verify RED**
 
 Run: `pnpm exec vitest run apps/web/tests/server-page-access.test.ts`
 Expected: FAIL because the server guard and its interface do not exist.
 
-- [ ] **Step 3: Implement session check and proxy**
+- [x] **Step 3: Implement session check and proxy**
 
-Call `${API_INTERNAL_URL}/me` with `cache: 'no-store'` and a `Cookie` header containing only the access cookie. Do not parse the JWT in Next.js. Redirect `401` to `/connexion`, return a non-cacheable `503` response on API failure or unrecognized status, and allow the page only for `200`. Exclude `/api/*`, `_next` assets, files with extensions, `/robots.txt`, and `/sitemap.xml` from page checks. A valid session on `/` redirects to `/dashboard`.
+Call `${API_INTERNAL_URL}/me` with `cache: 'no-store'` and a `Cookie` header containing only the access cookie. Do not parse the JWT in Next.js. Redirect private-page `401` responses to `/connexion`, return a non-cacheable `503` response on private-page API failure or unrecognized status, and allow private pages only for `200`. If verification fails on the public `/` page, keep serving the presentation rather than blocking it. Exclude `/api/*`, `_next` assets, known public assets, `/robots.txt`, and `/sitemap.xml` from page checks. A valid session on `/` redirects to `/dashboard`.
 
-- [ ] **Step 4: Remove the client-only security boundary**
+- [x] **Step 4: Remove the client-only security boundary**
 
 Remove `PrivatePageGate` from the root layout and delete the obsolete component once no route uses it. Keep `page-access.ts` only if it remains useful to the testable public-page policy; otherwise replace it with the server helper rather than duplicate allowlists.
 
-- [ ] **Step 5: Verify GREEN**
+- [x] **Step 5: Verify GREEN**
 
 Run: `pnpm exec vitest run apps/web/tests/server-page-access.test.ts apps/web/tests/private-page-access.test.ts`
 Expected: all anonymous, authenticated, revoked, unavailable, deep-route, and bypass cases pass.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add apps/web/proxy.ts apps/web/lib/server-page-access.ts apps/web/tests/server-page-access.test.ts apps/web/features/authentication/private-page-gate.tsx apps/web/lib/page-access.ts apps/web/app/layout.tsx
@@ -124,25 +124,25 @@ git commit -m "feat: guard application pages before server rendering"
 - Produce `LandingView(): React.JSX.Element` in `apps/web/features/home/landing-view.tsx`.
 - `/` renders the presentation for visitors and remains under proxy policy `public`.
 
-- [ ] **Step 1: Write failing landing assertions**
+- [x] **Step 1: Write failing landing assertions**
 
 Use `react-dom/server` to render `LandingView` and assert a French presentation heading, the official logo path `/branding/logo.svg`, a CTA to `/connexion`, feature descriptions, and absence of public game links or external demo images.
 
-- [ ] **Step 2: Verify RED**
+- [x] **Step 2: Verify RED**
 
 Run: `pnpm exec vitest run apps/web/tests/landing-view.test.ts`
 Expected: FAIL because `LandingView` does not exist.
 
-- [ ] **Step 3: Implement the landing**
+- [x] **Step 3: Implement the landing**
 
 Use the desktop D01 composition and adapt it responsively: public header, hero, clear Discord sign-in CTA, capability cards for implemented functionality, and public footer. Use Tailwind tokens, Hanken Grotesk/Inter/Geist roles, Lucide icons, and the official logo. Define the documented inverse palette as `@theme` tokens in the global Tailwind entrypoint. Do not show public games or route links that now require a session. Do not use Stitch demo assets or external user imagery.
 
-- [ ] **Step 4: Verify GREEN**
+- [x] **Step 4: Verify GREEN**
 
 Run: `pnpm exec vitest run apps/web/tests/landing-view.test.ts`
 Expected: landing markup and public navigation assertions pass.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add apps/web/features/home/landing-view.tsx apps/web/app/page.tsx apps/web/tests/landing-view.test.ts
@@ -164,25 +164,25 @@ git commit -m "feat: add public JDR Hub presentation page"
 - Sitemap contains only `/`.
 - Decision 007 supersedes F03's visitor-facing page policy while preserving historical F03 implementation details and the out-of-scope public API behavior.
 
-- [ ] **Step 1: Write failing sitemap assertion**
+- [x] **Step 1: Write failing sitemap assertion**
 
 Add a focused test for `sitemap()` asserting the only URL is the configured site origin plus `/`, and that it does not call `API_INTERNAL_URL` for game slugs.
 
-- [ ] **Step 2: Verify RED**
+- [x] **Step 2: Verify RED**
 
 Run: `pnpm exec vitest run apps/web/tests/sitemap.test.ts`
 Expected: FAIL because the current sitemap includes `/parties` and public slugs.
 
-- [ ] **Step 3: Update SEO outputs and project records**
+- [x] **Step 3: Update SEO outputs and project records**
 
 Return only `/` from the sitemap. Keep crawler guidance explicit that app routes require login, while noting robots directives are not access controls. Add decision 007 and link it from the decision index; update FIX-UX-001's feature record and project-status entry to describe the final private-page policy and current PR without changing historical F03's merged status.
 
-- [ ] **Step 4: Verify GREEN**
+- [x] **Step 4: Verify GREEN**
 
 Run: `pnpm exec vitest run apps/web/tests/sitemap.test.ts`
 Expected: root is the only sitemap entry; no game slug API is called.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add apps/web/app/sitemap.ts apps/web/app/robots.ts apps/web/tests/sitemap.test.ts docs/decisions/007-private-pages-public-presentation.md docs/decisions/README.md docs/features/023-game-creation-access-and-discovery.md docs/project-status.md docs/security/authorization-matrix.md
@@ -194,12 +194,12 @@ git commit -m "docs: record private app page policy"
 **Files:**
 - Verify all changed source, tests, docs, and feature tracking files.
 
-- [ ] Run targeted auth, page guard, landing and sitemap tests; verify each added test first failed for its intended reason.
-- [ ] Run the full repository test command used on PR #33, excluding ignored `.superpowers` scratch files as already documented.
-- [ ] Run `pnpm lint` and `pnpm build`.
-- [ ] Review responsive behavior at desktop/mobile using the available browser tool; if Browser and Playwright remain unavailable, record the exact blocker and keep manual QA in the PR checklist.
-- [ ] Review `git diff --check`, `git status`, changed tests, secrets, cookie attributes, route matcher, docs, and coverage.
-- [ ] Update the feature record with fresh commands/results, TDD Red/Green evidence, security checks, limitations and manual verification.
+- [x] Run targeted auth, page guard, landing and sitemap tests; verify each added test first failed for its intended reason.
+- [x] Run the full repository test command used on PR #33, excluding ignored `.superpowers` scratch files as already documented.
+- [x] Run `pnpm lint` and `pnpm build`.
+- [x] Review responsive behavior at desktop/mobile using the available browser tool; if Browser and Playwright remain unavailable, record the exact blocker and keep manual QA in the PR checklist. **Browser/Playwright unavailable; manual visual QA remains.**
+- [x] Review `git diff --check`, `git status`, changed tests, secrets, cookie attributes, route matcher, docs, and coverage. **Coverage not measured.**
+- [x] Update the feature record with fresh commands/results, TDD Red/Green evidence, security checks, limitations and manual verification.
 - [ ] Update PR #33 and push this branch; do not merge. Report the PR and stop for owner review.
 
 ## Self-review

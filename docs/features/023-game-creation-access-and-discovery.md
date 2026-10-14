@@ -129,3 +129,24 @@ isolées pour être testées sans dépendance externe.
   et l'écran indique une indisponibilité temporaire sans effacer la session.
 - Contrôle visuel mobile/desktop à terminer : Browser absent et Playwright non
   installé dans l'environnement au moment de cette fiche.
+
+## Vérifications finales — 2026-10-14
+
+- Red/Green : les tests du cookie, du garde serveur, de la landing et du sitemap
+  ont d'abord échoué sur les comportements manquants, puis passent après
+  implémentation. Le test de disponibilité de `/` a aussi été ajouté en rouge
+  lorsque Hono répond 503, puis passe après le maintien de la page publique.
+- `pnpm exec vitest run tests apps/api/tests apps/web/tests packages/shared/tests packages/database/tests`
+  — 142 fichiers et 421 tests verts.
+- `pnpm lint` — réussi (build préalable des packages partagés, génération des
+  types Next.js et vérification TypeScript de l'API, du web et des packages).
+- `pnpm build` — réussi pour Hono et Next.js ; le build liste le proxy Next.js.
+- `git diff --check` — réussi.
+- Couverture non mesurée pour cette passe.
+- Un smoke test HTTP local n'a pas pu se connecter au serveur dans le bac à
+  sable (`PermissionError: Operation not permitted` sur le socket loopback).
+  Browser est indisponible et Playwright n'est pas installé : la vérification
+  visuelle mobile/desktop reste à effectuer par le propriétaire.
+- Aucun secret réel ni donnée personnelle n'a été introduit. Le proxy ne
+  transmet que le cookie d'accès à `/me`, refuse les pages privées en cas de
+  panne, et laisse `/` public même quand la vérification de session échoue.

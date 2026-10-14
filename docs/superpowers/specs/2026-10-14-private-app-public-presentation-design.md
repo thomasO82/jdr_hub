@@ -27,9 +27,11 @@ autorisation de lire une page Next.js.
   page privée.
 - Session expirée ou révoquée : traitée comme non authentifiée par la vérification
   serveur auprès de Hono.
-- API inaccessible ou réponse inattendue : refus fermé, sans servir le contenu
-  privé ; afficher une réponse temporairement indisponible plutôt que déconnecter
-  l'utilisateur à tort.
+- API inaccessible ou réponse inattendue : refus fermé pour toute page privée,
+  sans effacer les cookies ; afficher une réponse temporairement indisponible
+  plutôt que déconnecter l'utilisateur à tort. `/` reste servi comme page publique
+  si la session ne peut pas être vérifiée ; il n'est alors pas redirigé vers le
+  dashboard.
 - Utilisateur déjà connecté sur `/` : redirection vers `/dashboard`, afin que le
   retour OAuth n'atterrisse pas sur la présentation.
 - Les routes API et les ressources internes Next.js ne sont pas des pages et
