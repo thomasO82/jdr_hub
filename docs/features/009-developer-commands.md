@@ -6,20 +6,20 @@ DEV-002
 
 ## Statut
 
-`IN_PROGRESS`
+`MERGED`
 
 ## Branche
 
-`chore/developer-commands`
+`chore/drizzle-studio` (travail préparé sur `chore/developer-commands`)
 
 ## Lien ou numéro de Pull Request
 
-Non créée.
+[PR #13](https://github.com/thomasO82/jdr_hub/pull/13), fusionnée dans `develop` le 2026-09-05. Le travail DEV-002 a été intégré avec Drizzle Studio.
 
 ## Dates
 
 - Début : 2026-09-05
-- Fin : Non terminée
+- Fin : 2026-09-05
 
 ## Contexte et besoin
 
@@ -69,4 +69,7 @@ son refus de l’environnement production.
 
 - Les commandes supposent Docker Compose disponible et un `.env` configuré pour
   les variables obligatoires de l’API.
-- La Pull Request reste à créer.
+
+## Synchronisation après fusion — 2026-10-14
+
+Le diff de la PR #13 comprend les scripts, le Makefile et les tests de DEV-002. GitHub confirme que la PR a été fusionnée dans `develop` le 2026-09-05.

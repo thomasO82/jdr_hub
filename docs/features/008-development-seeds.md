@@ -6,20 +6,20 @@ DEV-001
 
 ## Statut
 
-`IN_PROGRESS`
+`MERGED`
 
 ## Branche
 
-`feat/development-seeds`
+`chore/drizzle-studio` (travail préparé sur `feat/development-seeds`)
 
 ## Lien ou numéro de Pull Request
 
-Non créée.
+[PR #13](https://github.com/thomasO82/jdr_hub/pull/13), fusionnée dans `develop` le 2026-09-05. Le travail DEV-001 a été intégré avec Drizzle Studio.
 
 ## Dates
 
 - Début : 2026-09-05
-- Fin : Non terminée
+- Fin : 2026-09-05
 
 ## Contexte et besoin
 
@@ -85,3 +85,7 @@ réutilisées.
   production.
 - Les parties privées, brouillon et fermée sont volontairement absentes de la
   route publique ; elles restent disponibles en base pour les tests ciblés.
+
+## Synchronisation après fusion — 2026-10-14
+
+Le diff de la PR #13 comprend les scripts de seed et leurs tests. GitHub confirme que la PR a été fusionnée dans `develop` le 2026-09-05.
