@@ -6,7 +6,7 @@ DOC-002
 
 ## Statut
 
-`IN_PROGRESS`
+`IN_REVIEW`
 
 ## Branche
 
@@ -14,7 +14,7 @@ DOC-002
 
 ## Lien ou numéro de Pull Request
 
-Non créée.
+Ouverture en cours vers `develop`.
 
 ## Dates de début et de fin
 
