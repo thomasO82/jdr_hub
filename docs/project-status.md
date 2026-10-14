@@ -26,7 +26,7 @@ Seuls les statuts suivants sont autorisés :
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | DOC-001 | Mise en place du suivi documentaire | `MERGED` | `docs/feature-tracking` | [PR #1](https://github.com/thomasO82/jdr_hub/pull/1), fusionnée dans `main` | Documentation fusionnée | Contrôles documentaires consignés | [README du registre](features/README.md) |
 | DOC-002 | Synchronisation des statuts après fusion | `MERGED` | `docs/sync-merged-feature-statuses` | [PR #30](https://github.com/thomasO82/jdr_hub/pull/30), fusionnée dans `develop` | Vérification documentaire consignée dans la fiche | Statuts rapprochés de GitHub ; aucune donnée sensible ajoutée | [Fiche DOC-002](features/021-sync-merged-feature-statuses.md) |
-| DOC-003 | Synchronisation des fiches des outils de développement | `IN_REVIEW` | `docs/sync-development-tools-status` | [PR #31](https://github.com/thomasO82/jdr_hub/pull/31) vers `develop` | Vérification documentaire consignée dans la fiche | États de fusion confirmés via GitHub ; aucune donnée sensible ajoutée | [Fiche DOC-003](features/022-sync-development-tools-status.md) |
+| DOC-003 | Synchronisation des fiches des outils de développement | `MERGED` | `docs/sync-development-tools-status` | [PR #31](https://github.com/thomasO82/jdr_hub/pull/31), fusionnée dans `develop` | Vérification documentaire consignée dans la fiche | États de fusion confirmés via GitHub ; aucune donnée sensible ajoutée | [Fiche DOC-003](features/022-sync-development-tools-status.md) |
 | F00 | Socle monorepo, Docker et CI sécurisée | `MERGED` | `fix/f00-hardening` | [PR #3](https://github.com/thomasO82/jdr_hub/pull/3) | Vérifications finales vertes avant fusion | Audit hautes vulnérabilités vide, réseau DB interne, non-root, digests et healthchecks | [Fiche F00](features/001-monorepo-foundation.md) |
 | F01 | Discord OAuth2 et sessions sécurisées | `MERGED` | `feat/discord-auth` | [PR #4](https://github.com/thomasO82/jdr_hub/pull/4) | 60 tests verts ; lint, typecheck et builds verts avant fusion | Contrôles OAuth/session réalisés ; audit pnpm : une vulnérabilité modérée transitive esbuild à traiter séparément | [Fiche F01](features/002-discord-authentication.md) |
 | F12 | Durcissement JWT des sessions | `MERGED` | `fix/jwt-session-security` | [PR #5](https://github.com/thomasO82/jdr_hub/pull/5) et correctif [PR #6](https://github.com/thomasO82/jdr_hub/pull/6), fusionnées dans `develop` | Vérifications consignées dans la fiche | JWT d’accès, rotation, révocation serveur et CSRF | [Fiche F12](features/003-jwt-session-security.md) |
@@ -68,6 +68,10 @@ historique et documentent cette synchronisation.
 
 La PR #13 comprend également les seeds DEV-001 et les commandes DEV-002. La
 PR #30 est fusionnée ; sa fiche DOC-002 est à jour.
+
+## Mise à jour après fusion — 2026-10-14
+
+Le propriétaire a confirmé la fusion de DOC-003 dans la [PR #31](https://github.com/thomasO82/jdr_hub/pull/31). La fiche DOC-003 et le tableau global reflètent cet état.
 
 ## Mise à jour après fusion — 2026-10-12
 

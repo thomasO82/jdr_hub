@@ -6,7 +6,7 @@ DOC-003
 
 ## Statut
 
-`IN_REVIEW`
+`MERGED`
 
 ## Branche
 
@@ -14,12 +14,12 @@ DOC-003
 
 ## Lien ou numéro de Pull Request
 
-[PR #31](https://github.com/thomasO82/jdr_hub/pull/31), ouverte vers `develop` le 2026-10-14.
+[PR #31](https://github.com/thomasO82/jdr_hub/pull/31), fusionnée dans `develop` le 2026-10-14.
 
 ## Dates de début et de fin
 
 - Début : 2026-10-14
-- Fin : Non terminée
+- Fin : 2026-10-14
 
 ## Contexte
 
@@ -67,4 +67,10 @@ s'applique pas ; aucun test n'est ajouté, supprimé ou modifié.
 
 ## Vérification manuelle
 
-- Relecture humaine de la cohérence du tableau et des fiches avant fusion.
+- Relecture humaine confirmée par la fusion de la PR #31 le 2026-10-14.
+
+## Évolutions datées
+
+| Date | Évolution | Impact | Référence |
+| --- | --- | --- | --- |
+| 2026-10-14 | Fusion de la mise à jour documentaire | DOC-003 passe à `MERGED` ; DEV-001, DEV-002 et DOC-002 restent synchronisées avec leurs PR | [PR #31](https://github.com/thomasO82/jdr_hub/pull/31) |
