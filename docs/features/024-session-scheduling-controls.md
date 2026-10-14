@@ -2,7 +2,7 @@
 
 ## État
 
-`IN_REVIEW` — branche `feat/session-scheduling-controls`, PR vers `develop` en cours de création.
+`IN_REVIEW` — branche `feat/session-scheduling-controls`, [PR #34](https://github.com/thomasO82/jdr_hub/pull/34) vers `develop`.
 
 ## Contexte
 
