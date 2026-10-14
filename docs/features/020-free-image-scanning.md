@@ -6,12 +6,12 @@ FIX-SEC-003
 
 ## Statut
 
-`IN_PROGRESS`
+`MERGED`
 
 ## Branche et Pull Request
 
 - Branche : `fix/free-image-scanning`
-- Pull Request : création automatique refusée (`403 Resource not accessible by integration`) ; [ouvrir manuellement vers `develop`](https://github.com/thomasO82/jdr_hub/compare/develop...fix/free-image-scanning?expand=1)
+- Pull Request : [PR #27](https://github.com/thomasO82/jdr_hub/pull/27), fusionnée dans `develop` le 2026-10-13.
 
 ## Contexte
 
@@ -85,12 +85,15 @@ des Dockerfiles.
   n'est ajouté.
 - L'action et sa dépendance `setup-trivy` sont épinglées dans leur dépôt
   officiel. Le build et l'analyse locale des deux images passent ; le run CI
-  GitHub reste à confirmer après ouverture de la PR.
+  GitHub reste à confirmer ; la PR #27 est fusionnée.
 
 ## Limites et vérifications restantes
 
-- Ouvrir la Pull Request avec le lien ci-dessus ; le connecteur GitHub n'a pas
-  le droit de créer la PR.
-- Confirmer le résultat du workflow GitHub après ouverture de la PR.
+- La PR #27 est fusionnée. Le résultat du workflow GitHub reste à consulter
+  si ses journaux deviennent accessibles.
 - Aucun coût d'abonnement scanner n'est ajouté ; les quotas éventuels des
   runners GitHub restent ceux du compte GitHub.
+
+## Synchronisation après fusion — 2026-10-13
+
+La PR #27 a été fusionnée dans `develop` le 2026-10-13. GitHub confirme son état fusionné ; le résultat du job GitHub reste à suivre selon les contrôles CI disponibles.

@@ -4,19 +4,20 @@
 F06
 
 ## Statut
-`IN_PROGRESS`
+
+`MERGED`
 
 ## Branche
 `feat/sessions-scheduling`
 
 ## Pull Request
-Non créée automatiquement : `gh` n'est pas installé dans l'environnement.
-Ouverture manuelle : https://github.com/thomasO82/jdr_hub/pull/new/feat/sessions-scheduling
+
+[PR #15](https://github.com/thomasO82/jdr_hub/pull/15), fusionnée dans `develop` le 2026-09-05.
 
 ## Dates
 
 - Début : 2026-09-06
-- Fin : Non terminée
+- Fin : 2026-09-06
 
 ## Contexte et périmètre prévu
 
@@ -92,11 +93,12 @@ secret ou horaire privé d'un autre utilisateur n'est exposé.
 - les notifications Discord, présences et absences ne font pas partie de F06 ;
 - le planning ne propose pour l'instant que la vue mensuelle desktop et
   l'agenda mobile ; les vues semaine/jour de la maquette restent décoratives ;
-- l'ouverture de la PR interviendra après les vérifications et reste sous
-  réserve des permissions GitHub.
 
-## Blocage de livraison
+## Suivi de livraison
 
-La branche est poussée et vérifiée, mais la PR doit être ouverte manuellement
-avec le lien ci-dessus. Le statut reste `IN_PROGRESS` jusqu'à l'ouverture
-effective de la PR.
+La PR #15 est fusionnée dans `develop` depuis le 2026-09-05. Les limites
+fonctionnelles et vérifications manuelles restantes sont conservées ci-dessus.
+
+## Synchronisation après fusion — 2026-09-05
+
+La PR #15 a été fusionnée dans `develop` le 2026-09-05. GitHub confirme son état fusionné.

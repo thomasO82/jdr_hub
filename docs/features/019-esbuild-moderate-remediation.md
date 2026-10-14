@@ -6,13 +6,12 @@ FIX-SEC-002
 
 ## Statut
 
-IN_PROGRESS — branche poussée ; création de PR refusée par l'intégration GitHub
-(`403 Resource not accessible by integration`).
+`MERGED`
 
 ## Dates
 
 - Début : 2026-10-13
-- Fin : en cours
+- Fin : 2026-10-13
 
 ## Branche
 
@@ -20,8 +19,7 @@ IN_PROGRESS — branche poussée ; création de PR refusée par l'intégration G
 
 ## Pull Request
 
-Non créée automatiquement : le connecteur GitHub a renvoyé `403 Resource not
-accessible by integration`. [Ouvrir manuellement la PR vers `develop`](https://github.com/thomasO82/jdr_hub/pull/new/fix/esbuild-moderate-remediation).
+[PR #26](https://github.com/thomasO82/jdr_hub/pull/26), fusionnée dans `develop` le 2026-10-13.
 
 ## Contexte et besoin utilisateur
 
@@ -101,12 +99,9 @@ Le nouveau scan Docker Scout doit encore être confirmé par la CI GitHub.
 
 ## Limites et suite
 
-- Confirmer que l'action v1.25.0 analyse les deux images locales avec les
-  permissions actuelles et sans credentials additionnels ; les logs des runs
-  antérieurs ne permettaient pas de conclure.
-- Vérifier le run CI de la PR, notamment les deux étapes Docker Scout.
-- Après ouverture de la PR, passer le statut à `IN_REVIEW` et s'arrêter pour la
-  revue et la fusion par le propriétaire.
+- Le run GitHub de la PR #26 a échoué sur `quality`, sans journaux accessibles
+  pour isoler la cause. Le scanner d'images a ensuite été remplacé par Trivy
+  dans FIX-SEC-003, fusionnée dans la PR #27.
 
 ## Suivi après fusion — 2026-10-13
 
@@ -115,3 +110,7 @@ Le run GitHub associé a terminé en échec sur le job `quality` ; les étapes e
 logs ne sont pas disponibles via l'intégration, donc la cause exacte n'est pas
 confirmée. Le remplacement de Docker Scout par un scanner sans abonnement est
 suivi séparément dans FIX-SEC-003 (`docs/features/020-free-image-scanning.md`).
+
+## Synchronisation après fusion — 2026-10-13
+
+La PR #26 a été fusionnée dans `develop` le 2026-10-13. Le statut CI en échec et l’absence de journaux accessibles restent des limites documentées ; la correction de scan est suivie dans FIX-SEC-003.

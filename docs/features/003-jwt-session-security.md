@@ -2,7 +2,7 @@
 
 ## Statut
 
-`IN_PROGRESS`
+`MERGED`
 
 ## Branche
 
@@ -10,14 +10,12 @@
 
 ## Pull Request
 
-Non créée : la branche a été poussée, mais l'intégration GitHub de cette
-session a reçu `403 Resource not accessible by integration` lors de la
-création vers `develop`.
+[PR #5](https://github.com/thomasO82/jdr_hub/pull/5) et le correctif [PR #6](https://github.com/thomasO82/jdr_hub/pull/6), fusionnés dans `develop`.
 
 ## Dates
 
 - Début : 2026-09-04
-- Dernière mise à jour : 2026-09-04
+- Dernière mise à jour : 2026-10-14
 
 ## Dépendances
 
@@ -162,3 +160,7 @@ fichiers `app/**/page.tsx` restent des points d'entrée de route et de métadonn
 - La rotation transactionnelle PostgreSQL est couverte par les tests du
   repository en mémoire ; un harnais d'intégration PostgreSQL concurrent dédié
   reste à créer ultérieurement.
+
+## Synchronisation après fusion — 2026-09-05
+
+Les PR #5 et #6 ont été fusionnées dans `develop` les 2026-09-04 et 2026-09-05. GitHub confirme leur état fusionné.

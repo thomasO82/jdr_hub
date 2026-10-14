@@ -6,7 +6,7 @@ DEV-003
 
 ## Statut
 
-`IN_PROGRESS`
+`MERGED`
 
 ## Branche
 
@@ -14,12 +14,12 @@ DEV-003
 
 ## Lien ou numéro de Pull Request
 
-Non créée.
+[PR #13](https://github.com/thomasO82/jdr_hub/pull/13), fusionnée dans `develop` le 2026-09-05.
 
 ## Dates
 
 - Début : 2026-09-05
-- Fin : Non terminée
+- Fin : 2026-09-05
 
 ## Contexte et besoin
 
@@ -86,4 +86,8 @@ par l’environnement.
 - Studio n’est pas destiné à la production.
 - L’URL `https://local.drizzle.studio` nécessite que le service local soit
   démarré et que le navigateur autorise sa connexion à `127.0.0.1:4983`.
-- La Pull Request reste à créer.
+- La PR #13 est fusionnée dans `develop`.
+
+## Synchronisation après fusion — 2026-09-05
+
+La PR #13 a été fusionnée dans `develop` le 2026-09-05. GitHub confirme son état fusionné.

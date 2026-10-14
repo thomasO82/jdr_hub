@@ -6,19 +6,15 @@ F07
 
 ## Statut
 
-`IN_PROGRESS`
-
-> La Pull Request n’est pas encore ouverte. Le statut deviendra `IN_REVIEW`
-> uniquement après l’ouverture effective de la PR.
+`MERGED`
 
 ## Branche
 
-`feat/game-messaging`
+`feat/attendance-notifications`
 
 ## Lien ou numéro de Pull Request
 
-Non créée automatiquement : `gh` n’est pas installé dans l’environnement.
-Ouverture manuelle : https://github.com/thomasO82/jdr_hub/pull/new/feat/attendance-notifications
+[PR #17](https://github.com/thomasO82/jdr_hub/pull/17), fusionnée dans `develop` le 2026-09-06.
 
 ## Dates de début et de fin
 
@@ -441,9 +437,12 @@ d'indisponibilité Discord ou de DM bloqué. Aucun texte de chat n'est transmis.
   intégrations `pnpm test:integration` — 8 fichiers / 17 tests verts ;
   configuration Compose avec valeurs fictives valide. Le build Next a dû être
   relancé hors du bac à sable après un refus d'ouverture de port Turbopack.
-- L'UI de consentement/profil et la réception Discord réelle restent à faire ;
-  le statut demeure `IN_PROGRESS`.
-- Limite TDD à ne pas masquer : les tests unitaires du client Discord et du
-  worker ont été ajoutés après leur code et n'ont pas eu de phase Red observée.
-  Cette preuve manque avant toute PR ; les tests PostgreSQL de l'outbox et du
-  callback OAuth ont, eux, échoué avant leur correction.
+- L'interface de consentement et le réglage de profil ont été livrés dans
+  F07B, PR #28. La réception Discord réelle reste à vérifier.
+- Limite TDD connue malgré la fusion : les tests unitaires du client Discord et
+  du worker ont été ajoutés après leur code, sans phase Red observée. Les tests
+  PostgreSQL de l'outbox et du callback OAuth ont, eux, échoué avant correction.
+
+## Synchronisation après fusion — 2026-09-06
+
+La PR #17 a été fusionnée dans `develop` le 2026-09-06. GitHub confirme son état fusionné.

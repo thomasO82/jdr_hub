@@ -6,7 +6,7 @@ F10
 
 ## Statut
 
-IN_PROGRESS
+`MERGED`
 
 ## Branche
 
@@ -14,12 +14,12 @@ IN_PROGRESS
 
 ## Lien ou numéro de Pull Request
 
-Non créée
+[PR #23](https://github.com/thomasO82/jdr_hub/pull/23), fusionnée dans `develop` le 2026-09-08.
 
 ## Dates de début et de fin
 
 - Début : 2026-09-08
-- Fin : Non terminée
+- Fin : 2026-09-08
 
 ## Dépendances
 
@@ -153,3 +153,7 @@ git status --short
 ```
 
 Le conteneur PostgreSQL temporaire utilisé pour la suite d’intégration a été arrêté et supprimé après vérification.
+
+## Synchronisation après fusion — 2026-09-08
+
+La PR #23 a été fusionnée dans `develop` le 2026-09-08. GitHub confirme son état fusionné.

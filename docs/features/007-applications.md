@@ -2,7 +2,7 @@
 
 ## Statut
 
-`IN_PROGRESS`
+`MERGED`
 
 ## Branche
 
@@ -10,7 +10,7 @@
 
 ## Pull Request
 
-Non créée.
+[PR #18](https://github.com/thomasO82/jdr_hub/pull/18), fusionnée dans `develop` le 2026-09-06. Cette PR inclut les changements de F04 et le correctif des identifiants UUID.
 
 ## Dépendances
 
@@ -124,3 +124,7 @@ Voir `docs/superpowers/specs/2026-09-05-applications-design.md`.
   invariants de repository sont couverts par le helper déterministe et le
   schéma Drizzle.
 - La vérification visuelle manuelle desktop/mobile reste à effectuer.
+
+## Synchronisation après fusion — 2026-09-06
+
+La PR #18 a intégré dans `develop` les fichiers API, web et documentation de F04, ainsi que le correctif UUID. GitHub confirme sa fusion le 2026-09-06.
