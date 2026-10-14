@@ -14,7 +14,7 @@ DOC-002
 
 ## Lien ou numéro de Pull Request
 
-Ouverture en cours vers `develop`.
+[PR #30](https://github.com/thomasO82/jdr_hub/pull/30), ouverte vers `develop` le 2026-10-14.
 
 ## Dates de début et de fin
 
