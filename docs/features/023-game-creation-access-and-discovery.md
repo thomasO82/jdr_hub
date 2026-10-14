@@ -127,8 +127,9 @@ isolées pour être testées sans dépendance externe.
   dashboard.
 - Si `/me` renvoie 503 ou est inaccessible, le contenu privé ne s'affiche pas
   et l'écran indique une indisponibilité temporaire sans effacer la session.
-- Contrôle visuel mobile/desktop à terminer : Browser absent et Playwright non
-  installé dans l'environnement au moment de cette fiche.
+- La landing a été contrôlée par Playwright sur desktop et mobile le
+  2026-10-14 ; le flux réel de connexion OAuth Discord reste à faire par le
+  propriétaire.
 
 ## Vérifications finales — 2026-10-14
 
@@ -143,10 +144,19 @@ isolées pour être testées sans dépendance externe.
 - `pnpm build` — réussi pour Hono et Next.js ; le build liste le proxy Next.js.
 - `git diff --check` — réussi.
 - Couverture non mesurée pour cette passe.
-- Un smoke test HTTP local n'a pas pu se connecter au serveur dans le bac à
-  sable (`PermissionError: Operation not permitted` sur le socket loopback).
-  Browser est indisponible et Playwright n'est pas installé : la vérification
-  visuelle mobile/desktop reste à effectuer par le propriétaire.
+- QA rendu : Playwright 1.64.0 avec Chromium 156.0.8078.4, utilisé en fallback
+  car le plugin Browser n'est pas disponible. Landing en 200, titre et H1
+  attendus, logo chargé, CTA Discord vers `/connexion`, et `/dashboard` sans
+  session redirigé vers `/connexion`.
+- Viewports contrôlés : desktop 1440×1000 et mobile 390×844. Aucun débordement
+  horizontal sur mobile et aucune erreur console relevée. Captures conservées
+  temporairement dans `/tmp/jdrhub-landing-desktop.png` et
+  `/tmp/jdrhub-landing-mobile.png`.
+- Playwright et Chromium sont dans le cache utilisateur, sans dépendance ajoutée
+  au dépôt. Les bibliothèques absentes du système ont été extraites sous `/tmp`
+  pour ce test uniquement.
+- Le parcours OAuth réel Discord, les autres navigateurs et l'accessibilité au
+  clavier n'ont pas été contrôlés dans cette passe.
 - Aucun secret réel ni donnée personnelle n'a été introduit. Le proxy ne
   transmet que le cookie d'accès à `/me`, refuse les pages privées en cas de
   panne, et laisse `/` public même quand la vérification de session échoue.

@@ -197,7 +197,7 @@ git commit -m "docs: record private app page policy"
 - [x] Run targeted auth, page guard, landing and sitemap tests; verify each added test first failed for its intended reason.
 - [x] Run the full repository test command used on PR #33, excluding ignored `.superpowers` scratch files as already documented.
 - [x] Run `pnpm lint` and `pnpm build`.
-- [x] Review responsive behavior at desktop/mobile using the available browser tool; if Browser and Playwright remain unavailable, record the exact blocker and keep manual QA in the PR checklist. **Browser/Playwright unavailable; manual visual QA remains.**
+- [x] Review responsive behavior at desktop/mobile using the available browser tool; if Browser and Playwright remain unavailable, record the exact blocker and keep manual QA in the PR checklist. **Browser unavailable; Playwright 1.64.0 with Chromium 156.0.8078.4 verified desktop 1440×1000 and mobile 390×844. OAuth and keyboard accessibility remain manual.**
 - [x] Review `git diff --check`, `git status`, changed tests, secrets, cookie attributes, route matcher, docs, and coverage. **Coverage not measured.**
 - [x] Update the feature record with fresh commands/results, TDD Red/Green evidence, security checks, limitations and manual verification.
 - [x] Update PR #33 and push this branch; do not merge. Report the PR and stop for owner review.
