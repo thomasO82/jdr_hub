@@ -15,6 +15,9 @@ n’étaient pas cliquables.
 
 - Dans **Gestion de la partie → Séances**, le MJ peut planifier une séance avec
   une date et une plage horaire saisies dans son fuseau de navigateur.
+- Le panneau demande d’abord le mode de planification. Après le choix d’une
+  date fixe ou de créneaux à proposer, seul le formulaire correspondant reste
+  visible ; « Changer de mode » permet de revenir au choix.
 - Le MJ peut proposer de un à dix créneaux. Il peut en ajouter ou en retirer,
   consulter les votes reçus et retenir explicitement un créneau.
 - La séance créée ou retenue affiche un lien direct vers sa position dans le
@@ -68,3 +71,20 @@ n’étaient pas cliquables.
 - L’API reste l’autorité finale pour les dates invalides, la limite de trois
   séances d’un one-shot et les autorisations ; le frontend présente un message
   générique en cas de refus.
+
+## Suivi UX — 2026-10-14
+
+- **Red :** le test SSR vérifiait le sélecteur de mode et l’absence des deux
+  formulaires au premier affichage ; il échouait car les deux formulaires
+  étaient rendus simultanément.
+- **Green :** un état local mémorise le mode choisi, masque le sélecteur pendant
+  l’édition et rend uniquement le formulaire correspondant.
+- **Refactor :** le retour au sélecteur est explicite et conserve les brouillons
+  saisis dans chaque formulaire.
+- **Vérification interactive :** Playwright sur le build de production a choisi
+  chaque mode, confirmé que l’autre choix disparaissait, créé une séance fixe,
+  proposé puis retenu un créneau. Viewports 1440×1000 et 390×844 ; aucune erreur
+  console. Captures mises à jour ci-dessus.
+- **Résultats après suivi :** 143 fichiers et 422 tests passent hors deux tests
+  temporaires `.superpowers` qui ciblent un répertoire absent ; `pnpm lint` et
+  `pnpm build` passent.
