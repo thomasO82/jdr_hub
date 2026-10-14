@@ -1,3 +1,4 @@
+import { sql } from 'drizzle-orm'
 import {
   index,
   pgTable,
@@ -5,6 +6,7 @@ import {
   text,
   timestamp,
   unique,
+  uniqueIndex,
   uuid,
   varchar,
 } from 'drizzle-orm/pg-core'
@@ -13,9 +15,22 @@ import { gameSchema } from './games.js'
 
 const { games } = gameSchema
 
+export const timeProposalRounds = pgTable('time_proposal_rounds', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  gameId: uuid('game_id').notNull().references(() => games.id, { onDelete: 'cascade' }),
+  proposerId: uuid('proposer_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  status: varchar('status', { length: 16 }).notNull().default('OPEN'),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+}, (table) => [
+  index('time_proposal_rounds_game_index').on(table.gameId),
+  uniqueIndex('time_proposal_rounds_open_game_unique').on(table.gameId).where(sql`"status" = 'OPEN'`),
+])
+
 export const timeProposals = pgTable('time_proposals', {
   id: uuid('id').defaultRandom().primaryKey(),
   gameId: uuid('game_id').notNull().references(() => games.id, { onDelete: 'cascade' }),
+  roundId: uuid('round_id').notNull().references(() => timeProposalRounds.id, { onDelete: 'cascade' }),
   proposerId: uuid('proposer_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
   startsAt: timestamp('starts_at', { withTimezone: true }).notNull(),
   endsAt: timestamp('ends_at', { withTimezone: true }).notNull(),
@@ -54,4 +69,4 @@ export const gameSessions = pgTable('game_sessions', {
   index('game_sessions_status_index').on(table.status),
 ])
 
-export const schedulingSchema = { timeProposals, timeVotes, gameSessions }
+export const schedulingSchema = { timeProposalRounds, timeProposals, timeVotes, gameSessions }
