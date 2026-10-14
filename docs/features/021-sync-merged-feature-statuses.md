@@ -6,7 +6,7 @@ DOC-002
 
 ## Statut
 
-`IN_REVIEW`
+`MERGED`
 
 ## Branche
 
@@ -14,12 +14,12 @@ DOC-002
 
 ## Lien ou numéro de Pull Request
 
-[PR #30](https://github.com/thomasO82/jdr_hub/pull/30), ouverte vers `develop` le 2026-10-14.
+[PR #30](https://github.com/thomasO82/jdr_hub/pull/30), fusionnée dans `develop` le 2026-10-14.
 
 ## Dates de début et de fin
 
 - Début : 2026-10-14
-- Fin : Non terminée
+- Fin : 2026-10-14
 
 ## Dépendances
 
@@ -47,7 +47,7 @@ Les fiches concernées et `docs/project-status.md` ont été rapprochés des ét
 
 ### Restant à faire
 
-Faire relire et fusionner cette mise à jour documentaire.
+La mise à jour a été relue et fusionnée via la PR #30.
 
 ## Besoin utilisateur
 
@@ -167,7 +167,7 @@ Relire le tableau global et les fiches mises à jour avant fusion.
 
 ### Restante
 
-- Revue humaine de la cohérence documentaire.
+- Revue humaine effectuée lors de la fusion de la PR #30.
 
 ## Décisions associées
 
