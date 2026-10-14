@@ -58,7 +58,7 @@ importers:
         version: 0.576.0(react@19.2.0)
       next:
         specifier: 16.3.8
-        version: 16.3.8(@types/node@22.20.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+        version: 16.3.8(@playwright/test@1.64.0)(@types/node@22.20.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
       react:
         specifier: 19.2.0
         version: 19.2.0
@@ -69,6 +69,9 @@ importers:
         specifier: 4.2.2
         version: 4.2.2
     devDependencies:
+      '@playwright/test':
+        specifier: ^1.64.0
+        version: 1.64.0
       '@types/react':
         specifier: ^19.2.7
         version: 19.2.18
@@ -522,6 +525,11 @@ packages:
     engines: {node: '>= 10'}
     cpu: [x64]
     os: [win32]
+
+  '@playwright/test@1.64.0':
+    resolution: {integrity: sha512-oTN9FNYuN6bqQMwiho6jJKLCG2/QOYCixGXuCjRmzOq23eODeukuY2XiAVoVpAECbuezMt1MHQjAiQxK8F+Y+g==}
+    engines: {node: '>=20'}
+    hasBin: true
 
   '@redis/bloom@5.12.1':
     resolution: {integrity: sha512-PUUfv+ms7jgPSBVoo/DN4AkPHj4D5TZSd6SbJX7egzBplkYUcKmHRE8RKia7UtZ8bSQbLguLvxVO+asKtQfZWA==}
@@ -1182,6 +1190,16 @@ packages:
     resolution: {integrity: sha512-qcJu88Q2IWqJsDD529JKMdwGm/dvInW4HvQnRwiH9JtihJvzGOscDtHE3x1pBKeUOTysQ8kVmLnJ2kJu7yhcGA==}
     engines: {node: '>=12'}
 
+  playwright-core@1.64.0:
+    resolution: {integrity: sha512-T9r+MZkTECl2+oUcZ26YgZzTrYidTsIhYYkJix+6iDOymOb1FB2RLLSOxRGnZGv5DStt+aduIVbt+E8WygXYpg==}
+    engines: {node: '>=20'}
+    hasBin: true
+
+  playwright@1.64.0:
+    resolution: {integrity: sha512-kVzTnYFYEyQ9RGzBjNCd2+yEqWmVbxl3AHPynv3qQ6JTjv4a+kwRcnqQwIpuP3NnrnIrE/Q6wWAIAvMfIE2/Yg==}
+    engines: {node: '>=20'}
+    hasBin: true
+
   postcss@8.5.23:
     resolution: {integrity: sha512-g50586zr4bZmwFiTlflMu8E0bDTb5I5gertgwAKmsdUlTQIhZtunzUlD1WSzwcVWPoAVpsrA6vlfCD7oXvRwgg==}
     engines: {node: ^10 || ^12 || >=14}
@@ -1666,6 +1684,10 @@ snapshots:
   '@next/swc-win32-x64-msvc@16.3.8':
     optional: true
 
+  '@playwright/test@1.64.0':
+    dependencies:
+      playwright: 1.64.0
+
   '@redis/bloom@5.12.1(@redis/client@5.12.1)':
     dependencies:
       '@redis/client': 5.12.1
@@ -2054,7 +2076,7 @@ snapshots:
 
   nanoid@3.3.18: {}
 
-  next@16.3.8(@types/node@22.20.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0):
+  next@16.3.8(@playwright/test@1.64.0)(@types/node@22.20.1)(react-dom@19.2.0(react@19.2.0))(react@19.2.0):
     dependencies:
       '@next/env': 16.3.8
       '@swc/helpers': 0.5.23
@@ -2073,6 +2095,7 @@ snapshots:
       '@next/swc-linux-x64-musl': 16.3.8
       '@next/swc-win32-arm64-msvc': 16.3.8
       '@next/swc-win32-x64-msvc': 16.3.8
+      '@playwright/test': 1.64.0
       sharp: 0.35.5(@types/node@22.20.1)
     transitivePeerDependencies:
       - '@babel/core'
@@ -2121,6 +2144,12 @@ snapshots:
   picocolors@1.1.1: {}
 
   picomatch@4.0.7: {}
+
+  playwright-core@1.64.0: {}
+
+  playwright@1.64.0:
+    dependencies:
+      playwright-core: 1.64.0
 
   postcss@8.5.23:
     dependencies:
