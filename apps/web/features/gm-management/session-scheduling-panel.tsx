@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { CalendarDays, Clock3, Plus, Trash2 } from 'lucide-react'
 import type { DashboardSession, GameType, ProposalInput, SchedulingProposal } from '@jdr-hub/shared'
 import { createSchedulingApi } from '../../lib/scheduling-api'
+import { sessionWindowValidationMessage } from './session-scheduling-validation'
 
 type SlotDraft = { startsAt: string; endsAt: string }
 type SchedulingMode = 'fixed' | 'proposals'
@@ -52,9 +53,15 @@ export function SessionSchedulingPanel({ gameId, gameType, nextSession, openProp
 
   async function createFixedSession(event: FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault()
+    const window = toIsoWindow(fixedSlot)
+    const validationMessage = sessionWindowValidationMessage(window)
+    if (validationMessage) {
+      setError(validationMessage)
+      return
+    }
     beginRequest()
     try {
-      const result = await api.createSession(gameId, { ...toIsoWindow(fixedSlot), notes: null })
+      const result = await api.createSession(gameId, { ...window, notes: null })
       if (!result) {
         setError(gameType === 'ONE_SHOT' ? 'La séance n’a pas pu être planifiée. Vérifiez les horaires et la limite de trois séances du one-shot.' : 'La séance n’a pas pu être planifiée. Vérifiez les horaires puis réessayez.')
         return
@@ -69,9 +76,15 @@ export function SessionSchedulingPanel({ gameId, gameType, nextSession, openProp
 
   async function createProposals(event: FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault()
+    const slots = proposalSlots.map(toIsoWindow)
+    const validationMessage = slots.map(sessionWindowValidationMessage).find((message) => message !== null)
+    if (validationMessage) {
+      setError(validationMessage)
+      return
+    }
     beginRequest()
     try {
-      const result = await api.createProposals(gameId, proposalSlots.map(toIsoWindow))
+      const result = await api.createProposals(gameId, slots)
       if (!result) {
         setError('Les créneaux n’ont pas pu être envoyés. Vérifiez les horaires puis réessayez.')
         return

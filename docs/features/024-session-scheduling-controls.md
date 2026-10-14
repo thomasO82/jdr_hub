@@ -18,6 +18,9 @@ n’étaient pas cliquables.
 - Le panneau demande d’abord le mode de planification. Après le choix d’une
   date fixe ou de créneaux à proposer, seul le formulaire correspondant reste
   visible ; « Changer de mode » permet de revenir au choix.
+- Les formulaires refusent localement une fin antérieure ou égale au début et
+  indiquent clairement qu’il faut choisir une heure de fin postérieure. L’API
+  conserve sa validation complète comme contrôle final.
 - Le MJ peut proposer de un à dix créneaux. Il peut en ajouter ou en retirer,
   consulter les votes reçus et retenir explicitement un créneau.
 - La séance créée ou retenue affiche un lien direct vers sa position dans le
@@ -88,3 +91,19 @@ n’étaient pas cliquables.
 - **Résultats après suivi :** 143 fichiers et 422 tests passent hors deux tests
   temporaires `.superpowers` qui ciblent un répertoire absent ; `pnpm lint` et
   `pnpm build` passent.
+
+## Suivi validation des horaires — 2026-10-14
+
+- **Red :** tests du validateur avec le payload signalé (fin le 14 octobre,
+  début le 15) et un intervalle croissant ; l’import du validateur échouait car
+  il n’existait pas encore.
+- **Green :** les deux formulaires consultent le validateur avant l’appel API et
+  affichent un message français si la fin n’est pas postérieure au début.
+- **Refactor :** le validateur reste dans un petit module UI commun aux deux
+  parcours ; la validation serveur reste inchangée.
+- **Résultats :** 144 fichiers et 424 tests passent hors deux tests temporaires
+  `.superpowers` qui ciblent un répertoire absent ; `pnpm lint` et `pnpm build`
+  passent.
+- **Playwright :** les deux formulaires bloquent le payload inversé sans appel
+  API ; la création d’une date fixe et l’envoi puis la sélection d’un créneau
+  valide fonctionnent toujours. Aucune erreur console.
