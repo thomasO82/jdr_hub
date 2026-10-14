@@ -17,8 +17,8 @@ import { updateGame } from './services/update-game.js'
 type GameEnv = { Variables: { requestId: string } }
 type Dependencies = { authConfig: AuthConfig; authRepository: AuthRepository; repository: GamesRepository & PublicGamesRepository; now?: () => Date }
 
-function fail(c: Context<GameEnv>, status: 400 | 401 | 403 | 404 | 409) {
-  return c.json({ data: null, error: { code: status === 401 ? 'AUTH_ERROR' : 'GAME_ERROR', message: status === 401 ? 'Authentication failed' : 'Game request failed' }, meta: { requestId: c.get('requestId') } }, status)
+function fail(c: Context<GameEnv>, status: 400 | 401 | 403 | 404 | 409, code?: string) {
+  return c.json({ data: null, error: { code: code ?? (status === 401 ? 'AUTH_ERROR' : 'GAME_ERROR'), message: 'Game request failed' }, meta: { requestId: c.get('requestId') } }, status)
 }
 
 function requiredId(c: Context<GameEnv>): string | null {
@@ -40,10 +40,14 @@ export function createGameHandlers(dependencies: Dependencies) {
     },
     tags: async (c: Context<GameEnv>) => c.json({ data: await dependencies.repository.listActiveTags(), error: null, meta: { requestId: c.get('requestId') } }),
     get: async (c: Context<GameEnv>) => {
+      const user = await currentUser(c, dependencies)
+      if (!user) return fail(c, 401)
       const id = requiredId(c)
       if (!id) return fail(c, 400)
       const game = await getGame({ id, repository: dependencies.repository })
-      return game ? c.json({ data: game, error: null, meta: { requestId: c.get('requestId') } }) : fail(c, 404)
+      return game && game.ownerId === user.id
+        ? c.json({ data: game, error: null, meta: { requestId: c.get('requestId') } })
+        : fail(c, 404)
     },
     publicGet: async (c: Context<GameEnv>) => {
       const slug = c.req.param('slug')
@@ -67,12 +71,16 @@ export function createGameHandlers(dependencies: Dependencies) {
     create: async (c: Context<GameEnv>) => {
       const user = await currentUser(c, dependencies)
       if (!user) return fail(c, 401)
+      if (c.req.header('origin') !== dependencies.authConfig.appOrigin) return fail(c, 403)
       const parsed = createGameSchema.safeParse(await c.req.json().catch(() => null))
       if (!parsed.success) return fail(c, 400)
       try {
         const game = await createGame({ ownerId: user.id, game: parsed.data, repository: dependencies.repository })
         return c.json({ data: game, error: null, meta: { requestId: c.get('requestId') } }, 201)
-      } catch { return fail(c, 409) }
+      } catch (error) {
+        if (error instanceof Error && error.message === 'GAME_TAG_INVALID') return fail(c, 400, 'INVALID_GAME_TAG')
+        return fail(c, 409)
+      }
     },
     update: async (c: Context<GameEnv>) => {
       const user = await currentUser(c, dependencies)

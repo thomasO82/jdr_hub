@@ -65,7 +65,7 @@ export function createPostgresGamesRepository(database: Database): GamesReposito
         ? await database.select({ id: tags.id, slug: tags.slug }).from(tags).where(and(eq(tags.isActive, true), inArray(tags.slug, tagSlugs)))
         : []
       if (tagRows.length !== new Set(tagSlugs).size) throw new Error('GAME_TAG_INVALID')
-      const [game] = await database.insert(games).values(gameInput).returning()
+      const [game] = await database.insert(games).values({ ...gameInput, status: 'OPEN' }).returning()
       if (!game) throw new Error('GAME_CREATE_FAILED')
       if (tagSlugs.length > 0) {
         await database.insert(gameTags).values(tagRows.map((tag) => ({ gameId: game.id, tagId: tag.id })))

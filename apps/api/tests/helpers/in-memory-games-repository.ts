@@ -24,7 +24,7 @@ export function createInMemoryGamesRepository(seed: GameRecord[] = []): InMemory
   const games = new Map(seed.map((game) => [game.id, game]))
   return {
     async create(input) {
-      const game: GameRecord = { ...input, id: randomUUID(), status: 'DRAFT', tags: input.tags }
+      const game: GameRecord = { ...input, id: randomUUID(), status: 'OPEN', tags: input.tags }
       games.set(game.id, game)
       return game
     },

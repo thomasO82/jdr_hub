@@ -6,6 +6,8 @@ un contrôle d'autorisation.
 | Ressource/action | Visiteur | Utilisateur connecté | Candidat | Membre | MJ propriétaire | Administrateur |
 | --- | --- | --- | --- | --- | --- | --- |
 | Lire le catalogue et les fiches publiques | Oui | Oui | Oui | Oui | Oui | Oui |
+| Lire une partie par identifiant interne | Non | Non | Non | Non | Oui, uniquement ses parties | Selon politique support |
+| Créer une partie | Non | Oui, session active et origine applicative exacte | Oui, mêmes contrôles | Oui, mêmes contrôles | Oui, mêmes contrôles | Selon politique support |
 | Déposer une candidature | Non | Oui, sauf sa propre partie | Oui, une candidature unique | Oui si aucune candidature existante | Non sur sa partie | Selon politique support |
 | Lire ses propres candidatures | Non | Oui | Oui | Oui | Oui pour ses candidatures | Selon politique support |
 | Lire les candidatures d'une partie | Non | Non | Non | Non | Oui, uniquement ses parties | Selon politique support |
@@ -62,3 +64,8 @@ créés côté serveur uniquement pour les présences `PRESENT`, avec une clé
 d'idempotence unique et une transaction partagée avec la validation de séance.
 Le montant, le niveau et le motif ne sont jamais des champs d'autorité du
 navigateur ; la réponse n'expose ni clé d'idempotence ni identifiant Discord.
+
+Clarification FIX-UX-001 — 2026-10-14 : les fiches publiques se lisent par
+slug via `/public/games/:slug`. La lecture par identifiant interne est réservée
+au MJ propriétaire ; les créations exigent une session active et l'origine
+applicative exacte.

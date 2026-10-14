@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { PrivatePageGate } from '../features/authentication/private-page-gate'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -21,7 +22,7 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body>{children}</body>
+      <body><PrivatePageGate>{children}</PrivatePageGate></body>
     </html>
   )
 }
