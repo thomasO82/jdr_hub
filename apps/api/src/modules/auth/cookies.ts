@@ -26,10 +26,11 @@ export function setAuthCookies(
   setCookie(c, ACCESS_COOKIE_NAME, accessToken, {
     expires: new Date(now.getTime() + AUTH_LIFETIMES.accessTokenMs),
     httpOnly: true,
-    path: '/api',
+    path: '/',
     sameSite: 'Lax',
     secure: config.isProduction,
   })
+  clearAccessCookie(c, config, '/api')
   setCookie(c, REFRESH_COOKIE_NAME, refreshToken, {
     expires: refreshExpiresAt,
     httpOnly: true,
@@ -42,12 +43,23 @@ export function setAuthCookies(
 /** Removes every browser credential, including the retired legacy session cookie. */
 export function clearAuthCookies(c: Context, config: AuthConfig): void {
   for (const [name, path] of [
-    [ACCESS_COOKIE_NAME, '/api'],
+    [ACCESS_COOKIE_NAME, '/'],
     [REFRESH_COOKIE_NAME, '/api/auth'],
     [LEGACY_COOKIE_NAME, '/'],
   ] as const) {
     setCookie(c, name, '', { httpOnly: true, maxAge: 0, path, sameSite: 'Lax', secure: config.isProduction })
   }
+  clearAccessCookie(c, config, '/api')
+}
+
+function clearAccessCookie(c: Context, config: AuthConfig, path: '/' | '/api'): void {
+  setCookie(c, ACCESS_COOKIE_NAME, '', {
+    httpOnly: true,
+    maxAge: 0,
+    path,
+    sameSite: 'Lax',
+    secure: config.isProduction,
+  })
 }
 
 /** Retires only the predecessor cookie after a successful OAuth callback. */

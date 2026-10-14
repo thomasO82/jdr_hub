@@ -63,11 +63,11 @@ describe('JWT authentication routes', () => {
     expect(callback.status).toBe(302)
     expect(accessCookie).toMatch(/^jdr_hub_access=.+/)
     expect(refreshCookie).toMatch(/^jdr_hub_refresh=.+/)
-    expect(callback.headers.getSetCookie()).toEqual(expect.arrayContaining([
-      expect.stringContaining('jdr_hub_access='),
-      expect.stringContaining('Path=/api'),
-      expect.stringContaining('jdr_hub_refresh='),
-      expect.stringContaining('Path=/api/auth'),
+    const cookies = callback.headers.getSetCookie()
+    expect(cookies).toEqual(expect.arrayContaining([
+      expect.stringMatching(/^jdr_hub_access=[^;]+;.*Path=\/;/),
+      expect.stringMatching(/^jdr_hub_refresh=[^;]+;.*Path=\/api\/auth;/),
+      expect.stringMatching(/^jdr_hub_access=;.*Max-Age=0.*Path=\/api;/),
     ]))
   })
 
@@ -76,10 +76,15 @@ describe('JWT authentication routes', () => {
     const { accessCookie, refreshCookie } = await login(app)
 
     expect((await app.request('/me', { headers: { cookie: accessCookie } })).status).toBe(200)
-    expect((await app.request('/auth/logout', {
+    const logout = await app.request('/auth/logout', {
       method: 'POST',
       headers: { cookie: refreshCookie, origin: config.appOrigin },
-    })).status).toBe(204)
+    })
+    expect(logout.status).toBe(204)
+    expect(logout.headers.getSetCookie()).toEqual(expect.arrayContaining([
+      expect.stringMatching(/^jdr_hub_access=;.*Max-Age=0.*Path=\//),
+      expect.stringMatching(/^jdr_hub_access=;.*Max-Age=0.*Path=\/api;/),
+    ]))
     expect((await app.request('/me', { headers: { cookie: accessCookie } })).status).toBe(401)
   })
 
@@ -104,6 +109,9 @@ describe('JWT authentication routes', () => {
     const replacementRefreshCookie = cookiePair(refreshed, 'jdr_hub_refresh')
 
     expect(refreshed.status).toBe(204)
+    expect(refreshed.headers.getSetCookie()).toEqual(expect.arrayContaining([
+      expect.stringMatching(/^jdr_hub_access=;.*Max-Age=0.*Path=\/api;/),
+    ]))
     expect((await app.request('/me', { headers: { cookie: accessCookie } })).status).toBe(401)
     expect((await app.request('/me', { headers: { cookie: replacementAccessCookie } })).status).toBe(200)
     expect((await app.request('/auth/refresh', {
