@@ -107,3 +107,45 @@ n’étaient pas cliquables.
 - **Playwright :** les deux formulaires bloquent le payload inversé sans appel
   API ; la création d’une date fixe et l’envoi puis la sélection d’un créneau
   valide fonctionnent toujours. Aucune erreur console.
+
+## Révision des propositions et des séances — 2026-10-14
+
+- **Comportement ajouté :** chaque nouvel envoi crée un tour de vote distinct.
+  Une seule proposition peut être ouverte par partie à la fois ; retenir un
+  créneau ferme ses options sœurs et le tour. Les votes déjà enregistrés restent
+  inchangés.
+- **Gestion MJ :** le MJ propriétaire peut consulter les séances planifiées,
+  terminées et annulées. Il peut déplacer une séance `SCHEDULED` sans modifier
+  la proposition d’origine ni ses votes, ou l’annuler après confirmation. Une
+  séance annulée sort du planning, son tour devient `CANCELLED`, son historique
+  reste visible et une séance de remplacement ou un nouveau tour peuvent être
+  créés. Les statuts `COMPLETED` et `CANCELLED` ne sont plus modifiables.
+- **Base :** migration additive `0011_flat_sentinel.sql`, création des tours,
+  rattachement des propositions existantes sans supprimer les votes et
+  contrainte garantissant un tour `OPEN` au maximum par partie.
+- **Preuve TDD — Red :** tests shared/schema manquants, puis tests API/services
+  sans les méthodes de tour et de gestion ; les tests client web échouaient sur
+  les nouvelles méthodes absentes et les règles de regroupement d’interface.
+- **Preuve TDD — Green :** contrats, transactions repository, services,
+  endpoints et interface ajoutés ; les tests ciblés API, services et UI passent.
+  Le test PostgreSQL vérifie sélection concurrente, création concurrente,
+  conservation des votes, modification sans réécriture de la proposition,
+  annulation, retrait du planning et séance de remplacement.
+- **Résultats :** `pnpm exec vitest run --exclude='.superpowers/**'` — 146
+  fichiers/439 tests verts ; tests d’intégration PostgreSQL — 11 fichiers/24
+  tests verts ; `pnpm lint`, `pnpm --filter @jdr-hub/web typecheck` et
+  `pnpm build` verts. `pnpm test` complet donne 441 tests verts et deux échecs
+  temporaires préexistants sous `.superpowers/sdd/2026-09-02-monorepo-foundation`
+  car leur fixture `red-baseline` est absente.
+- **Sécurité :** listing et mutations vérifient le propriétaire côté serveur ;
+  mutations protégées par session, origine exacte, rate limit et schéma Zod
+  strict. Les lignes de séance et de tour sont verrouillées pendant leurs
+  transitions. Les réponses d’erreur gardent leur enveloppe générique.
+- **Vérification navigateur :** tentative Playwright avec données API fictives,
+  mais Chromium ne démarre pas car la bibliothèque système `libnspr4.so` manque.
+  L’installation des bibliothèques a été bloquée par `sudo` qui demande un mot
+  de passe dans cet environnement. Le rendu responsive et les interactions
+  navigateur restent donc à vérifier manuellement avant fusion.
+- **Dépendance de développement :** `@playwright/test` 1.64.0 a été ajouté à la
+  demande antérieure du propriétaire pour les contrôles frontend. Aucun test
+  navigateur automatisé n’a pu être exécuté dans cet environnement.
