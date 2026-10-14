@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from 'react'
 import Link from 'next/link'
 import { AppShell } from '../layout/app-shell'
+import { createdGameDestination, gameCreationErrorMessage } from './game-creation-feedback'
 
 export function NewGameView() {
   const [error, setError] = useState<string | null>(null)
@@ -13,25 +14,38 @@ export function NewGameView() {
     setPending(true)
     setError(null)
     const form = new FormData(event.currentTarget)
-    const response = await fetch('/api/games', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({
-        title: form.get('title'),
-        system: form.get('system'),
-        description: form.get('description'),
-        type: form.get('type'),
-        maxPlayers: Number(form.get('maxPlayers')),
-        visibility: form.get('visibility'),
-        tags: String(form.get('tags') ?? '').split(',').map((tag) => tag.trim()).filter(Boolean),
-      }),
-    })
-    setPending(false)
-    if (!response.ok) {
-      setError('Impossible de créer la partie. Connectez-vous puis réessayez.')
-      return
+    try {
+      const response = await fetch('/api/games', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({
+          title: form.get('title'),
+          system: form.get('system'),
+          description: form.get('description'),
+          type: form.get('type'),
+          maxPlayers: Number(form.get('maxPlayers')),
+          visibility: form.get('visibility'),
+          tags: String(form.get('tags') ?? '').split(',').map((tag) => tag.trim()).filter(Boolean),
+        }),
+      })
+      if (!response.ok) {
+        const body = await response.json().catch(() => null) as { error?: { code?: string } } | null
+        setError(gameCreationErrorMessage(response.status, body?.error?.code))
+        return
+      }
+
+      const body = await response.json() as { data?: { id?: unknown; slug?: unknown; visibility?: unknown } }
+      const game = body.data
+      if (typeof game?.id !== 'string' || typeof game.slug !== 'string' || (game.visibility !== 'PUBLIC' && game.visibility !== 'PRIVATE')) {
+        setError('La partie a été créée, mais sa fiche ne peut pas être ouverte. Retrouvez-la dans votre espace de gestion.')
+        return
+      }
+      window.location.assign(createdGameDestination({ id: game.id, slug: game.slug, visibility: game.visibility }))
+    } catch {
+      setError('La partie n’a pas pu être créée. Vérifiez votre connexion puis réessayez.')
+    } finally {
+      setPending(false)
     }
-    window.location.assign('/parties')
   }
 
   return (

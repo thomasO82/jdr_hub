@@ -13,9 +13,10 @@ describe('public editorial pages', () => {
     }
   })
 
-  it('defines sitemap and robots from public routes', () => {
-    expect(read('../app/sitemap.ts')).toContain('/parties')
+  it('keeps sitemap and crawler guidance limited to the public presentation', () => {
+    expect(read('../app/sitemap.ts')).not.toContain('/parties')
     expect(read('../app/robots.ts')).toContain('disallow')
+    expect(read('../app/robots.ts')).toContain("allow: '/$'")
   })
 
   it('marks filtered catalogue URLs as noindex', () => {

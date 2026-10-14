@@ -5,12 +5,13 @@ import { describe, expect, it } from 'vitest'
 const web = resolve(import.meta.dirname, '..')
 
 describe('dashboard page composition', () => {
-  it('provides a private dashboard route and keeps the root as its entry point', () => {
+  it('keeps the dashboard private and uses the root for the public presentation', () => {
     const dashboardPage = readFileSync(resolve(web, 'app/dashboard/page.tsx'), 'utf8')
     const rootPage = readFileSync(resolve(web, 'app/page.tsx'), 'utf8')
 
     expect(dashboardPage).toContain('DashboardView')
-    expect(rootPage).toContain('/dashboard')
+    expect(rootPage).toContain('LandingView')
+    expect(rootPage).not.toContain('/dashboard')
   })
 
   it('points the shared shell dashboard navigation to the private route', () => {

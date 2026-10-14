@@ -45,9 +45,9 @@ describe('dashboard visual structure', () => {
     expect(source).toContain('hidden h-16')
   })
 
-  it('keeps the root route as a route composition for the dashboard', () => {
+  it('keeps the root route as a composition of the public landing', () => {
     const page = read('../app/page.tsx')
-    expect(page).toContain('redirect')
+    expect(page).toContain('LandingView')
     expect(page).not.toContain('HomeView')
   })
 })

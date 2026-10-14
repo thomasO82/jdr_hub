@@ -11,6 +11,9 @@
   --color-primary-fixed-dim: #d2bbff;
   --color-on-primary: #ffffff;
   --color-on-primary-fixed: #25005a;
+  --color-inverse-surface: #2d3133;
+  --color-inverse-on-surface: #eff1f3;
+  --color-inverse-primary: #d2bbff;
   --color-background: #f7f9fb;
   --color-surface: #ffffff;
   --color-surface-container: #eceef0;
