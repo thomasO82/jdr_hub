@@ -200,7 +200,7 @@ git commit -m "docs: record private app page policy"
 - [x] Review responsive behavior at desktop/mobile using the available browser tool; if Browser and Playwright remain unavailable, record the exact blocker and keep manual QA in the PR checklist. **Browser/Playwright unavailable; manual visual QA remains.**
 - [x] Review `git diff --check`, `git status`, changed tests, secrets, cookie attributes, route matcher, docs, and coverage. **Coverage not measured.**
 - [x] Update the feature record with fresh commands/results, TDD Red/Green evidence, security checks, limitations and manual verification.
-- [ ] Update PR #33 and push this branch; do not merge. Report the PR and stop for owner review.
+- [x] Update PR #33 and push this branch; do not merge. Report the PR and stop for owner review.
 
 ## Self-review
 
