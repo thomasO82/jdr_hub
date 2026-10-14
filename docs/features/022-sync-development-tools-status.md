@@ -14,7 +14,7 @@ DOC-003
 
 ## Lien ou numéro de Pull Request
 
-Ouverture en cours vers `develop`.
+[PR #31](https://github.com/thomasO82/jdr_hub/pull/31), ouverte vers `develop` le 2026-10-14.
 
 ## Dates de début et de fin
 
