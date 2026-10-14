@@ -32,6 +32,10 @@ propres contrôles d'authentification et d'autorisation.
 | Créer/lire/annuler les invitations d'une partie | Non | Non | Non | Non | Oui, uniquement ses parties | Selon politique support |
 | Accepter/refuser une invitation reçue | Non | Oui, uniquement les siennes | Oui, uniquement les siennes | Oui, uniquement les siennes | Non pour une invitation reçue par autrui | Selon politique support |
 | Lire la gestion d'une partie | Non | Non | Non | Non | Oui, uniquement ses parties | Selon politique support |
+| Lire les propositions et voter sur un créneau ouvert | Non | Non | Non | Oui, partie dont il est membre actif | Oui, uniquement ses parties | Selon politique support |
+| Créer un tour de propositions ou retenir un créneau | Non | Non | Non | Non | Oui, uniquement ses parties | Selon politique support |
+| Lire l’historique des séances d’une partie | Non | Non | Non | Non | Oui, uniquement ses parties | Selon politique support |
+| Modifier ou annuler une séance planifiée | Non | Non | Non | Non | Oui, uniquement ses parties et si la séance est `SCHEDULED` | Selon politique support |
 | Retirer un joueur du roster | Non | Non | Non | Non | Oui, uniquement ses parties ; jamais le MJ | Selon politique support |
 | Lire son historique XP et sa progression | Non | Oui, uniquement les siennes | Oui, uniquement les siennes | Oui, uniquement les siennes | Oui, uniquement les siennes | Selon politique support |
 | Attribuer l'XP d'une séance validée | Non | Non | Non | Non | Oui, uniquement ses parties et après validation | Selon politique support |
@@ -78,3 +82,9 @@ Clarification FIX-UX-001 — 2026-10-14 : les fiches publiques se lisent par
 slug via `/public/games/:slug`. La lecture par identifiant interne est réservée
 au MJ propriétaire ; les créations exigent une session active et l'origine
 applicative exacte.
+
+FIX-UX-002 — 2026-10-14 : les tours de vote et leur historique sont visibles
+au MJ propriétaire et aux membres actifs de la partie. Seul le MJ propriétaire
+peut lister l’historique complet des séances, retenir un créneau, modifier une
+séance `SCHEDULED` ou l’annuler. Les séances `COMPLETED` et `CANCELLED` sont
+terminales ; l’annulation conserve le tour et les votes pour consultation.

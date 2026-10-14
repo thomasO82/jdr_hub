@@ -4,6 +4,7 @@ const dateTimeSchema = z.iso.datetime({ offset: true })
 
 export const sessionStatusSchema = z.enum(['PROPOSED', 'SCHEDULED', 'COMPLETED', 'CANCELLED'])
 export const proposalStatusSchema = z.enum(['OPEN', 'CLOSED', 'SELECTED'])
+export const proposalRoundStatusSchema = z.enum(['OPEN', 'SELECTED', 'CLOSED', 'CANCELLED'])
 export const voteValueSchema = z.enum(['YES', 'MAYBE', 'NO'])
 
 export const sessionWindowSchema = z.object({
@@ -23,6 +24,11 @@ export const proposalInputSchema = z.object({
 export const fixedSessionInputSchema = sessionWindowSchema.extend({
   notes: z.string().trim().max(2_000).nullable().default(null),
 }).strict()
+export const sessionUpdateInputSchema = sessionWindowSchema
+export const sessionManagementCommandSchema = z.union([
+  sessionUpdateInputSchema,
+  z.object({ status: z.literal('CANCELLED') }).strict(),
+])
 
 export const voteCommandSchema = z.object({ vote: voteValueSchema }).strict()
 export const sessionCommandSchema = z.union([
@@ -48,16 +54,21 @@ export const planningQuerySchema = z.object({
 
 export type SessionStatus = z.infer<typeof sessionStatusSchema>
 export type ProposalStatus = z.infer<typeof proposalStatusSchema>
+export type ProposalRoundStatus = z.infer<typeof proposalRoundStatusSchema>
 export type VoteValue = z.infer<typeof voteValueSchema>
 export type SessionWindow = z.infer<typeof sessionWindowSchema>
 export type ProposalInput = z.infer<typeof proposalInputSchema>
 export type FixedSessionInput = z.infer<typeof fixedSessionInputSchema>
+export type SessionUpdateInput = z.infer<typeof sessionUpdateInputSchema>
+export type SessionManagementCommand = z.infer<typeof sessionManagementCommandSchema>
 export type VoteCommand = z.infer<typeof voteCommandSchema>
 export type SessionCommand = z.infer<typeof sessionCommandSchema>
 
 export type SchedulingProposal = {
   id: string
   gameId: string
+  roundId: string
+  roundStatus: ProposalRoundStatus
   startsAt: string
   endsAt: string
   status: ProposalStatus

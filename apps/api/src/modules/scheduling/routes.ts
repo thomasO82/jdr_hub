@@ -5,8 +5,10 @@ export function registerSchedulingRoutes(app: Hono<SchedulingRouteEnv>, dependen
   const handlers = createSchedulingHandlers(dependencies)
   app.post('/games/:id/proposals', handlers.createProposals)
   app.get('/games/:id/proposals', handlers.listProposals)
+  app.get('/games/:gameId/sessions', handlers.listGameSessions)
   app.post('/proposals/:id/votes', handlers.castVote)
   app.post('/games/:id/sessions', handlers.createSession)
+  app.patch('/games/:gameId/sessions/:sessionId', handlers.manageSession)
   app.get('/planning', handlers.getPlanning)
 }
 

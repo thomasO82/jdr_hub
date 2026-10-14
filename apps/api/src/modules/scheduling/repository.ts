@@ -1,6 +1,6 @@
-import { and, asc, eq, gte, inArray, lte, or } from 'drizzle-orm'
+import { and, asc, eq, gte, inArray, lte, ne, or } from 'drizzle-orm'
 import { authSchema, gameSchema, schedulingSchema, type createDatabase } from '@jdr-hub/database'
-import type { GameStatus, GameType, ProposalStatus, SessionStatus, SessionWindow, VoteValue } from '@jdr-hub/shared'
+import type { GameStatus, GameType, ProposalRoundStatus, ProposalStatus, SessionStatus, SessionWindow, VoteValue } from '@jdr-hub/shared'
 
 export type SchedulingGame = {
   id: string
@@ -17,6 +17,8 @@ export type ProposalRecord = {
   startsAt: Date
   endsAt: Date
   status: ProposalStatus
+  roundId: string
+  roundStatus: ProposalRoundStatus
   createdAt: Date
   updatedAt: Date
 }
@@ -48,6 +50,9 @@ export interface SchedulingRepository {
   findProposal(proposalId: string): Promise<ProposalRecord | null>
   createVote(input: { proposalId: string; userId: string; vote: VoteValue; now: Date }): Promise<void>
   createFixedSession(input: { gameId: string; startsAt: Date; endsAt: Date; notes: string | null; now: Date }): Promise<SessionRecord>
+  listGameSessions(gameId: string): Promise<SessionRecord[]>
+  updateScheduledSession(input: { gameId: string; sessionId: string; startsAt: Date; endsAt: Date; now: Date }): Promise<SessionRecord>
+  cancelScheduledSession(input: { gameId: string; sessionId: string; now: Date }): Promise<SessionRecord>
   selectProposal(input: { gameId: string; proposalId: string; now: Date }): Promise<SessionRecord>
   listPlanning(input: { userId: string; from: Date | null; to: Date | null }): Promise<PlanningPage>
 }
@@ -60,15 +65,16 @@ const toGame = (row: { id: string; ownerId: string; title: string; type: string;
   status: row.status as GameStatus,
 })
 
-const toProposal = (row: { id: string; gameId: string; proposerId: string; startsAt: Date; endsAt: Date; status: string; createdAt: Date; updatedAt: Date }): ProposalRecord => ({
+const toProposal = (row: { id: string; gameId: string; proposerId: string; roundId: string; roundStatus: string; startsAt: Date; endsAt: Date; status: string; createdAt: Date; updatedAt: Date }): ProposalRecord => ({
   ...row,
   status: row.status as ProposalStatus,
+  roundStatus: row.roundStatus as ProposalRoundStatus,
 })
 
 export function createPostgresSchedulingRepository(database: Database): SchedulingRepository {
   const { users } = authSchema
   const { games, gameMembers } = gameSchema
-  const { gameSessions, timeProposals, timeVotes } = schedulingSchema
+  const { gameSessions, timeProposalRounds, timeProposals, timeVotes } = schedulingSchema
 
   return {
     async findGame(gameId) {
@@ -86,11 +92,25 @@ export function createPostgresSchedulingRepository(database: Database): Scheduli
       return Boolean(owner)
     },
     async createProposals({ gameId, proposerId, slots, now }) {
-      const rows = await database.insert(timeProposals).values(slots.map((slot) => ({ gameId, proposerId, startsAt: new Date(slot.startsAt), endsAt: new Date(slot.endsAt), createdAt: now, updatedAt: now }))).returning()
-      return rows.map(toProposal)
+      try {
+        return await database.transaction(async (tx) => {
+          const [game] = await tx.select({ id: games.id }).from(games).where(eq(games.id, gameId)).for('update').limit(1)
+          if (!game) throw new Error('SCHEDULING_NOT_FOUND')
+          const [openRound] = await tx.select({ id: timeProposalRounds.id }).from(timeProposalRounds).where(and(eq(timeProposalRounds.gameId, gameId), eq(timeProposalRounds.status, 'OPEN'))).for('update').limit(1)
+          if (openRound) throw new Error('SCHEDULING_CONFLICT')
+          const [round] = await tx.insert(timeProposalRounds).values({ gameId, proposerId, status: 'OPEN', createdAt: now, updatedAt: now }).returning()
+          if (!round) throw new Error('SCHEDULING_CREATE_FAILED')
+          const rows = await tx.insert(timeProposals).values(slots.map((slot) => ({ gameId, roundId: round.id, proposerId, startsAt: new Date(slot.startsAt), endsAt: new Date(slot.endsAt), createdAt: now, updatedAt: now }))).returning()
+          return rows.map((row) => toProposal({ ...row, roundStatus: round.status }))
+        })
+      } catch (error) {
+        if (error instanceof Error && error.message.startsWith('SCHEDULING_')) throw error
+        if (typeof error === 'object' && error !== null && 'code' in error && error.code === '23505') throw new Error('SCHEDULING_CONFLICT')
+        throw error
+      }
     },
     async listProposals(gameId, userId) {
-      const proposals = await database.select().from(timeProposals).where(eq(timeProposals.gameId, gameId)).orderBy(asc(timeProposals.startsAt))
+      const proposals = await database.select({ id: timeProposals.id, gameId: timeProposals.gameId, proposerId: timeProposals.proposerId, roundId: timeProposals.roundId, roundStatus: timeProposalRounds.status, startsAt: timeProposals.startsAt, endsAt: timeProposals.endsAt, status: timeProposals.status, createdAt: timeProposals.createdAt, updatedAt: timeProposals.updatedAt }).from(timeProposals).innerJoin(timeProposalRounds, eq(timeProposals.roundId, timeProposalRounds.id)).where(eq(timeProposals.gameId, gameId)).orderBy(asc(timeProposals.startsAt))
       const votes = await database.select({ proposalId: timeVotes.proposalId, userId: timeVotes.userId, vote: timeVotes.vote }).from(timeVotes).innerJoin(timeProposals, eq(timeVotes.proposalId, timeProposals.id)).where(eq(timeProposals.gameId, gameId))
       return proposals.map((proposal) => {
         const proposalVotes = votes.filter((vote) => vote.proposalId === proposal.id)
@@ -98,12 +118,20 @@ export function createPostgresSchedulingRepository(database: Database): Scheduli
       })
     },
     async findProposal(proposalId) {
-      const [row] = await database.select().from(timeProposals).where(eq(timeProposals.id, proposalId)).limit(1)
+      const [row] = await database.select({ id: timeProposals.id, gameId: timeProposals.gameId, proposerId: timeProposals.proposerId, roundId: timeProposals.roundId, roundStatus: timeProposalRounds.status, startsAt: timeProposals.startsAt, endsAt: timeProposals.endsAt, status: timeProposals.status, createdAt: timeProposals.createdAt, updatedAt: timeProposals.updatedAt }).from(timeProposals).innerJoin(timeProposalRounds, eq(timeProposals.roundId, timeProposalRounds.id)).where(eq(timeProposals.id, proposalId)).limit(1)
       return row ? toProposal(row) : null
     },
     async createVote({ proposalId, userId, vote, now }) {
       try {
-        await database.insert(timeVotes).values({ proposalId, userId, vote, createdAt: now, updatedAt: now })
+        await database.transaction(async (tx) => {
+          const [proposal] = await tx.select({ roundId: timeProposals.roundId }).from(timeProposals).where(eq(timeProposals.id, proposalId)).limit(1)
+          if (!proposal) throw new Error('SCHEDULING_NOT_FOUND')
+          const [round] = await tx.select({ status: timeProposalRounds.status }).from(timeProposalRounds).where(eq(timeProposalRounds.id, proposal.roundId)).for('update').limit(1)
+          if (!round || round.status !== 'OPEN') throw new Error('SCHEDULING_CONFLICT')
+          const [openProposal] = await tx.select({ id: timeProposals.id }).from(timeProposals).where(and(eq(timeProposals.id, proposalId), eq(timeProposals.status, 'OPEN'))).for('update').limit(1)
+          if (!openProposal) throw new Error('SCHEDULING_CONFLICT')
+          await tx.insert(timeVotes).values({ proposalId, userId, vote, createdAt: now, updatedAt: now })
+        })
       } catch {
         throw new Error('SCHEDULING_CONFLICT')
       }
@@ -114,17 +142,54 @@ export function createPostgresSchedulingRepository(database: Database): Scheduli
       const [game] = await database.select({ title: games.title }).from(games).where(eq(games.id, gameId)).limit(1)
       return { id: row.id, gameId: row.gameId, proposalId: row.proposalId, gameTitle: game?.title ?? '', startsAt: row.startsAt, endsAt: row.endsAt, status: row.status as SessionStatus, notes: row.notes }
     },
+    async listGameSessions(gameId) {
+      const rows = await database.select({ id: gameSessions.id, gameId: gameSessions.gameId, proposalId: gameSessions.proposalId, gameTitle: games.title, startsAt: gameSessions.startsAt, endsAt: gameSessions.endsAt, status: gameSessions.status, notes: gameSessions.notes }).from(gameSessions).innerJoin(games, eq(gameSessions.gameId, games.id)).where(eq(gameSessions.gameId, gameId)).orderBy(asc(gameSessions.startsAt))
+      return rows.map((row) => ({ ...row, status: row.status as SessionStatus }))
+    },
+    async updateScheduledSession({ gameId, sessionId, startsAt, endsAt, now }) {
+      return database.transaction(async (tx) => {
+        const [current] = await tx.select().from(gameSessions).where(and(eq(gameSessions.id, sessionId), eq(gameSessions.gameId, gameId))).for('update').limit(1)
+        if (!current) throw new Error('SCHEDULING_NOT_FOUND')
+        if (current.status !== 'SCHEDULED') throw new Error('SCHEDULING_CONFLICT')
+        const [updated] = await tx.update(gameSessions).set({ startsAt, endsAt, updatedAt: now }).where(eq(gameSessions.id, sessionId)).returning()
+        if (!updated) throw new Error('SCHEDULING_NOT_FOUND')
+        const [game] = await tx.select({ title: games.title }).from(games).where(eq(games.id, gameId)).limit(1)
+        return { id: updated.id, gameId: updated.gameId, proposalId: updated.proposalId, gameTitle: game?.title ?? '', startsAt: updated.startsAt, endsAt: updated.endsAt, status: updated.status as SessionStatus, notes: updated.notes }
+      })
+    },
+    async cancelScheduledSession({ gameId, sessionId, now }) {
+      return database.transaction(async (tx) => {
+        const [current] = await tx.select().from(gameSessions).where(and(eq(gameSessions.id, sessionId), eq(gameSessions.gameId, gameId))).for('update').limit(1)
+        if (!current) throw new Error('SCHEDULING_NOT_FOUND')
+        if (current.status !== 'SCHEDULED') throw new Error('SCHEDULING_CONFLICT')
+        if (current.proposalId) {
+          const [proposal] = await tx.select({ roundId: timeProposals.roundId }).from(timeProposals).where(eq(timeProposals.id, current.proposalId)).limit(1)
+          if (proposal) await tx.update(timeProposalRounds).set({ status: 'CANCELLED', updatedAt: now }).where(and(eq(timeProposalRounds.id, proposal.roundId), eq(timeProposalRounds.status, 'SELECTED')))
+        }
+        const [updated] = await tx.update(gameSessions).set({ status: 'CANCELLED', updatedAt: now }).where(eq(gameSessions.id, sessionId)).returning()
+        if (!updated) throw new Error('SCHEDULING_NOT_FOUND')
+        const [game] = await tx.select({ title: games.title }).from(games).where(eq(games.id, gameId)).limit(1)
+        return { id: updated.id, gameId: updated.gameId, proposalId: updated.proposalId, gameTitle: game?.title ?? '', startsAt: updated.startsAt, endsAt: updated.endsAt, status: updated.status as SessionStatus, notes: updated.notes }
+      })
+    },
     async selectProposal({ gameId, proposalId, now }) {
       return database.transaction(async (tx) => {
+        const [proposalReference] = await tx.select({ roundId: timeProposals.roundId }).from(timeProposals).where(and(eq(timeProposals.id, proposalId), eq(timeProposals.gameId, gameId))).limit(1)
+        if (!proposalReference) throw new Error('SCHEDULING_NOT_FOUND')
+        const [round] = await tx.select().from(timeProposalRounds).where(eq(timeProposalRounds.id, proposalReference.roundId)).for('update').limit(1)
+        if (!round) throw new Error('SCHEDULING_NOT_FOUND')
         const [proposal] = await tx.select().from(timeProposals).where(and(eq(timeProposals.id, proposalId), eq(timeProposals.gameId, gameId))).for('update').limit(1)
         if (!proposal) throw new Error('SCHEDULING_NOT_FOUND')
         const [existing] = await tx.select().from(gameSessions).where(eq(gameSessions.proposalId, proposalId)).limit(1)
         if (existing) {
+          if (existing.status !== 'SCHEDULED') throw new Error('SCHEDULING_CONFLICT')
           const [game] = await tx.select({ title: games.title }).from(games).where(eq(games.id, gameId)).limit(1)
           return { id: existing.id, gameId: existing.gameId, proposalId: existing.proposalId, gameTitle: game?.title ?? '', startsAt: existing.startsAt, endsAt: existing.endsAt, status: existing.status as SessionStatus, notes: existing.notes }
         }
-        if (proposal.status !== 'OPEN') throw new Error('SCHEDULING_CONFLICT')
+        if (round.status !== 'OPEN' || proposal.status !== 'OPEN') throw new Error('SCHEDULING_CONFLICT')
+        await tx.update(timeProposals).set({ status: 'CLOSED', updatedAt: now }).where(and(eq(timeProposals.roundId, round.id), ne(timeProposals.id, proposalId), eq(timeProposals.status, 'OPEN')))
         await tx.update(timeProposals).set({ status: 'SELECTED', updatedAt: now }).where(eq(timeProposals.id, proposalId))
+        await tx.update(timeProposalRounds).set({ status: 'SELECTED', updatedAt: now }).where(eq(timeProposalRounds.id, round.id))
         const [created] = await tx.insert(gameSessions).values({ gameId, proposalId, startsAt: proposal.startsAt, endsAt: proposal.endsAt, status: 'SCHEDULED', createdAt: now, updatedAt: now }).returning()
         if (!created) throw new Error('SCHEDULING_CREATE_FAILED')
         const [game] = await tx.select({ title: games.title }).from(games).where(eq(games.id, gameId)).limit(1)
