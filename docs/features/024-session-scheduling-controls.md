@@ -149,3 +149,24 @@ n’étaient pas cliquables.
 - **Dépendance de développement :** `@playwright/test` 1.64.0 a été ajouté à la
   demande antérieure du propriétaire pour les contrôles frontend. Aucun test
   navigateur automatisé n’a pu être exécuté dans cet environnement.
+
+## Correctif des votes clôturés — 2026-10-14
+
+- **Contexte :** un `POST /api/proposals/:id/votes` peut répondre `409` quand le
+  vote existe déjà ou que le créneau/le tour a été clôturé. L’API masque la
+  cause précise dans son enveloppe d’erreur ; le statut seul ne permet donc pas
+  de départager ces situations.
+- **Red :** le nouveau test de disponibilité a d’abord échoué car la règle
+  partagée de vote n’existait pas. Il vérifie ensuite les tours clos, les
+  propositions clôturées, le vote déjà enregistré et leurs libellés français.
+- **Green :** les vues desktop et mobile désactivent les choix non votables ;
+  l’envoi ignore les propositions fermées et ne s’active qu’après un choix
+  valable. Un échec concurrent demande d’actualiser la page.
+- **Sécurité :** l’API conserve ses contrôles serveur d’adhésion, de vote
+  unique et de statut du tour. Le contrôle frontend ne remplace pas ces règles.
+- **Vérifications :** `pnpm exec vitest run --exclude='.superpowers/**'` — 147
+  fichiers/444 tests verts ; `pnpm lint` et `pnpm build` verts.
+- **Limite :** sans le corps complet de la réponse ni l’état de la proposition,
+  la cause du `409` reçu par le propriétaire reste indéterminée. Une modification
+  du MJ ou un vote déjà enregistré juste avant la requête reste un conflit
+  légitime ; l’interface invite alors à recharger les propositions.
