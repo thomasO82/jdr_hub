@@ -8,6 +8,10 @@
 
 `fix/game-creation-auth-and-discovery`
 
+## Pull Request
+
+[PR #33](https://github.com/thomasO82/jdr_hub/pull/33), ouverte vers `develop`.
+
 ## Contexte et besoin
 
 Trois défauts ont été signalés pendant les essais : les écrans de compte
