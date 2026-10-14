@@ -6,7 +6,7 @@ REF-001
 
 ## Statut
 
-`IN_PROGRESS`
+`MERGED`
 
 ## Branche
 
@@ -14,12 +14,12 @@ REF-001
 
 ## Lien ou numéro de Pull Request
 
-Non créée.
+[PR #9](https://github.com/thomasO82/jdr_hub/pull/9), fusionnée dans `main` le 2026-09-05.
 
 ## Dates de début et de fin
 
 - Début : 2026-09-05
-- Fin : Non terminée
+- Fin : 2026-09-05
 
 ## Dépendances
 
@@ -262,5 +262,9 @@ Aucune route nouvelle dans cette migration.
 
 ## Limites connues
 
-- La PR n’est pas encore créée.
-- Les pages SEO publiques F03 restent à développer.
+- La PR #9 est fusionnée dans `main`.
+- Les pages SEO publiques ont ensuite été livrées avec F03 dans la PR #12.
+
+## Synchronisation après fusion — 2026-09-05
+
+La PR #9 a été fusionnée dans `main` le 2026-09-05. GitHub confirme la fusion ; la fiche conserve la cible historique de cette PR.

@@ -6,7 +6,7 @@ F03
 
 ## Statut
 
-`IN_PROGRESS`
+`MERGED`
 
 ## Branche
 
@@ -14,12 +14,12 @@ F03
 
 ## Lien ou numéro de Pull Request
 
-Non créée.
+[PR #12](https://github.com/thomasO82/jdr_hub/pull/12), fusionnée dans `develop` le 2026-09-05.
 
 ## Dates de début et de fin
 
 - Début : 2026-09-05
-- Fin : Non terminée
+- Fin : 2026-09-05
 
 ## Dépendances
 
@@ -52,7 +52,7 @@ publiques, le rendu SSR et les routes SEO sont implémentés sur la branche.
 
 ### Restant à faire
 
-La PR et la vérification manuelle dans Docker restent à réaliser.
+La PR #12 est fusionnée ; la vérification manuelle dans Docker reste à réaliser.
 
 ## Besoin utilisateur
 
@@ -136,7 +136,7 @@ Components sont séparés par responsabilité.
 
 ### Restant à faire
 
-La revue visuelle et la PR restent à faire.
+La PR #12 est fusionnée ; la revue visuelle reste à effectuer.
 
 ## Modèle de données et migrations
 
@@ -264,5 +264,9 @@ publique restent à faire.
 
 ## Limites connues
 
-- La PR n’est pas encore créée.
-- Les pages SEO F03 ne sont pas encore implémentées.
+- Les pages SSR indexables sont incluses dans la PR #12.
+- La vérification manuelle dans Docker et la revue visuelle restent à effectuer.
+
+## Synchronisation après fusion — 2026-09-05
+
+La PR #12 a été fusionnée dans `develop` le 2026-09-05. GitHub confirme son état fusionné.

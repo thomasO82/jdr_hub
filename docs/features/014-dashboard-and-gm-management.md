@@ -6,11 +6,7 @@ F08
 
 ## Statut
 
-`IN_PROGRESS`
-
-> La Pull Request n'est pas encore ouverte. Le statut deviendra `IN_REVIEW`
-> après son ouverture effective. Il ne deviendra `MERGED` qu'après confirmation
-> du propriétaire.
+`MERGED`
 
 ## Branche
 
@@ -18,14 +14,12 @@ F08
 
 ## Lien ou numéro de Pull Request
 
-Création automatique refusée par l'intégration GitHub (`403 Resource not
-accessible by integration`). Ouverture manuelle :
-https://github.com/thomasO82/jdr_hub/pull/new/feat/dashboard-and-gm-management
+[PR #21](https://github.com/thomasO82/jdr_hub/pull/21), fusionnée dans `develop` le 2026-09-08.
 
 ## Dates de début et de fin
 
 - Début : 2026-09-06
-- Fin : Non terminée
+- Fin : 2026-09-08
 
 ## Dépendances
 
@@ -438,3 +432,7 @@ refus.
 | --- | --- | --- | --- |
 | 2026-09-06 | Ajout du workflow complet d'invitation et de la gestion MJ | Dashboard, roster et invitations sont livrés dans une seule PR | branche `feat/dashboard-and-gm-management` |
 | 2026-09-08 | Fusion du dashboard notifications dans F08 | Le résumé n’apparaît qu’en présence de notifications non lues ; la cloche reste dans la barre supérieure sticky | `origin/develop`, commit de fusion |
+
+## Synchronisation après fusion — 2026-09-08
+
+La PR #21 a été fusionnée dans `develop` le 2026-09-08. GitHub confirme son état fusionné.

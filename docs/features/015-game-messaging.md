@@ -6,10 +6,7 @@ F07B
 
 ## Statut
 
-`IN_PROGRESS`
-
-> Le statut deviendra `IN_REVIEW` uniquement après l'ouverture effective de la
-> Pull Request. Il ne deviendra `MERGED` qu'après confirmation du propriétaire.
+`MERGED`
 
 ## Branche
 
@@ -17,14 +14,12 @@ F07B
 
 ## Lien ou numéro de Pull Request
 
-Non créée automatiquement : GitHub refuse la création par intégration
-(`403 Resource not accessible by integration`).
-Ouverture manuelle : https://github.com/thomasO82/jdr_hub/pull/new/feat/game-messaging
+[PR #28](https://github.com/thomasO82/jdr_hub/pull/28), fusionnée dans `develop` le 2026-10-13.
 
 ## Dates de début et de fin
 
 - Début : 2026-09-06
-- Fin : Non terminée
+- Fin : 2026-10-13
 
 ## Dépendances
 
@@ -245,3 +240,7 @@ tests verts — a été exécutée avec des conteneurs PostgreSQL et Redis éph�
 dédiés sur les ports locaux de test. L'UI n'a pas été modifiée dans F07B ; la
 vérification visuelle/accessibilité reste à faire, l'outil Browser et
 Playwright n'étant pas disponibles.
+
+## Synchronisation après fusion — 2026-10-13
+
+La PR #28 a été fusionnée dans `develop` le 2026-10-13. GitHub confirme son état fusionné ; la vérification navigateur reste à confirmer comme indiqué dans la fiche.
