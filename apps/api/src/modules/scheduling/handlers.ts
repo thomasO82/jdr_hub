@@ -1,16 +1,19 @@
 import type { Context } from 'hono'
-import { fixedSessionInputSchema, planningQuerySchema, proposalInputSchema, sessionCommandSchema, voteCommandSchema } from '@jdr-hub/shared'
+import { fixedSessionInputSchema, planningQuerySchema, proposalInputSchema, sessionCommandSchema, sessionManagementCommandSchema, voteCommandSchema } from '@jdr-hub/shared'
 import { readAccessToken } from '../auth/cookies.js'
 import type { AuthConfig } from '../auth/config.js'
 import type { AuthRepository } from '../auth/repository.js'
 import { authenticateUser } from '../auth/services/authenticate-user.js'
 import type { SchedulingRepository } from './repository.js'
 import { castVote } from './services/cast-vote.js'
+import { cancelScheduledSession } from './services/cancel-scheduled-session.js'
 import { createProposals } from './services/create-proposals.js'
 import { createSession } from './services/create-session.js'
 import { getPlanning } from './services/get-planning.js'
 import { listProposals } from './services/list-proposals.js'
+import { listGameSessions } from './services/list-game-sessions.js'
 import { selectProposal } from './services/select-proposal.js'
+import { updateScheduledSession } from './services/update-scheduled-session.js'
 
 export type SchedulingDependencies = {
   authConfig: AuthConfig
@@ -74,6 +77,32 @@ export function createSchedulingHandlers(dependencies: SchedulingDependencies) {
       if (!gameId) return error(c, 400)
       try {
         const data = await listProposals({ gameId, userId: user.id, repository: dependencies.repository })
+        return c.json({ data, error: null, meta: { requestId: c.get('requestId') } })
+      } catch (value) { return error(c, domainStatus(value)) }
+    },
+    listGameSessions: async (c: Context<SchedulingRouteEnv>) => {
+      const user = await currentUser(c)
+      if (!user) return error(c, 401)
+      const gameId = required(c, 'gameId')
+      if (!gameId) return error(c, 400)
+      try {
+        const data = await listGameSessions({ gameId, ownerId: user.id, repository: dependencies.repository })
+        return c.json({ data, error: null, meta: { requestId: c.get('requestId') } })
+      } catch (value) { return error(c, domainStatus(value)) }
+    },
+    manageSession: async (c: Context<SchedulingRouteEnv>) => {
+      const user = await currentUser(c)
+      if (!user) return error(c, 401)
+      if (!trustedOrigin(c)) return error(c, 403)
+      if (!allowed(user.id)) return error(c, 429)
+      const gameId = required(c, 'gameId')
+      const sessionId = required(c, 'sessionId')
+      const parsed = sessionManagementCommandSchema.safeParse(await c.req.json().catch(() => null))
+      if (!gameId || !sessionId || !parsed.success) return error(c, 400)
+      try {
+        const data = 'status' in parsed.data
+          ? await cancelScheduledSession({ gameId, sessionId, ownerId: user.id, repository: dependencies.repository, now })
+          : await updateScheduledSession({ gameId, sessionId, ownerId: user.id, ...parsed.data, repository: dependencies.repository, now })
         return c.json({ data, error: null, meta: { requestId: c.get('requestId') } })
       } catch (value) { return error(c, domainStatus(value)) }
     },

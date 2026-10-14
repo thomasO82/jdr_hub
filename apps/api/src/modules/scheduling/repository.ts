@@ -50,6 +50,9 @@ export interface SchedulingRepository {
   findProposal(proposalId: string): Promise<ProposalRecord | null>
   createVote(input: { proposalId: string; userId: string; vote: VoteValue; now: Date }): Promise<void>
   createFixedSession(input: { gameId: string; startsAt: Date; endsAt: Date; notes: string | null; now: Date }): Promise<SessionRecord>
+  listGameSessions(gameId: string): Promise<SessionRecord[]>
+  updateScheduledSession(input: { gameId: string; sessionId: string; startsAt: Date; endsAt: Date; now: Date }): Promise<SessionRecord>
+  cancelScheduledSession(input: { gameId: string; sessionId: string; now: Date }): Promise<SessionRecord>
   selectProposal(input: { gameId: string; proposalId: string; now: Date }): Promise<SessionRecord>
   listPlanning(input: { userId: string; from: Date | null; to: Date | null }): Promise<PlanningPage>
 }
@@ -138,6 +141,36 @@ export function createPostgresSchedulingRepository(database: Database): Scheduli
       if (!row) throw new Error('SCHEDULING_CREATE_FAILED')
       const [game] = await database.select({ title: games.title }).from(games).where(eq(games.id, gameId)).limit(1)
       return { id: row.id, gameId: row.gameId, proposalId: row.proposalId, gameTitle: game?.title ?? '', startsAt: row.startsAt, endsAt: row.endsAt, status: row.status as SessionStatus, notes: row.notes }
+    },
+    async listGameSessions(gameId) {
+      const rows = await database.select({ id: gameSessions.id, gameId: gameSessions.gameId, proposalId: gameSessions.proposalId, gameTitle: games.title, startsAt: gameSessions.startsAt, endsAt: gameSessions.endsAt, status: gameSessions.status, notes: gameSessions.notes }).from(gameSessions).innerJoin(games, eq(gameSessions.gameId, games.id)).where(eq(gameSessions.gameId, gameId)).orderBy(asc(gameSessions.startsAt))
+      return rows.map((row) => ({ ...row, status: row.status as SessionStatus }))
+    },
+    async updateScheduledSession({ gameId, sessionId, startsAt, endsAt, now }) {
+      return database.transaction(async (tx) => {
+        const [current] = await tx.select().from(gameSessions).where(and(eq(gameSessions.id, sessionId), eq(gameSessions.gameId, gameId))).for('update').limit(1)
+        if (!current) throw new Error('SCHEDULING_NOT_FOUND')
+        if (current.status !== 'SCHEDULED') throw new Error('SCHEDULING_CONFLICT')
+        const [updated] = await tx.update(gameSessions).set({ startsAt, endsAt, updatedAt: now }).where(eq(gameSessions.id, sessionId)).returning()
+        if (!updated) throw new Error('SCHEDULING_NOT_FOUND')
+        const [game] = await tx.select({ title: games.title }).from(games).where(eq(games.id, gameId)).limit(1)
+        return { id: updated.id, gameId: updated.gameId, proposalId: updated.proposalId, gameTitle: game?.title ?? '', startsAt: updated.startsAt, endsAt: updated.endsAt, status: updated.status as SessionStatus, notes: updated.notes }
+      })
+    },
+    async cancelScheduledSession({ gameId, sessionId, now }) {
+      return database.transaction(async (tx) => {
+        const [current] = await tx.select().from(gameSessions).where(and(eq(gameSessions.id, sessionId), eq(gameSessions.gameId, gameId))).for('update').limit(1)
+        if (!current) throw new Error('SCHEDULING_NOT_FOUND')
+        if (current.status !== 'SCHEDULED') throw new Error('SCHEDULING_CONFLICT')
+        if (current.proposalId) {
+          const [proposal] = await tx.select({ roundId: timeProposals.roundId }).from(timeProposals).where(eq(timeProposals.id, current.proposalId)).limit(1)
+          if (proposal) await tx.update(timeProposalRounds).set({ status: 'CANCELLED', updatedAt: now }).where(and(eq(timeProposalRounds.id, proposal.roundId), eq(timeProposalRounds.status, 'SELECTED')))
+        }
+        const [updated] = await tx.update(gameSessions).set({ status: 'CANCELLED', updatedAt: now }).where(eq(gameSessions.id, sessionId)).returning()
+        if (!updated) throw new Error('SCHEDULING_NOT_FOUND')
+        const [game] = await tx.select({ title: games.title }).from(games).where(eq(games.id, gameId)).limit(1)
+        return { id: updated.id, gameId: updated.gameId, proposalId: updated.proposalId, gameTitle: game?.title ?? '', startsAt: updated.startsAt, endsAt: updated.endsAt, status: updated.status as SessionStatus, notes: updated.notes }
+      })
     },
     async selectProposal({ gameId, proposalId, now }) {
       return database.transaction(async (tx) => {

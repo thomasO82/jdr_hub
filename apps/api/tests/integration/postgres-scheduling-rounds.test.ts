@@ -48,6 +48,19 @@ describe('PostgreSQL scheduling proposal rounds', () => {
       expect(history.find((proposal) => proposal.id === options[1]!.id)).toMatchObject({ status: 'SELECTED', roundStatus: 'SELECTED' })
       await expect(repository.createVote({ proposalId: options[0]!.id, userId: memberId, vote: 'NO', now })).rejects.toThrow('SCHEDULING_CONFLICT')
 
+      const selectedSession = (await repository.listGameSessions(gameId)).find((session) => session.proposalId === options[1]!.id)!
+      const changedStartsAt = new Date('2026-10-22T18:00:00.000Z')
+      const changedEndsAt = new Date('2026-10-22T21:00:00.000Z')
+      expect(await repository.updateScheduledSession({ gameId, sessionId: selectedSession.id, startsAt: changedStartsAt, endsAt: changedEndsAt, now })).toMatchObject({ startsAt: changedStartsAt, endsAt: changedEndsAt })
+      expect((await repository.listProposals(gameId, memberId)).find((proposal) => proposal.id === options[1]!.id)).toMatchObject({ status: 'SELECTED', startsAt: new Date('2026-10-21T18:00:00.000Z') })
+      expect(await repository.cancelScheduledSession({ gameId, sessionId: selectedSession.id, now })).toMatchObject({ status: 'CANCELLED' })
+      expect((await repository.listProposals(gameId, memberId)).find((proposal) => proposal.id === options[1]!.id)).toMatchObject({ status: 'SELECTED', roundStatus: 'CANCELLED', votes: { yes: 0 } })
+      expect((await repository.listPlanning({ userId: ownerId, from: null, to: null })).items).toHaveLength(0)
+      await expect(repository.cancelScheduledSession({ gameId, sessionId: selectedSession.id, now })).rejects.toThrow('SCHEDULING_CONFLICT')
+      const fixedReplacement = await repository.createFixedSession({ gameId, startsAt: changedStartsAt, endsAt: changedEndsAt, notes: null, now })
+      expect((await repository.listGameSessions(gameId)).map((session) => session.status)).toEqual(['CANCELLED', 'SCHEDULED'])
+      expect(fixedReplacement.status).toBe('SCHEDULED')
+
       const competingOptions = await repository.createProposals({
         gameId,
         proposerId: ownerId,
@@ -69,7 +82,7 @@ describe('PostgreSQL scheduling proposal rounds', () => {
       expect(competingRounds.filter((result) => result.status === 'rejected')).toHaveLength(1)
       expect(await database.db.select({ id: timeProposalRounds.id }).from(timeProposalRounds).where(eq(timeProposalRounds.gameId, gameId))).toHaveLength(3)
       expect(await database.db.select({ id: timeProposals.id }).from(timeProposals).where(eq(timeProposals.gameId, gameId))).toHaveLength(5)
-      expect(await database.db.select({ id: gameSessions.id }).from(gameSessions).where(eq(gameSessions.gameId, gameId))).toHaveLength(2)
+      expect(await database.db.select({ id: gameSessions.id }).from(gameSessions).where(eq(gameSessions.gameId, gameId))).toHaveLength(3)
     } finally {
       await database.db.delete(games).where(eq(games.id, gameId))
       await database.db.delete(users).where(inArray(users.id, [ownerId, memberId]))

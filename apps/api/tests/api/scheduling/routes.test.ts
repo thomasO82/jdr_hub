@@ -100,4 +100,36 @@ describe('scheduling API routes', () => {
     expect(planning.status).toBe(200)
     expect((await planning.json()).data.items).toHaveLength(1)
   })
+
+  it('lets the owner list, edit and cancel a session through strict protected commands', async () => {
+    const { app, owner, member } = await createTestApp()
+    const ownerHeaders = { cookie: owner.cookie, origin: config.appOrigin, 'content-type': 'application/json' }
+    const memberHeaders = { ...ownerHeaders, cookie: member.cookie }
+    const created = await app.request(`/games/${gameId}/sessions`, { method: 'POST', headers: ownerHeaders, body: JSON.stringify({ ...slot, notes: null }) })
+    const session = (await created.json()).data as { id: string; startsAt: string }
+
+    expect((await app.request(`/games/${gameId}/sessions`, { headers: { cookie: owner.cookie } })).status).toBe(200)
+    expect((await app.request(`/games/${gameId}/sessions`, { headers: { cookie: member.cookie } })).status).toBe(403)
+    expect((await app.request(`/games/${gameId}/sessions`, { headers: {} })).status).toBe(401)
+    expect((await app.request(`/games/${gameId}/sessions/${session.id}`, { method: 'PATCH', headers: { ...ownerHeaders, origin: 'https://attacker.example' }, body: JSON.stringify(slot) })).status).toBe(403)
+    expect((await app.request(`/games/${gameId}/sessions/${session.id}`, { method: 'PATCH', headers: memberHeaders, body: JSON.stringify(slot) })).status).toBe(403)
+    expect((await app.request(`/games/${gameId}/sessions/${session.id}`, { method: 'PATCH', headers: ownerHeaders, body: JSON.stringify({ ...slot, status: 'CANCELLED' }) })).status).toBe(400)
+    expect((await app.request(`/games/${gameId}/sessions/not-a-session`, { method: 'PATCH', headers: ownerHeaders, body: JSON.stringify({ ...slot, endsAt: slot.startsAt }) })).status).toBe(400)
+
+    const changedWindow = { startsAt: '2026-10-22T18:00:00.000Z', endsAt: '2026-10-22T21:00:00.000Z' }
+    const updated = await app.request(`/games/${gameId}/sessions/${session.id}`, { method: 'PATCH', headers: ownerHeaders, body: JSON.stringify(changedWindow) })
+    expect(updated.status).toBe(200)
+    expect((await updated.json()).data).toMatchObject(changedWindow)
+    const visiblePlanning = await app.request('/planning?from=2026-10-01T00:00:00.000Z&to=2026-10-31T23:59:59.000Z', { headers: { cookie: member.cookie } })
+    expect((await visiblePlanning.json()).data.items[0]).toMatchObject(changedWindow)
+
+    const cancelled = await app.request(`/games/${gameId}/sessions/${session.id}`, { method: 'PATCH', headers: ownerHeaders, body: JSON.stringify({ status: 'CANCELLED' }) })
+    expect(cancelled.status).toBe(200)
+    expect((await cancelled.json()).data.status).toBe('CANCELLED')
+    const ownerHistory = await (await app.request(`/games/${gameId}/sessions`, { headers: { cookie: owner.cookie } })).json()
+    expect(ownerHistory).toMatchObject({ data: [expect.objectContaining({ status: 'CANCELLED' })] })
+    const inactivePlanning = await (await app.request(`/planning?from=2026-10-01T00:00:00.000Z&to=2026-10-31T23:59:59.000Z`, { headers: { cookie: member.cookie } })).json()
+    expect(inactivePlanning).toMatchObject({ data: { items: [] } })
+    expect((await app.request(`/games/${gameId}/sessions/${session.id}`, { method: 'PATCH', headers: ownerHeaders, body: JSON.stringify({ status: 'CANCELLED' }) })).status).toBe(409)
+  })
 })

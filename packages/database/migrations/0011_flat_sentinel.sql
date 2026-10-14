@@ -8,19 +8,18 @@ CREATE TABLE "time_proposal_rounds" (
 );
 --> statement-breakpoint
 ALTER TABLE "time_proposals" ADD COLUMN "round_id" uuid;--> statement-breakpoint
-WITH open_game_rounds AS (
-	INSERT INTO "time_proposal_rounds" ("id", "game_id", "proposer_id", "status", "created_at", "updated_at")
-	SELECT gen_random_uuid(), proposals."game_id", games."owner_id", 'OPEN', min(proposals."created_at"), max(proposals."updated_at")
-	FROM "time_proposals" AS proposals
-	INNER JOIN "games" AS games ON games."id" = proposals."game_id"
-	WHERE proposals."status" = 'OPEN'
-	GROUP BY proposals."game_id", games."owner_id"
-	RETURNING "id", "game_id"
-)
+INSERT INTO "time_proposal_rounds" ("id", "game_id", "proposer_id", "status", "created_at", "updated_at")
+SELECT gen_random_uuid(), proposals."game_id", games."owner_id", 'OPEN', min(proposals."created_at"), max(proposals."updated_at")
+FROM "time_proposals" AS proposals
+INNER JOIN "games" AS games ON games."id" = proposals."game_id"
+WHERE proposals."status" = 'OPEN'
+GROUP BY proposals."game_id", games."owner_id";--> statement-breakpoint
 UPDATE "time_proposals" AS proposals
-SET "round_id" = open_game_rounds."id
-FROM open_game_rounds
-WHERE proposals."game_id" = open_game_rounds."game_id" AND proposals."status" = 'OPEN';--> statement-breakpoint
+SET "round_id" = (
+	SELECT rounds."id" FROM "time_proposal_rounds" AS rounds
+	WHERE rounds."game_id" = proposals."game_id" AND rounds."status" = 'OPEN'
+)
+WHERE proposals."status" = 'OPEN';--> statement-breakpoint
 INSERT INTO "time_proposal_rounds" ("id", "game_id", "proposer_id", "status", "created_at", "updated_at")
 SELECT proposals."id", proposals."game_id", proposals."proposer_id",
 	CASE

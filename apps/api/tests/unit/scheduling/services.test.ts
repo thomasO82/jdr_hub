@@ -1,10 +1,13 @@
 import { describe, expect, it } from 'vitest'
 import { castVote } from '../../../src/modules/scheduling/services/cast-vote.js'
+import { cancelScheduledSession } from '../../../src/modules/scheduling/services/cancel-scheduled-session.js'
 import { createProposals } from '../../../src/modules/scheduling/services/create-proposals.js'
 import { createSession } from '../../../src/modules/scheduling/services/create-session.js'
 import { getPlanning } from '../../../src/modules/scheduling/services/get-planning.js'
+import { listGameSessions } from '../../../src/modules/scheduling/services/list-game-sessions.js'
 import { listProposals } from '../../../src/modules/scheduling/services/list-proposals.js'
 import { selectProposal } from '../../../src/modules/scheduling/services/select-proposal.js'
+import { updateScheduledSession } from '../../../src/modules/scheduling/services/update-scheduled-session.js'
 import { createInMemorySchedulingRepository } from '../../helpers/in-memory-scheduling-repository.js'
 
 const ownerId = '00000000-0000-4000-8000-000000000001'
@@ -104,5 +107,50 @@ describe('scheduling services', () => {
     const planning = await getPlanning({ userId: memberId, from: new Date('2026-10-01T00:00:00.000Z'), to: new Date('2026-10-31T23:59:59.000Z'), repository: repo })
     expect(planning.items).toHaveLength(1)
     expect(planning.items[0]?.gameTitle).toBe('La crypte')
+  })
+
+  it('lets only the owner list sessions and edit scheduled dates without changing vote history', async () => {
+    const repo = repository()
+    const [proposal] = await createProposals({ gameId, ownerId, slots: [slot], repository: repo, now: () => now })
+    await castVote({ proposalId: proposal!.id, userId: memberId, vote: 'YES', repository: repo, now: () => now })
+    const session = await selectProposal({ gameId, ownerId, proposalId: proposal!.id, repository: repo, now: () => now })
+    const newWindow = { startsAt: '2026-10-22T18:00:00.000Z', endsAt: '2026-10-22T21:00:00.000Z' }
+
+    await expect(listGameSessions({ gameId, ownerId: memberId, repository: repo })).rejects.toThrow('SCHEDULING_FORBIDDEN')
+    expect(await listGameSessions({ gameId, ownerId, repository: repo })).toMatchObject([{ id: session.id, status: 'SCHEDULED' }])
+    const updated = await updateScheduledSession({ gameId, sessionId: session.id, ownerId, ...newWindow, repository: repo, now: () => now })
+    expect(updated).toMatchObject({ startsAt: new Date(newWindow.startsAt), endsAt: new Date(newWindow.endsAt) })
+    expect((await listProposals({ gameId, userId: memberId, repository: repo }))[0]).toMatchObject({ startsAt: new Date(slot.startsAt), votes: { yes: 1 }, userVote: 'YES' })
+  })
+
+  it('cancels a scheduled session, preserves the poll, and permits a replacement date', async () => {
+    const repo = repository()
+    const [proposal] = await createProposals({ gameId, ownerId, slots: [slot], repository: repo, now: () => now })
+    await castVote({ proposalId: proposal!.id, userId: memberId, vote: 'YES', repository: repo, now: () => now })
+    const session = await selectProposal({ gameId, ownerId, proposalId: proposal!.id, repository: repo, now: () => now })
+
+    const cancelled = await cancelScheduledSession({ gameId, sessionId: session.id, ownerId, repository: repo, now: () => now })
+    expect(cancelled.status).toBe('CANCELLED')
+    expect(await getPlanning({ userId: memberId, from: null, to: null, repository: repo })).toMatchObject({ items: [] })
+    expect((await listProposals({ gameId, userId: memberId, repository: repo }))[0]).toMatchObject({ status: 'SELECTED', roundStatus: 'CANCELLED', votes: { yes: 1 }, userVote: 'YES' })
+    await expect(updateScheduledSession({ gameId, sessionId: session.id, ownerId, ...slot, repository: repo, now: () => now })).rejects.toThrow('SCHEDULING_CONFLICT')
+    await expect(cancelScheduledSession({ gameId, sessionId: session.id, ownerId, repository: repo, now: () => now })).rejects.toThrow('SCHEDULING_CONFLICT')
+
+    const replacement = await createSession({ gameId, ownerId, ...slot, notes: null, repository: repo, now: () => now })
+    expect(replacement.status).toBe('SCHEDULED')
+  })
+
+  it('rejects edits and cancellation for completed sessions and releases one-shot capacity after cancellation', async () => {
+    const repo = repository()
+    const completed = await repo.createFixedSession({ gameId, ...{ startsAt: new Date(slot.startsAt), endsAt: new Date(slot.endsAt) }, notes: null, now })
+    repo.setSessionStatus(completed.id, 'COMPLETED')
+    await expect(updateScheduledSession({ gameId, sessionId: completed.id, ownerId, ...slot, repository: repo, now: () => now })).rejects.toThrow('SCHEDULING_CONFLICT')
+    await expect(cancelScheduledSession({ gameId, sessionId: completed.id, ownerId, repository: repo, now: () => now })).rejects.toThrow('SCHEDULING_CONFLICT')
+
+    const oneShotRepo = repository()
+    await oneShotRepo.seedSessions(gameId, 2)
+    const scheduled = await createSession({ gameId, ownerId, ...slot, notes: null, repository: oneShotRepo, now: () => now })
+    await cancelScheduledSession({ gameId, sessionId: scheduled.id, ownerId, repository: oneShotRepo, now: () => now })
+    expect((await createSession({ gameId, ownerId, ...slot, notes: null, repository: oneShotRepo, now: () => now })).status).toBe('SCHEDULED')
   })
 })

@@ -8,6 +8,7 @@ type RoundRecord = { id: string; gameId: string; proposerId: string; status: Pro
 export function createInMemorySchedulingRepository(input: { games: InMemoryGame[]; members: Array<{ gameId: string; userId: string }> }): SchedulingRepository & {
   setGameStatus(gameId: string, status: GameStatus): void
   closeProposal(proposalId: string): void
+  setSessionStatus(sessionId: string, status: SessionStatus): void
   seedSessions(gameId: string, count: number): Promise<void>
 } {
   const games = [...input.games]
@@ -68,6 +69,27 @@ export function createInMemorySchedulingRepository(input: { games: InMemoryGame[
       sessions.push(created)
       return created
     },
+    async listGameSessions(gameId) { return sessions.filter((item) => item.gameId === gameId).sort((a, b) => a.startsAt.getTime() - b.startsAt.getTime()) },
+    async updateScheduledSession({ gameId, sessionId, startsAt, endsAt }) {
+      const current = sessions.find((item) => item.id === sessionId && item.gameId === gameId)
+      if (!current) throw new Error('SCHEDULING_NOT_FOUND')
+      if (current.status !== 'SCHEDULED') throw new Error('SCHEDULING_CONFLICT')
+      current.startsAt = startsAt
+      current.endsAt = endsAt
+      return current
+    },
+    async cancelScheduledSession({ gameId, sessionId, now }) {
+      const current = sessions.find((item) => item.id === sessionId && item.gameId === gameId)
+      if (!current) throw new Error('SCHEDULING_NOT_FOUND')
+      if (current.status !== 'SCHEDULED') throw new Error('SCHEDULING_CONFLICT')
+      current.status = 'CANCELLED'
+      if (current.proposalId) {
+        const record = proposal(current.proposalId)
+        const round = rounds.find((item) => item.id === record?.roundId)
+        if (round?.status === 'SELECTED') { round.status = 'CANCELLED'; round.updatedAt = now }
+      }
+      return current
+    },
     async selectProposal({ gameId, proposalId, now }) {
       const selected = proposal(proposalId)
       if (!selected || selected.gameId !== gameId) throw new Error('SCHEDULING_NOT_FOUND')
@@ -94,6 +116,7 @@ export function createInMemorySchedulingRepository(input: { games: InMemoryGame[
     },
     setGameStatus(gameId, status) { const candidate = game(gameId); if (candidate) candidate.status = status },
     closeProposal(proposalId) { const candidate = proposal(proposalId); if (candidate) candidate.status = 'CLOSED' },
+    setSessionStatus(sessionId, status) { const candidate = sessions.find((item) => item.id === sessionId); if (candidate) candidate.status = status },
     async seedSessions(gameId, count) { for (let index = 0; index < count; index += 1) sessions.push(session(gameId, null, new Date(`2026-10-${String(index + 1).padStart(2, '0')}T18:00:00.000Z`), new Date(`2026-10-${String(index + 1).padStart(2, '0')}T19:00:00.000Z`), 'SCHEDULED', null)) },
   }
 }
